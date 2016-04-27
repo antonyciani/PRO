@@ -1,7 +1,11 @@
 package monitor;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.util.LinkedList;
 
+import communication.SystemInfoRetrieverProtocol;
+import communication.SystemInfoRetrieverServer;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,21 +15,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import monitor.model.CPUInfo;
-import monitor.model.HDDInfo;
-import monitor.model.PCInfo;
-import monitor.model.Program;
-import monitor.view.ComputerOverviewController;
-import monitor.view.FilterEditDialogController;
-import monitor.view.RootLayoutController;
-import utils.SystemInfoRecuperator;
+import monitor.model.*;
+import monitor.view.*;
+
 
 public class ServerApp extends Application {
 
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 
-	private ObservableList<PCInfo> pcData = FXCollections.observableArrayList();
+	private ObservableList<PCInfoViewWrapper> pcData = FXCollections.observableArrayList();
 
 	public ServerApp(){
 		String hostname = "MichaelPc";
@@ -35,11 +34,11 @@ public class ServerApp extends Application {
 		CPUInfo cpu = new CPUInfo("Intell", "i7", 2.7, 4);
 		HDDInfo hdd = new HDDInfo(500.8, 209.4);
 		int ramSize = 16;
-		ObservableList<Program> programs = FXCollections.observableArrayList();
-		programs.add(new Program("ls", "1.2", "10.2.1990"));
-		programs.add(new Program("cat", "2.3", "12.03.2000"));
+		ObservableList<Program> programViewWrappers = FXCollections.observableArrayList();
+		programViewWrappers.add(new Program("ls", "1.2", "10.2.1990"));
+		programViewWrappers.add(new Program("cat", "2.3", "12.03.2000"));
 
-		pcData.add(new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs));
+		pcData.add(new PCInfoViewWrapper(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programViewWrappers));
 
 		hostname = "LuciePc";
 		ipAddress = "192.168.1.11";
@@ -49,11 +48,22 @@ public class ServerApp extends Application {
 		hdd = new HDDInfo(500.8, 400.4);
 		ramSize = 8;
 
-		pcData.add(new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs));
-		pcData.add(SystemInfoRecuperator.retrievePCInfo());
+		pcData.add(new PCInfoViewWrapper(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programViewWrappers));
+		//pcData.add(SystemInfoRecuperator.retrievePCInfo());
+		try {
+			SystemInfoRetrieverServer sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.CLIENT_PORT, SystemInfoRetrieverProtocol.SERVER_PORT);
+			LinkedList<PCInfo> pcs = sirs.retrieveInfosFromClients();
+ 			for(PCInfo pc : pcs )
+			pcData.add(new PCInfoViewWrapper(pc));
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
-	public ObservableList<PCInfo> getPcInfo() {
+	public ObservableList<PCInfoViewWrapper> getPcInfo() {
         return pcData;
     }
 

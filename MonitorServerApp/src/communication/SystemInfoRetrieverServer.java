@@ -1,24 +1,36 @@
 package communication;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import monitor.model.PCInfo;
 
 public class SystemInfoRetrieverServer {
 
 
-		final static Logger LOG = Logger.getLogger(SystemInfoRetrieverServer.class.getName());
+		private final static Logger LOG = Logger.getLogger(SystemInfoRetrieverServer.class.getName());
 
-		int port;
-		DatagramSocket udpSocket;
+		private int udpPort;
+		private int tcpPort;
+		private LinkedList<PCInfo> pcInfos;
+		
 
 		/**
 		 * Constructor
@@ -26,10 +38,12 @@ public class SystemInfoRetrieverServer {
 		 * @param port the port to listen on
 		 * @throws SocketException 
 		 */
-		public SystemInfoRetrieverServer(int port) throws SocketException {
+		public SystemInfoRetrieverServer(int udpPort, int tcpPort) throws SocketException {
 			
-			this.port = port;
-			udpSocket = new DatagramSocket(port);
+			this.udpPort = udpPort;
+			this.tcpPort = tcpPort;
+			pcInfos = new LinkedList<>();
+			
 		}
 
 		/**
@@ -39,10 +53,12 @@ public class SystemInfoRetrieverServer {
 		 * and send back the data converted to uppercase. This will continue until the
 		 * client sends the "BYE" command.
 		 */
-		public void serveClients() {
+		public LinkedList<PCInfo> retrieveInfosFromClients() {
 			LOG.info("Starting the Receptionist Worker on a new thread...");
 			new Thread(new ReceptionistWorker()).start();
+			return pcInfos;
 		}
+		
 
 		/**
 		 * This inner class implements the behavior of the "receptionist", whose
@@ -53,27 +69,27 @@ public class SystemInfoRetrieverServer {
 		private class ReceptionistWorker implements Runnable {
 
 			
-			
-			public void sendRequestInfos() throws IOException {
-				
-				udpSocket.send(new DatagramPacket(SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes(), 
-						SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length));
-
-			}
-			
 			@Override
 			public void run() {
 				ServerSocket serverSocket;
+				DatagramSocket udpSocket;
+				
 
 				try {
-					serverSocket = new ServerSocket(port);
+					serverSocket = new ServerSocket(tcpPort);
+					udpSocket = new DatagramSocket(SystemInfoRetrieverProtocol.SERVER_PORT);
+					udpSocket.setBroadcast(true);
+					
+					udpSocket.send(new DatagramPacket(SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes(), SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length, InetAddress.getByName("localhost"), udpPort ));
+					
 				} catch (IOException ex) {
 					LOG.log(Level.SEVERE, null, ex);
 					return;
 				}
-
+				
 				while (true) {
-					LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {0}", port);
+					
+					LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {0}", tcpPort);
 					try {
 						Socket clientSocket = serverSocket.accept();
 						LOG.info("A new client has arrived. Starting a new thread and delegating work to a new servant...");
@@ -94,14 +110,16 @@ public class SystemInfoRetrieverServer {
 			private class ServantWorker implements Runnable {
 
 				Socket clientSocket;
-				BufferedReader in = null;
-				PrintWriter out = null;
+				InputStream in = null;
+				OutputStream out = null;
+				
 
 				public ServantWorker(Socket clientSocket) {
 					try {
 						this.clientSocket = clientSocket;
-						in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-						out = new PrintWriter(clientSocket.getOutputStream());
+						LOG.info(clientSocket.getInetAddress().toString());
+						in = clientSocket.getInputStream();
+						out = clientSocket.getOutputStream();
 					} catch (IOException ex) {
 						Logger.getLogger(SystemInfoRetrieverServer.class.getName()).log(Level.SEVERE, null, ex);
 					}
@@ -109,19 +127,26 @@ public class SystemInfoRetrieverServer {
 
 				@Override
 				public void run() {
-					String line;
+					PCInfo data;
 					boolean shouldRun = true;
-
-					out.println("Welcome to the Multi-Threaded Server.\nSend me text lines and conclude with the BYE command.");
-					out.flush();
+					boolean isInfoReady = false;
+					String msg = "";
+					
+					
 					try {
-						LOG.info("Reading until client sends BYE or closes the connection...");
-						while ((shouldRun) && (line = in.readLine()) != null) {
-							if (line.equalsIgnoreCase("bye")) {
-								shouldRun = false;
+						BufferedReader br = new BufferedReader(new InputStreamReader(in));
+						LOG.info("Waiting for client INFOISREADY");
+						while ((!isInfoReady) && (msg = br.readLine()) != null) {
+							if(msg.equals(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO)){
+								isInfoReady = true;
+								LOG.info("RECEIVED READY");
 							}
-							out.println("> " + line.toUpperCase());
-							out.flush();
+						}
+						LOG.info("Reading object data from clients");
+						ObjectInputStream ois = new ObjectInputStream(in);
+						while ((shouldRun) && (data = (PCInfo) ois.readObject()) != null) {
+							pcInfos.add(data);
+							shouldRun = false;
 						}
 
 						LOG.info("Cleaning up resources...");
@@ -129,7 +154,7 @@ public class SystemInfoRetrieverServer {
 						in.close();
 						out.close();
 
-					} catch (IOException ex) {
+					} catch (IOException | ClassNotFoundException ex) {
 						if (in != null) {
 							try {
 								in.close();
@@ -138,7 +163,11 @@ public class SystemInfoRetrieverServer {
 							}
 						}
 						if (out != null) {
-							out.close();
+							try {
+								out.close();
+							} catch (IOException e) {
+								LOG.log(Level.SEVERE, e.getMessage(), e);
+							}
 						}
 						if (clientSocket != null) {
 							try {

@@ -1,40 +1,27 @@
 package monitor.model;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import java.io.Serializable;
 
-public class Program {
-	StringProperty name;
-	StringProperty version;
-	StringProperty lastUpdate;
+public class Program implements Serializable{
+	String name;
+	String version;
+	String lastUpdate;
 
 	public Program(String name, String version, String lastUpdate){
-		this.name = new SimpleStringProperty(name);
-		this.version = new SimpleStringProperty(version);
-		this.lastUpdate = new SimpleStringProperty(lastUpdate);
+		this.name = name;
+		this.version = version;
+		this.lastUpdate = lastUpdate;
 	}
 
-	public String getName() {
-		return name.get();
-	}
-
-	public StringProperty nameProperty(){
+	public String getName(){
 		return name;
 	}
 
-	public String getVersion() {
-		return version.get();
-	}
-
-	public StringProperty versionProperty(){
+	public String getVersion(){
 		return version;
 	}
 
-	public String getLastUpdate() {
-		return lastUpdate.get();
-	}
-
-	public StringProperty lastUpdateProperty(){
+	public String getLastUpdate(){
 		return lastUpdate;
 	}
 }

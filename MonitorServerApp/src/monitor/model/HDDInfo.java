@@ -1,30 +1,26 @@
 package monitor.model;
 
+import java.io.Serializable;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
-public class HDDInfo {
-	private DoubleProperty totalSize;
-	private DoubleProperty freeSize;
+public class HDDInfo implements Serializable{
+	
+	private double totalSize;
+	private double freeSize;
 
 	public HDDInfo(double totalSize, double freeSize){
-		this.totalSize = new SimpleDoubleProperty(totalSize);
-		this.freeSize = new SimpleDoubleProperty(freeSize);
+		this.totalSize = totalSize;
+		this.freeSize = freeSize;
 	}
 
 	public double getTotalSize() {
-		return totalSize.get();
-	}
-
-	public DoubleProperty totalSizeProperty(){
 		return totalSize;
 	}
 
 	public double getFreeSize() {
-		return freeSize.get();
-	}
-
-	public DoubleProperty freeSizeProperty(){
 		return freeSize;
 	}
+
 }

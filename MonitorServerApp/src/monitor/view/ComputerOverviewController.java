@@ -13,8 +13,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import monitor.ServerApp;
-import monitor.model.PCInfo;
-import monitor.model.Program;
+import monitor.model.PCInfoViewWrapper;
+import monitor.model.ProgramViewWrapper;
 
 public class ComputerOverviewController {
 
@@ -22,21 +22,21 @@ public class ComputerOverviewController {
     private TextField filterField;
 
 	@FXML
-	private TableView<PCInfo>  pcTable;
+	private TableView<PCInfoViewWrapper>  pcTable;
 	@FXML
-	private TableColumn<PCInfo, String> hostnameColumn;
+	private TableColumn<PCInfoViewWrapper, String> hostnameColumn;
 	@FXML
-	private TableColumn<PCInfo, String> ipAddressColumn;
+	private TableColumn<PCInfoViewWrapper, String> ipAddressColumn;
 
 
 	@FXML
-	private TableView<Program> programTable;
+	private TableView<ProgramViewWrapper> programTable;
 	@FXML
-	private TableColumn<Program, String> nameColumn;
+	private TableColumn<ProgramViewWrapper, String> nameColumn;
 	@FXML
-	private TableColumn<Program, String> versionColumn;
+	private TableColumn<ProgramViewWrapper, String> versionColumn;
 	@FXML
-	private TableColumn<Program, String> lastUpdateColumn;
+	private TableColumn<ProgramViewWrapper, String> lastUpdateColumn;
 
 
 	@FXML
@@ -73,7 +73,7 @@ public class ComputerOverviewController {
 
 
     private ServerApp serverApp;
-    private FilteredList<PCInfo> filteredList;
+    private FilteredList<PCInfoViewWrapper> filteredList;
 
 
     public void setServerApp(ServerApp serverApp){
@@ -81,7 +81,7 @@ public class ComputerOverviewController {
 		// 1. Wrap the ObservableList in a FilteredList (initially display all data).
 		filteredList = new FilteredList<>(serverApp.getPcInfo(), p -> true);
 		// 3. Wrap the FilteredList in a SortedList.
-        SortedList<PCInfo> sortedList = new SortedList<>(filteredList);
+        SortedList<PCInfoViewWrapper> sortedList = new SortedList<>(filteredList);
 
      // 4. Bind the SortedList comparator to the TableView comparator.
         sortedList.comparatorProperty().bind(pcTable.comparatorProperty());
@@ -126,7 +126,7 @@ public class ComputerOverviewController {
         });
     }
 
-    private void showPcDetails(PCInfo pc){
+    private void showPcDetails(PCInfoViewWrapper pc){
     	if(pc != null){
     		hostnameLabel.setText(pc.getHostname());
     		ipAddressLabel.setText(pc.getIpAddress());
@@ -135,7 +135,7 @@ public class ComputerOverviewController {
     		cpuConstructorLabel.setText(pc.getCpu().getConstructor());
     		cpuModelLabel.setText(pc.getCpu().getModel());
     		cpuFrequencyLabel.setText(Double.toString(pc.getCpu().getFrequency()));
-    		cpuNumbCorelLabel.setText(Integer.toString(pc.getCpu().getNumbCore()));
+    		cpuNumbCorelLabel.setText(Integer.toString(pc.getCpu().getNbCore()));
     		hddTotalSizeLabel.setText(Double.toString(pc.getHdd().getTotalSize()));
     		hddFreeSizeLabel.setText(Double.toString(pc.getHdd().getFreeSize()));
     		ramSizeLabel.setText(Long.toString(pc.getRamSize()));
@@ -163,7 +163,7 @@ public class ComputerOverviewController {
     	}
     }
 
-    private void showProgrammsDetails(PCInfo pc){
+    private void showProgrammsDetails(PCInfoViewWrapper pc){
     	if(pc != null){
     		programTable.setItems(pc.getPrograms());
     		nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -172,7 +172,7 @@ public class ComputerOverviewController {
     	}
     }
 
-    private void showPieChartDetails(PCInfo pc){
+    private void showPieChartDetails(PCInfoViewWrapper pc){
     	if(pc != null){
 
     		double availableSpace = pc.getHdd().getFreeSize();

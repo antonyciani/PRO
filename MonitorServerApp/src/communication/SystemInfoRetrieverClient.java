@@ -1,14 +1,23 @@
 package communication;
 
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.LinkedList;
 import java.util.logging.Logger;
+
+import monitor.model.PCInfo;
+import utils.SystemInfoRecuperator;
 
 public class SystemInfoRetrieverClient {
 
@@ -16,48 +25,81 @@ public class SystemInfoRetrieverClient {
 
 	DatagramSocket udpSocket;
 	Socket tcpSocket;
-	BufferedReader in;
-	PrintWriter out;
+	InputStream in;
+	OutputStream out;
+	boolean sendInfoMsgReceived = false;
 	boolean connected = false;
+
+	private int port;
 	
 	
 	public SystemInfoRetrieverClient(int portToListen) throws SocketException {
+		this.port = portToListen;
 		udpSocket = new DatagramSocket(portToListen);
+		udpSocket.setBroadcast(true);
+		
+
 		
 	}
 
 	public void startListening() throws IOException{
 		
-		connected = false;
-		DatagramPacket udpPacket = null;
-		while(!connected){
+		byte[] buffer = new byte[SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length];
+		
+		DatagramPacket udpPacket = new DatagramPacket(buffer, buffer.length);
+		while(!sendInfoMsgReceived){
 			
 			udpSocket.receive(udpPacket);
-			String msg = new String(udpPacket.getData().toString());
-			
-			if(msg == SystemInfoRetrieverProtocol.REQUEST_INFO){
+			String msg = new String(udpPacket.getData());
+			LOG.info("Received: " +msg);
+			if(msg.equals(SystemInfoRetrieverProtocol.REQUEST_INFO)){
 				
-				connected = true;
+				sendInfoMsgReceived = true;
 				LOG.info("Server requested infos");
 				
 			}
 		}
-		sendInfos(udpPacket.getAddress());
+		try {
+			wait(10000000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		LOG.info("Connecting to server via TCP");
+		connect(udpPacket.getAddress());
+		//PCInfo pc = SystemInfoRecuperator.retrievePCInfo();
+		PrintWriter pw = new PrintWriter(out);
+		pw.write(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO);
+		//sendInfos(pc);
+		//disconnect
+		
+		
+	}
+	
+	public void connect(InetAddress serverAddress) {
+		
+		try {
+			tcpSocket = new Socket(serverAddress, SystemInfoRetrieverProtocol.SERVER_PORT);
+			in = tcpSocket.getInputStream();
+			out = tcpSocket.getOutputStream();
+			connected = true;
+			LOG.info("Connected to server in TCP");
+		} catch (IOException e) {
+			System.out.println("PROBLEME CONNEXION");
+			e.printStackTrace();
+		}
 		
 		
 	}
 
 
-	public void sendInfos(InetAddress serverAddress) throws IOException {
+	public void sendInfos(PCInfo pcInfo) throws IOException {
 		
-		tcpSocket = new Socket(serverAddress, SystemInfoRetrieverProtocol.RECEPTION_PORT);
-		
-		LOG.info("Connected to server in TCP");
-		
-		// Envoi avec TCP
-		
-		
+		ObjectOutputStream oos = new ObjectOutputStream(out);
+		oos.writeObject(pcInfo);
 
 	}
+	
+
 
 }

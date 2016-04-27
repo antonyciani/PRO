@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import monitor.model.PCInfo;
+import monitor.model.PCInfoViewWrapper;
 
 public class FilterEditDialogController {
 
@@ -21,7 +21,7 @@ public class FilterEditDialogController {
 	TextField InstalledProgramField;
 
 	private Stage dialogStage;
-	private ObservableList<PCInfo> pcList;
+	private ObservableList<PCInfoViewWrapper> pcList;
 
 
 	/**
@@ -38,7 +38,7 @@ public class FilterEditDialogController {
      *
      * @param pcList
      */
-    public void setPcList(ObservableList<PCInfo> pcList){
+    public void setPcList(ObservableList<PCInfoViewWrapper> pcList){
     	this.pcList = pcList;
     }
 

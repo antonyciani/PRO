@@ -5,35 +5,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Properties;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-
-import org.hyperic.sigar.CpuInfo;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import monitor.model.CPUInfo;
-import monitor.model.HDDInfo;
-import monitor.model.PCInfo;
-import monitor.model.Program;
-
+import monitor.model.*;
 /*
  -----------------------------------------------------------------------------------
  Laboratoire : <nn>
@@ -62,7 +44,7 @@ public class SystemInfoRecuperator {
 	public static CPUInfo retrieveCPUInfo() {
 
 		Sigar s = new Sigar();
-		String cpu = "";
+
 		try {
 			String vendor = s.getCpuInfoList()[0].getVendor();
 			String model = s.getCpuInfoList()[0].getModel();
@@ -141,7 +123,7 @@ public class SystemInfoRecuperator {
 		CPUInfo cpu = null;
 		HDDInfo hdd = null;
 		long ramSize = 0;
-		ObservableList<Program> programs = FXCollections.observableArrayList();
+		LinkedList<Program> programs = new LinkedList<>();
 
 		try {
 
