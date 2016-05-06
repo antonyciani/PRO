@@ -50,15 +50,35 @@ public class ServerApp extends Application {
 
 		pcData.add(new PCInfoViewWrapper(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programViewWrappers));
 		//pcData.add(SystemInfoRecuperator.retrievePCInfo());
+		SystemInfoRetrieverServer sirs = null;
 		try {
-			SystemInfoRetrieverServer sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.CLIENT_PORT, SystemInfoRetrieverProtocol.SERVER_PORT);
-			LinkedList<PCInfo> pcs = sirs.retrieveInfosFromClients();
- 			for(PCInfo pc : pcs )
-			pcData.add(new PCInfoViewWrapper(pc));
+			sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
+			sirs.retrieveInfosFromClients();
+			
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		LinkedList<PCInfo> pcInfos = sirs.getPcInfos();
+		
+		
+		
+		for(PCInfo pc : pcInfos){
+			System.out.println(pc.getHostname());
+			System.out.println(pc.getIpAddress());
+			System.out.println(pc.getMacAddress());
+			System.out.println(pc.getOs());
+			System.out.println(pc.getRamSize());
+			System.out.println(pc.getCpu().getConstructor());
+			System.out.println(pc.getCpu().getModel());
+			System.out.println(pc.getHdd().getFreeSize());
+			
+			
+			pcData.add(new PCInfoViewWrapper(pc));
+		}
+		
+		
+		
 		
 		
 	}

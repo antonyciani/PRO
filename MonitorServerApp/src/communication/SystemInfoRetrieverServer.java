@@ -1,18 +1,13 @@
 package communication;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -42,62 +37,85 @@ public class SystemInfoRetrieverServer {
 			
 			this.udpPort = udpPort;
 			this.tcpPort = tcpPort;
-			pcInfos = new LinkedList<>();
+			this.pcInfos = new LinkedList<>();
 			
 		}
 
-		/**
-		 * This method initiates the process. The server creates a socket and binds it
-		 * to the previously specified port. It then waits for clients in a infinite
-		 * loop. When a client arrives, the server will read its input line by line
-		 * and send back the data converted to uppercase. This will continue until the
-		 * client sends the "BYE" command.
-		 */
-		public LinkedList<PCInfo> retrieveInfosFromClients() {
+		
+		public void retrieveInfosFromClients() {
 			LOG.info("Starting the Receptionist Worker on a new thread...");
-			new Thread(new ReceptionistWorker()).start();
+			Thread receptionist = new Thread(new ReceptionistWorker());
+			receptionist.start();
+			try {
+				receptionist.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		public LinkedList<PCInfo> getPcInfos(){
+			
 			return pcInfos;
 		}
 		
 
-		/**
-		 * This inner class implements the behavior of the "receptionist", whose
-		 * responsibility is to listen for incoming connection requests. As soon as a
-		 * new client has arrived, the receptionist delegates the processing to a
-		 * "servant" who will execute on its own thread.
-		 */
 		private class ReceptionistWorker implements Runnable {
 
 			
 			@Override
 			public void run() {
 				ServerSocket serverSocket;
-				DatagramSocket udpSocket;
-				
+				MulticastSocket udpSocket;
+				//DatagramSocket udpSocket;
+				LinkedList<Thread> servants = new LinkedList<>();
 
 				try {
 					serverSocket = new ServerSocket(tcpPort);
-					udpSocket = new DatagramSocket(SystemInfoRetrieverProtocol.SERVER_PORT);
-					udpSocket.setBroadcast(true);
+					udpSocket = new MulticastSocket();
+					udpSocket.joinGroup(InetAddress.getByName("224.0.0.1"));
 					
-					udpSocket.send(new DatagramPacket(SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes(), SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length, InetAddress.getByName("localhost"), udpPort ));
+					udpSocket.send(new DatagramPacket(SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes(), SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length, InetAddress.getByName("224.0.0.1"), udpPort ));
 					
 				} catch (IOException ex) {
 					LOG.log(Level.SEVERE, null, ex);
 					return;
 				}
 				
-				while (true) {
+				
+				boolean listening = true;
+				try {
+					serverSocket.setSoTimeout(20000);
+				} catch (SocketException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				while (listening) {
 					
 					LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {0}", tcpPort);
 					try {
 						Socket clientSocket = serverSocket.accept();
+						LOG.info("Socket " + clientSocket);
 						LOG.info("A new client has arrived. Starting a new thread and delegating work to a new servant...");
-						new Thread(new ServantWorker(clientSocket)).start();
+						Thread newServant = new Thread(new ServantWorker(clientSocket));
+						newServant.start();
+						servants.add(newServant);
 					} catch (IOException ex) {
+						listening = false;
 						Logger.getLogger(SystemInfoRetrieverServer.class.getName()).log(Level.SEVERE, null, ex);
 					}
 				}
+				
+				for(Thread t : servants){
+					try {
+						t.join();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
 
 			}
 
@@ -109,17 +127,19 @@ public class SystemInfoRetrieverServer {
 		 */
 			private class ServantWorker implements Runnable {
 
-				Socket clientSocket;
-				InputStream in = null;
-				OutputStream out = null;
+				private Socket clientSocket;
+				private BufferedReader in;
+				private PrintWriter out;
 				
 
 				public ServantWorker(Socket clientSocket) {
 					try {
 						this.clientSocket = clientSocket;
+						LOG.info("Socket " + clientSocket);
 						LOG.info(clientSocket.getInetAddress().toString());
-						in = clientSocket.getInputStream();
-						out = clientSocket.getOutputStream();
+						in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			            out = new PrintWriter(clientSocket.getOutputStream());
+
 					} catch (IOException ex) {
 						Logger.getLogger(SystemInfoRetrieverServer.class.getName()).log(Level.SEVERE, null, ex);
 					}
@@ -129,32 +149,57 @@ public class SystemInfoRetrieverServer {
 				public void run() {
 					PCInfo data;
 					boolean shouldRun = true;
+					boolean isInfoReceived = false;
 					boolean isInfoReady = false;
 					String msg = "";
 					
 					
 					try {
-						BufferedReader br = new BufferedReader(new InputStreamReader(in));
+						
 						LOG.info("Waiting for client INFOISREADY");
-						while ((!isInfoReady) && (msg = br.readLine()) != null) {
+						
+						LOG.info(msg);
+						while ((!isInfoReady) && (msg = in.readLine()) != null) {
+							LOG.info(msg);
 							if(msg.equals(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO)){
-								isInfoReady = true;
+								
 								LOG.info("RECEIVED READY");
+								isInfoReady = true;
+								out.println(SystemInfoRetrieverProtocol.READY_TO_READ_INFO);
+								out.flush();
+								
 							}
 						}
-						LOG.info("Reading object data from clients");
-						ObjectInputStream ois = new ObjectInputStream(in);
-						while ((shouldRun) && (data = (PCInfo) ois.readObject()) != null) {
-							pcInfos.add(data);
-							shouldRun = false;
-						}
+						PCInfo pc = null;
+						ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+						try {
+							while (!isInfoReceived && ((pc = (PCInfo)ois.readObject()) != null)){
+								LOG.info("READING OBJECT");
+								
+								pcInfos.add(pc);
+								isInfoReceived = true;
+								System.out.println(pc.getHostname());
+								System.out.println(pc.getIpAddress());
+								System.out.println(pc.getMacAddress());
+								System.out.println(pc.getOs());
+								System.out.println(pc.getRamSize());
+								System.out.println(pc.getCpu().getConstructor());
+								System.out.println(pc.getCpu().getModel());
+								System.out.println(pc.getHdd().getFreeSize());
+								
+							}
 
-						LOG.info("Cleaning up resources...");
+
+							LOG.info("Cleaning up resources...");
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						clientSocket.close();
 						in.close();
 						out.close();
 
-					} catch (IOException | ClassNotFoundException ex) {
+					} catch (IOException ex) {
 						if (in != null) {
 							try {
 								in.close();
@@ -163,11 +208,7 @@ public class SystemInfoRetrieverServer {
 							}
 						}
 						if (out != null) {
-							try {
-								out.close();
-							} catch (IOException e) {
-								LOG.log(Level.SEVERE, e.getMessage(), e);
-							}
+							out.close();
 						}
 						if (clientSocket != null) {
 							try {

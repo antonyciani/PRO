@@ -2,15 +2,18 @@ package communication;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.LinkedList;
@@ -23,26 +26,30 @@ public class SystemInfoRetrieverClient {
 
 	private static final Logger LOG = Logger.getLogger(SystemInfoRetrieverClient.class.getName());
 
-	DatagramSocket udpSocket;
+	MulticastSocket udpSocket;
 	Socket tcpSocket;
-	InputStream in;
-	OutputStream out;
+	BufferedReader in;
+	PrintWriter out;
 	boolean sendInfoMsgReceived = false;
 	boolean connected = false;
 
-	private int port;
+	int udpPort;
+	int tcpPort;
 	
 	
-	public SystemInfoRetrieverClient(int portToListen) throws SocketException {
-		this.port = portToListen;
-		udpSocket = new DatagramSocket(portToListen);
-		udpSocket.setBroadcast(true);
+	public SystemInfoRetrieverClient(int udpPort, int tcpPort) throws SocketException {
+		this.udpPort = udpPort;
+		this.tcpPort = tcpPort;
+		
 		
 
 		
 	}
 
 	public void startListening() throws IOException{
+		
+		udpSocket = new MulticastSocket(udpPort);
+		udpSocket.joinGroup(InetAddress.getByName("224.0.0.1"));
 		
 		byte[] buffer = new byte[SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length];
 		
@@ -59,29 +66,49 @@ public class SystemInfoRetrieverClient {
 				
 			}
 		}
-		try {
-			wait(10000000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		LOG.info("Connecting to server via TCP");
-		connect(udpPacket.getAddress());
-		//PCInfo pc = SystemInfoRecuperator.retrievePCInfo();
-		PrintWriter pw = new PrintWriter(out);
-		pw.write(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO);
+		LOG.info(udpPacket.getAddress().toString());
+		connect(udpPacket.getAddress(), tcpPort);
+		PCInfo pc = null;
+		boolean ready = false;
+		String msg = "";
+		while(connected){
+			
+			if(!ready){
+				pc = SystemInfoRecuperator.retrievePCInfo();
+				ready = true;
+			}
+			else{
+				out.println(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO);
+				out.flush();
+				LOG.info("SENT SOMETHING");
+				while((msg = in.readLine()) != null){
+					
+					if(msg.equals(SystemInfoRetrieverProtocol.READY_TO_READ_INFO)){
+						ObjectOutputStream oos = new ObjectOutputStream(tcpSocket.getOutputStream());
+						oos.writeObject(pc);
+						LOG.info("INFO HAS BEEN SENT");
+					}
+				}
+				connected = false;
+			}
+		}
+
+		
+		
+		
 		//sendInfos(pc);
 		//disconnect
 		
 		
 	}
 	
-	public void connect(InetAddress serverAddress) {
+	public void connect(InetAddress serverAddress, int serverPort) {
 		
 		try {
-			tcpSocket = new Socket(serverAddress, SystemInfoRetrieverProtocol.SERVER_PORT);
-			in = tcpSocket.getInputStream();
-			out = tcpSocket.getOutputStream();
+			tcpSocket = new Socket(serverAddress, serverPort);
+			in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
+			out = new PrintWriter(tcpSocket.getOutputStream());
 			connected = true;
 			LOG.info("Connected to server in TCP");
 		} catch (IOException e) {
@@ -91,15 +118,6 @@ public class SystemInfoRetrieverClient {
 		
 		
 	}
-
-
-	public void sendInfos(PCInfo pcInfo) throws IOException {
-		
-		ObjectOutputStream oos = new ObjectOutputStream(out);
-		oos.writeObject(pcInfo);
-
-	}
 	
-
 
 }

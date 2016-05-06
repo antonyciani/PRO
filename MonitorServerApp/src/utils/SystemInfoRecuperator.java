@@ -90,14 +90,17 @@ public class SystemInfoRecuperator {
 						}
 						
 						System.out.println("P:" + program);
-						name = elems[1];
-						if(elems.length == 3){
-							version = elems[2];
-							System.out.println(elems[2]);
-						}
+						if(elems.length > 1){
+							name = elems[1];
+							if(elems.length == 3){
+								version = elems[2];
+								System.out.println(elems[2]);
+							}
+							Program p = new Program(name, version, "");
+							programs.add(p);
+						}					
 
-						Program p = new Program(name, version, "");
-						programs.add(p);
+						
 					}
 					
 				

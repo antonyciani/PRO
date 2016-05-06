@@ -12,12 +12,10 @@ public class ClientApp {
 	public static void main(String[] args) {
 		
 		try {
-			SystemInfoRetrieverClient sirc = new SystemInfoRetrieverClient(SystemInfoRetrieverProtocol.CLIENT_PORT);
+			SystemInfoRetrieverClient sirc = new SystemInfoRetrieverClient(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
 			
-			while(true){
-				System.out.println("Listening to the server");
-				sirc.startListening();
-			}
+			sirc.startListening();
+			
 			
 			
 		} catch (IOException e) {
