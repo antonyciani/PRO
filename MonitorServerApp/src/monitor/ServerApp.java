@@ -139,34 +139,34 @@ public class ServerApp extends Application {
         }
     }
 
-	public void showFilterEditDialog(){
-		try {
-			// Load the fxml file and create a new stage for the popup dialog.
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(ServerApp.class.getResource("view/FilterEditDialog.fxml"));
-			AnchorPane filterEditDialog = (AnchorPane) loader.load();
-
-			Stage filterStage = new Stage();
-			filterStage.setTitle("Filter");
-			filterStage.initModality(Modality.WINDOW_MODAL);
-			filterStage.initOwner(primaryStage);
-			Scene scene = new Scene(filterEditDialog);
-			filterStage.setScene(scene);
-
-			FilterEditDialogController controller = loader.getController();
-			controller.setDialogStage(filterStage);
-
-			controller.setPcList(pcData);
-
-            // Show the dialog and wait until the user closes it
-            filterStage.showAndWait();
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+//	public void showFilterEditDialog(){
+//		try {
+//			// Load the fxml file and create a new stage for the popup dialog.
+//			FXMLLoader loader = new FXMLLoader();
+//			loader.setLocation(ServerApp.class.getResource("view/FilterEditDialog.fxml"));
+//			AnchorPane filterEditDialog = (AnchorPane) loader.load();
+//
+//			Stage filterStage = new Stage();
+//			filterStage.setTitle("Filter");
+//			filterStage.initModality(Modality.WINDOW_MODAL);
+//			filterStage.initOwner(primaryStage);
+//			Scene scene = new Scene(filterEditDialog);
+//			filterStage.setScene(scene);
+//
+//			FilterEditDialogController controller = loader.getController();
+//			controller.setDialogStage(filterStage);
+//
+//			controller.setPcList(pcData);
+//
+//            // Show the dialog and wait until the user closes it
+//            filterStage.showAndWait();
+//
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 	public static void main(String[] args) {
 		launch(args);

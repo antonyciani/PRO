@@ -1,28 +1,26 @@
 package monitor.view;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import monitor.model.PCInfoViewWrapper;
+import utils.AdvancedFilters;
 
 public class FilterEditDialogController {
 
 	@FXML
-	TextField osField;
+	private TextField osField;
 	@FXML
-	TextField RAMSizeField;
+	private TextField ramSizeField;
 	@FXML
-	TextField HDDSizeField;
+	private TextField hddSizeField;
 	@FXML
-	TextField HDDOcupRateField;
+	private TextField hddOccupRateField;
 	@FXML
-	TextField InstalledProgramField;
+	private TextField programField;
 
 	private Stage dialogStage;
-	private ObservableList<PCInfoViewWrapper> pcList;
 
+	private AdvancedFilters filter;
 
 	/**
      * Sets the stage of this dialog.
@@ -38,18 +36,25 @@ public class FilterEditDialogController {
      *
      * @param pcList
      */
-    public void setPcList(ObservableList<PCInfoViewWrapper> pcList){
-    	this.pcList = pcList;
+    public void setAdvancedFilter(AdvancedFilters filter){
+    	this.filter = filter;
     }
-
 
     /**
      * Called when the user clicks ok.
      */
     @FXML
-    private void handleOk() {
+    private void handleSearch() {
 
-    	//TODO Filter
+    	System.out.println(osField.getText());
+    	System.out.println(ramSizeField.getText());
+    	System.out.println(hddSizeField.getText());
+    	System.out.println(hddOccupRateField.getText());
+    	System.out.println(programField.getText());
+
+    	filter.applyFilter(osField.getText(), ramSizeField.getText(), hddSizeField.getText(), hddOccupRateField.getText(), programField.getText());
+    	dialogStage.close();
+
     }
 
 	/**
@@ -59,5 +64,4 @@ public class FilterEditDialogController {
     private void handleCancel() {
         dialogStage.close();
     }
-
 }

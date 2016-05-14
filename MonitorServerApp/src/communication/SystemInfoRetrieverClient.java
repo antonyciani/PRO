@@ -1,22 +1,15 @@
 package communication;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import monitor.model.PCInfo;
@@ -40,9 +33,6 @@ public class SystemInfoRetrieverClient {
 	public SystemInfoRetrieverClient(int udpPort, int tcpPort) throws SocketException {
 		this.udpPort = udpPort;
 		this.tcpPort = tcpPort;
-		
-		
-
 		
 	}
 
@@ -91,14 +81,9 @@ public class SystemInfoRetrieverClient {
 					}
 				}
 				connected = false;
+				sendInfoMsgReceived = false;
 			}
 		}
-
-		
-		
-		
-		//sendInfos(pc);
-		//disconnect
 		
 		
 	}
@@ -115,9 +100,9 @@ public class SystemInfoRetrieverClient {
 			System.out.println("PROBLEME CONNEXION");
 			e.printStackTrace();
 		}
-		
-		
 	}
+	
+	
 	
 
 }

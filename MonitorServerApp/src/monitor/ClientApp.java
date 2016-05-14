@@ -14,17 +14,16 @@ public class ClientApp {
 		try {
 			SystemInfoRetrieverClient sirc = new SystemInfoRetrieverClient(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
 			
-			sirc.startListening();
-			
-			
+			while(true){
+				System.out.println("Listening to server message");
+				sirc.startListening();
+				
+			}
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		
 		
 	}
 	

@@ -54,7 +54,7 @@
                         <MenuButton mnemonicParsing="false" prefHeight="27.0" prefWidth="87.0" text="Option">
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#handleAdvancedFilter" text="Advanced Filters" />
-                            <MenuItem mnemonicParsing="false" text="Clear Filter" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleClearFilter" text="Clear Filter" />
                           </items>
                            <HBox.margin>
                               <Insets bottom="5.0" left="5.0" top="5.0" />
