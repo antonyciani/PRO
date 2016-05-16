@@ -53,23 +53,27 @@ public class Database{
 				//Création du processeur
 				int processorId = 0;
 				Statement statement = connection.createStatement();
+				System.out.println(pc.getCpu().getConstructor()+" "+pc.getCpu().getFrequency()+" "+pc.getCpu().getModel()+" "+pc.getCpu().getNbCore());
 				ResultSet result = statement.executeQuery("SELECT id FROM processor WHERE constructor ='"+pc.getCpu().getConstructor()+"'"
 						+ "AND frequency ="+pc.getCpu().getFrequency()+" AND model ='"+pc.getCpu().getModel()+"' AND nmbrcores="+pc.getCpu().getNbCore()+";");	
 				if(result.next()){
 					processorId = result.getInt(1);
+					System.out.println("Processor already exists, ID: "+processorId);
 				}
 				else{
 					int ok = statement.executeUpdate("INSERT INTO processor (constructor, frequency, model, nmbrcores) VALUES('"+pc.getCpu().getConstructor()+"', "+pc.getCpu().getFrequency()+", '"+pc.getCpu().getModel()+"', "+pc.getCpu().getNbCore()+")");
 					if(ok != 0){
-						System.out.println(ok);
+						System.out.println("Insert new processor: " +ok);
 						result = statement.executeQuery("SELECT id FROM processor WHERE constructor ='"+pc.getCpu().getConstructor()+"'"
-								+ "AND frequency ="+pc.getCpu().getFrequency()+" AND model ='"+pc.getCpu().getModel()+"' AND nmbrcores="+pc.getCpu().getNbCore());
+								+ "AND frequency ="+pc.getCpu().getFrequency()+" AND model ='"+pc.getCpu().getModel()+"' AND nmbrcores="+pc.getCpu().getNbCore()+";");
 						if(result.next()){
 							processorId = result.getInt(1);
+							System.out.println("New processor ID: "+processorId);
 						}
 					}
 				}
 				//Création de la machine
+				System.out.println("Processor Id: "+ processorId);
 				statement.executeUpdate("INSERT INTO machineState (MacAddress, captureTime, hostname, os, processorId, totalram, ipaddress, totalharddrivesize, freeharddrivesize) VALUES('"+ pc.getMacAddress()+"', '" + currentDate +"', '" +pc.getHostname()+"', '"+pc.getOs()+"', "+processorId+", "
 						+pc.getRamSize()+", '"+ pc.getIpAddress()+"', "+pc.getHdd().getTotalSize()+", "+pc.getHdd().getFreeSize()+")");
 				
@@ -305,7 +309,7 @@ public class Database{
 	}
 	
 	public static void main(String args[]){
-		Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "root");
+		Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
 		db.connect();
 		/*HashMap<Integer,Integer> map = db.nbPcByNbCores();
 		
@@ -335,10 +339,10 @@ public class Database{
 		ramSize = 16;
 		
 		PCInfo pc2 = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, new LinkedList<Program>());
-		ArrayList<PCInfo> pcs = new ArrayList<>();
-		//pcs.add(pc);
-		//pcs.add(pc2);
-		//db.storePCs(pcs);
+		LinkedList<PCInfo> pcs = new LinkedList<>();
+		pcs.add(pc);
+		pcs.add(pc2);
+		db.storePCs(pcs);
 		
 		/*
 		ArrayList<String> capt = db.getCaptures();
