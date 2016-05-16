@@ -1,7 +1,11 @@
 package monitor.view;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.util.LinkedList;
 
+import communication.SystemInfoRetrieverProtocol;
+import communication.SystemInfoRetrieverServer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -20,6 +24,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import monitor.ServerApp;
+import monitor.database.Database;
 import monitor.model.PCInfo;
 import monitor.model.PCInfoViewWrapper;
 import monitor.model.Program;
@@ -256,4 +261,45 @@ public class ComputerOverviewController {
     	filter.clearFilter();
     	pcTable.setItems(filteredList);
     }
+    
+    @FXML
+    public void handleRefresh(){
+
+    	
+    	ObservableList<PCInfoViewWrapper> pcData = serverApp.getPcInfo();
+    	Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
+    	db.connect();
+    	
+    	pcData.clear();
+    	
+		SystemInfoRetrieverServer sirs = null;
+		try {
+			sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
+			sirs.retrieveInfosFromClients();
+			
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		LinkedList<PCInfo> pcInfos = sirs.getPcInfos();
+		db.storePCs(pcInfos);
+		
+		
+		for(PCInfo pc : pcInfos){
+			System.out.println(pc.getHostname());
+			System.out.println(pc.getIpAddress());
+			System.out.println(pc.getMacAddress());
+			System.out.println(pc.getOs());
+			System.out.println(pc.getRamSize());
+			System.out.println(pc.getCpu().getConstructor());
+			System.out.println(pc.getCpu().getModel());
+			System.out.println(pc.getHdd().getFreeSize());
+			
+			pcData.add(new PCInfoViewWrapper(pc));
+		}
+
+    }
+    
 }

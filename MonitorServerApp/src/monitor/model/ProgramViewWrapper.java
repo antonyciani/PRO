@@ -8,16 +8,16 @@ public class ProgramViewWrapper {
 	StringProperty version;
 	StringProperty lastUpdate;
 
-	public ProgramViewWrapper(String name, String version, String lastUpdate){
+	public ProgramViewWrapper(String name, String version){
 		this.name = new SimpleStringProperty(name);
 		this.version = new SimpleStringProperty(version);
-		this.lastUpdate = new SimpleStringProperty(lastUpdate);
+
 	}
 	
 	public ProgramViewWrapper(Program program){
 		this.name = new SimpleStringProperty(program.getName());
 		this.version = new SimpleStringProperty(program.getVersion());
-		this.lastUpdate = new SimpleStringProperty(program.getLastUpdate());
+
 	}
 
 	public String getName() {

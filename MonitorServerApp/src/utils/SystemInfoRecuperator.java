@@ -96,7 +96,7 @@ public class SystemInfoRecuperator {
 								version = elems[2];
 								System.out.println(elems[2]);
 							}
-							Program p = new Program(name, version, "");
+							Program p = new Program(name, version);
 							programs.add(p);
 						}					
 

@@ -22,15 +22,15 @@ public class Database{
 	private String address;
 	private String username;
 	private String password;
-	private Connection connection;
-
+	private Connection connection; 
+	
 	public Database(String address, String username, String password){
 		this.address = address;
 		this.username = username;
 		this.password = password;
 		connection = null;
 	}
-	public void connect(){
+	public void connect(){		
 		try{
 			//load the driver
 			Class.forName("com.mysql.jdbc.Driver");
@@ -43,18 +43,18 @@ public class Database{
 		catch(SQLException e){
 			e.printStackTrace();
 		}
-
+		
 	}
-
-	public void storePCs(ArrayList<PCInfo> pcList){
+	
+	public void storePCs(LinkedList<PCInfo> pcInfos){
 		LocalDateTime currentDate = LocalDateTime.now();
-		for(PCInfo pc : pcList){
+		for(PCInfo pc : pcInfos){
 			try{
-				//Creation du processeur
+				//Création du processeur
 				int processorId = 0;
 				Statement statement = connection.createStatement();
 				ResultSet result = statement.executeQuery("SELECT id FROM processor WHERE constructor ='"+pc.getCpu().getConstructor()+"'"
-						+ "AND frequency ="+pc.getCpu().getFrequency()+" AND model ='"+pc.getCpu().getModel()+"' AND nmbrcores="+pc.getCpu().getNbCore()+";");
+						+ "AND frequency ="+pc.getCpu().getFrequency()+" AND model ='"+pc.getCpu().getModel()+"' AND nmbrcores="+pc.getCpu().getNbCore()+";");	
 				if(result.next()){
 					processorId = result.getInt(1);
 				}
@@ -69,34 +69,34 @@ public class Database{
 						}
 					}
 				}
-				//CrÃˆation de la machine
+				//Création de la machine
 				statement.executeUpdate("INSERT INTO machineState (MacAddress, captureTime, hostname, os, processorId, totalram, ipaddress, totalharddrivesize, freeharddrivesize) VALUES('"+ pc.getMacAddress()+"', '" + currentDate +"', '" +pc.getHostname()+"', '"+pc.getOs()+"', "+processorId+", "
 						+pc.getRamSize()+", '"+ pc.getIpAddress()+"', "+pc.getHdd().getTotalSize()+", "+pc.getHdd().getFreeSize()+")");
-
+				
 				//liste de programmes
 				for(Program p : pc.getPrograms()){
 					//l'ajouter dans les programmes
 					int programId = 0;
 					statement = connection.createStatement();
 					result = statement.executeQuery("SELECT id FROM program WHERE name ='"+p.getName()+"'"
-							+ "AND version ='"+p.getVersion()+"';");
+							+ "AND version ='"+p.getVersion()+"';");	
 					if(result.next()){
 						programId = result.getInt(1);
 					}
-					//rÃˆcupÃˆrer l'id
+					//récupérer l'id
 					else{
 						int ok = statement.executeUpdate("INSERT INTO program (name, version) VALUES('"+p.getName()+"', '"+p.getVersion()+"');");
 						if(ok != 0){
 							System.out.println(ok);
 							result = statement.executeQuery("SELECT id FROM program WHERE name ='"+p.getName()+"'"
-									+ "AND version ='"+p.getVersion()+"';");
+									+ "AND version ='"+p.getVersion()+"';");	
 							if(result.next()){
 								programId = result.getInt(1);
 							}
 						}
 					}
-
-					//ajouter â€¡ pc_program pcMacAddress, pcCaptureTime, programId
+					
+					//ajouter à pc_program pcMacAddress, pcCaptureTime, programId
 					statement.executeUpdate("INSERT INTO pc_program VALUES ('"+pc.getMacAddress()+"','"+ currentDate+"',"+programId+");");
 				}
 			}
@@ -105,32 +105,34 @@ public class Database{
 			}
 		}
 	}
-
-	public HashMap<Float, Integer> nbPcByHddSize(){
+	
+	public HashMap<Float, Integer> nbPcByHddSize(String captureTime){
 		HashMap<Float, Integer> map = new HashMap<Float, Integer>();
 		try{
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery("SELECT TotalHardDriveSize, count(TotalHardDriveSize)"
 					+ "FROM machineState "
+					+ "WHERE captureTime ='"+captureTime+"'"
 					+ "GROUP BY TotalHardDriveSize;");
 			while(result.next()){
 				map.put(result.getFloat(1), result.getInt(2));
 			}
-
+			
 		}
 		catch(SQLException e){
 			e.printStackTrace();
 		}
 		return map;
 	}
-
-	public HashMap<Float, Integer> nbPcByRamSize(){
+	
+	public HashMap<Float, Integer> nbPcByRamSize(String captureTime){
 		HashMap<Float, Integer> map = new HashMap<Float, Integer>();
 		try{
 			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery("SELECT champ1, count(champ1)"
-					+ "FROM infos "
-					+ "GROUP BY champ1;");
+			ResultSet result = statement.executeQuery("SELECT TotalRam, count(TotalRam)"
+					+ "FROM machineState "
+					+ "WHERE captureTime ='"+captureTime+"'"
+					+ "GROUP BY TotalRam;");
 			while(result.next()){
 				map.put(result.getFloat(1), result.getInt(2));
 			}
@@ -140,14 +142,13 @@ public class Database{
 		}
 		return map;
 	}
-
-	public HashMap<Integer, Integer> nbPcByNbCores(){
+	
+	public HashMap<Integer, Integer> nbPcByNbCores(String captureTime){
 		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
 		try{
 			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery("SELECT champ1, count(champ1)"
-					+ "FROM infos "
-					+ "GROUP BY champ1;");
+			ResultSet result = statement.executeQuery("SELECT nmbrCores, count(nmbrCores)"
+					+ "FROM machineState INNER JOIN processor ON machineState.processorID = processor.ID WHERE captureTime ='"+captureTime+"' GROUP BY nmbrCores;");
 			while(result.next()){
 				map.put(result.getInt(1), result.getInt(2));
 			}
@@ -157,14 +158,13 @@ public class Database{
 		}
 		return map;
 	}
-
-	public HashMap<String, Integer> nbPcByConstructor(){
+	
+	public HashMap<String, Integer> nbPcByConstructor(String captureTime){
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		try{
 			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery("SELECT champ1, count(champ1)"
-					+ "FROM infos "
-					+ "GROUP BY champ1;");
+			ResultSet result = statement.executeQuery("SELECT constructor, count(constructor)"
+					+ "FROM machineState INNER JOIN processor ON machineState.processorId = processor.ID WHERE captureTime ='"+captureTime+"' GROUP BY constructor;");
 			while(result.next()){
 				map.put(result.getString(1), result.getInt(2));
 			}
@@ -174,7 +174,7 @@ public class Database{
 		}
 		return map;
 	}
-
+	
 	public ArrayList<String> getCaptures(){
 		ArrayList<String> captures = new ArrayList<>();
 		try{
@@ -183,51 +183,66 @@ public class Database{
 			while(result.next()){
 				captures.add(result.getString(1));
 			}
-
+			
 		}
 		catch(SQLException e){
 			e.printStackTrace();
 		}
 		return captures;
 	}
-
+	public String getLastCapture(){
+		String capture ="";
+		try{
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT DISTINCT CaptureTime FROM machineState ORDER BY captureTime DESC");
+			if(result.next()){
+				capture = result.getString(1);
+			}
+			
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+		return capture;
+	}
+	
 	public ArrayList<PCInfo> loadPCInfo(String captureTime){
 		ArrayList<PCInfo> pcs = new ArrayList<>();
 		try{
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery("SELECT * FROM machinestate WHERE CaptureTime ='"+captureTime+"';");
 			while(result.next()){
-				//RÃˆcupÃˆration infos pc
+				//Récupération infos pc
 				String mac = result.getString(1);
 				String hostname = result.getString(3);
 				String os = result.getString(4);
 				int ram = result.getInt(6);
 				String ip = result.getString(7);
-
-				//RÃˆcupÃˆration et crÃˆation hdd
+				
+				//Récupération et création hdd
 				HDDInfo hdd = new HDDInfo(result.getDouble(8), result.getDouble(9));
-
-				//RÃˆcupÃˆration et crÃˆation processeur
+				
+				//Récupération et création processeur
 				int processorId = result.getInt(5);
 				Statement statement2 = connection.createStatement();
 				ResultSet resultTmp = statement2.executeQuery("SELECT * FROM processor WHERE id ="+processorId+";");
 				resultTmp.next();
 				CPUInfo cpu = new CPUInfo(resultTmp.getString(2), resultTmp.getString(4), resultTmp.getDouble(3), resultTmp.getInt(5));
-
-				//RÃˆcupÃˆration programmes
+				
+				//Récupération programmes
 				LinkedList<Program> programs = new LinkedList<>();
 				resultTmp = statement2.executeQuery("SELECT * FROM program WHERE ID IN ( "
 												+ "SELECT DISTINCT programID "
 												+ "FROM pc_program "
 												+ "WHERE pcMacAddress = '"+ mac+"' AND pcCaptureTime = '"+ captureTime +"');");
 				while(resultTmp.next()){
-					Program program = new Program(result.getString(1), result.getString(2),"");
+					Program program = new Program(result.getString(1), result.getString(2));
 					programs.add(program);
 				}
-				//CrÃˆation pc
+				//Création pc
 				PCInfo p = new PCInfo(hostname, ip, mac, os, cpu, hdd, ram, programs);
-
-				//Ajout â€¡ la liste
+				
+				//Ajout à la liste
 				pcs.add(p);
 			}
 		}
@@ -236,7 +251,7 @@ public class Database{
 		}
 		return pcs;
 	}
-
+	
 	public void deleteCapture(String captureTime){
 		try{
 			Statement statement = connection.createStatement();
@@ -245,7 +260,7 @@ public class Database{
 			e.printStackTrace();
 		}
 	}
-
+	
 	public HashMap<String, Double> freeHardDriveSizeRate(PCInfo pc){
 		HashMap<String, Double> map = new HashMap<>();
 		try{
@@ -255,7 +270,7 @@ public class Database{
 				double rate = result.getDouble(2)/result.getDouble(3);
 				map.put(result.getString(1), rate);
 			}
-
+				
 		}
 		catch(SQLException e){
 			e.printStackTrace();
@@ -271,12 +286,12 @@ public class Database{
 				double rate = result.getDouble(2)/result.getDouble(3);
 				map.put(result.getString(1), rate);
 			}
-
+				
 		}
 		catch(SQLException e){
 			e.printStackTrace();
 		}
-		return map;
+		return map;	
 	}
 	public void finalize(){
 		if(connection != null){
@@ -288,5 +303,111 @@ public class Database{
 			}
 		}
 	}
-}
+	
+	public static void main(String args[]){
+		Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "root");
+		db.connect();
+		/*HashMap<Integer,Integer> map = db.nbPcByNbCores();
+		
+		for(Entry<Integer, Integer> entry : map.entrySet()){
+			Integer key = entry.getKey();
+			Integer value = entry.getValue();
+			System.out.println(key + " : "+ value);
+		}*/
+		
+		String hostname = "LuciePc";
+		String ipAddress = "192.168.1.11";
+		String macAddress = "5E:FF:56:A2:AF:30";
+		String os = "Windows 7";
+		CPUInfo cpu = new CPUInfo("Intel", "i5", 2.3, 4);
+		HDDInfo hdd = new HDDInfo(500.8, 400.4);
+		long ramSize = 8;
+		LinkedList<Program> programs = new LinkedList<>();
+		programs.add(new Program("ls", "1.2"));
+		programs.add(new Program("cat", "2.3"));
+		PCInfo pc = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs);
+		hostname = "MichaelPc";
+		ipAddress = "192.168.1.10";
+		macAddress = "5E:FF:56:A2:AF:15";
+		os = "Windows 10";
+		cpu = new CPUInfo("Intel", "i7", 2.7, 4);
+		hdd = new HDDInfo(500.8, 209.4);
+		ramSize = 16;
+		
+		PCInfo pc2 = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, new LinkedList<Program>());
+		ArrayList<PCInfo> pcs = new ArrayList<>();
+		//pcs.add(pc);
+		//pcs.add(pc2);
+		//db.storePCs(pcs);
+		
+		/*
+		ArrayList<String> capt = db.getCaptures();
+		for(String s : capt){
+			System.out.println(s);
+		}
+		ArrayList<PCInfo> tmp = db.loadPCInfo(capt.get(0));
+		for(PCInfo p : tmp){
+			System.out.println(p.getHostname());
+		}
+		db.deleteCapture(capt.get(0));
+		capt = db.getCaptures();
+		for(String s : capt){
+			System.out.println(s);
+		}*/
+		db.deleteCapture("2016-05-06 15:36:07");
+		HashMap<String, Double> map = db.freeHardDriveSizeRate(pc2);
+		for(Entry<String, Double> entry : map.entrySet()){
+			String key = entry.getKey();
+			Double value = entry.getValue();
+			System.out.println(key + " : "+ value);
+		}
+		map = db.averageFreeHardDriveSizeRate();
+		for(Entry<String, Double> entry : map.entrySet()){
+			String key = entry.getKey();
+			Double value = entry.getValue();
+			System.out.println(key + " : "+ value);
+		}/*
+		hdd = new HDDInfo(500.8, 101.6);
+		pc2 = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, new LinkedList<Program>());
+		pcs.add(pc);
+		pcs.add(pc2);
+		db.storePCs(pcs);*/
+		String lastCapture = db.getLastCapture();
+		
+		System.out.println("Last capture: "+lastCapture);
+		
+		System.out.println("Nb PCs by nb Cores:");
+		HashMap<Integer,Integer> map2 = db.nbPcByNbCores(lastCapture);
+		
+		for(Entry<Integer, Integer> entry : map2.entrySet()){
+			Integer key = entry.getKey();
+			Integer value = entry.getValue();
+			System.out.println(key + " : "+ value);}
+		System.out.println("Nb PCs by hard drive size:");
+	
+		HashMap<Float,Integer> map3 = db.nbPcByHddSize(lastCapture);
 
+		for(Entry<Float, Integer> entry : map3.entrySet()){
+			Float key = entry.getKey();
+			Integer value = entry.getValue();
+			System.out.println(key + " : "+ value);}
+		System.out.println("Nb PCs by ram size:");
+
+		HashMap<Float,Integer> map4 = db.nbPcByRamSize(lastCapture);
+
+		for(Entry<Float, Integer> entry : map4.entrySet()){
+			Float key = entry.getKey();
+			Integer value = entry.getValue();
+			System.out.println(key + " : "+ value);}
+		System.out.println("Nb PCs by constructor");
+
+		HashMap<String,Integer> map5 = db.nbPcByConstructor(lastCapture);
+
+		for(Entry<String, Integer> entry : map5.entrySet()){
+			String key = entry.getKey();
+			Integer value = entry.getValue();
+			System.out.println(key + " : "+ value);}
+
+	}
+
+}

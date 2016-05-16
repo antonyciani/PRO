@@ -5,12 +5,12 @@ import java.io.Serializable;
 public class Program implements Serializable{
 	String name;
 	String version;
-	String lastUpdate;
 
-	public Program(String name, String version, String lastUpdate){
+
+	public Program(String name, String version){
 		this.name = name;
 		this.version = version;
-		this.lastUpdate = lastUpdate;
+
 	}
 
 	public String getName(){
@@ -21,7 +21,4 @@ public class Program implements Serializable{
 		return version;
 	}
 
-	public String getLastUpdate(){
-		return lastUpdate;
-	}
 }

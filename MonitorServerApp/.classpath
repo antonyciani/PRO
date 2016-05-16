@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="D:/HEIG/S4/PRO/PRO/MonitorServerApp/libs/jna-4.2.2.jar"/>
 	<classpathentry kind="lib" path="D:/HEIG/S4/PRO/PRO/MonitorServerApp/libs/sigar.jar"/>
 	<classpathentry kind="lib" path="D:/HEIG/S4/PRO/PRO/MonitorServerApp/libs/win32-x86-64.jar"/>
+	<classpathentry kind="lib" path="D:/HEIG/S4/PRO/GitHub/PRO_SystemInfoVisualizer/MonitorServerApp/libs/mysql-connector-java-5.1.39-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

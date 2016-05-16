@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
@@ -18,7 +23,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="monitor.view.ComputerOverviewController">
+<AnchorPane prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="monitor.view.ComputerOverviewController">
    <children>
       <SplitPane dividerPositions="0.33444592790387184" layoutX="98.0" layoutY="119.0" prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -119,7 +124,7 @@
                                        </children>
                                     </GridPane>
                                     <PieChart fx:id="chart" layoutX="331.0" layoutY="256.0" prefHeight="360.0" prefWidth="360.0" title="HDD Statistics" AnchorPane.leftAnchor="331.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="10.0" />
-                                    <Button layoutX="460.0" layoutY="508.0" mnemonicParsing="false" text="Refresh" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+                                    <Button layoutX="460.0" layoutY="508.0" mnemonicParsing="false" onAction="#handleRefresh" text="Refresh" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
                                     <Label fx:id="status" layoutX="635.0" layoutY="357.0" text="Label" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="20.0" />
                                  </children>
                               </AnchorPane>

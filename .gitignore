@@ -1,3 +1,7 @@
 .metadata
 .recommenders
+*.class
+bin/
+.metadata/.metadata
+.recommenders
 */bin

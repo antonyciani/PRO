@@ -35,8 +35,8 @@ public class ServerApp extends Application {
 		HDDInfo hdd = new HDDInfo(500.8, 209.4);
 		int ramSize = 16;
 		ObservableList<Program> programViewWrappers = FXCollections.observableArrayList();
-		programViewWrappers.add(new Program("ls", "1.2", "10.2.1990"));
-		programViewWrappers.add(new Program("cat", "2.3", "12.03.2000"));
+		programViewWrappers.add(new Program("ls", "1.2"));
+		programViewWrappers.add(new Program("cat", "2.3"));
 
 		pcData.add(new PCInfoViewWrapper(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programViewWrappers));
 
@@ -49,33 +49,33 @@ public class ServerApp extends Application {
 		ramSize = 8;
 
 		pcData.add(new PCInfoViewWrapper(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programViewWrappers));
-		//pcData.add(SystemInfoRecuperator.retrievePCInfo());
-		SystemInfoRetrieverServer sirs = null;
-		try {
-			sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
-			sirs.retrieveInfosFromClients();
-			
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		LinkedList<PCInfo> pcInfos = sirs.getPcInfos();
-		
-		
-		
-		for(PCInfo pc : pcInfos){
-			System.out.println(pc.getHostname());
-			System.out.println(pc.getIpAddress());
-			System.out.println(pc.getMacAddress());
-			System.out.println(pc.getOs());
-			System.out.println(pc.getRamSize());
-			System.out.println(pc.getCpu().getConstructor());
-			System.out.println(pc.getCpu().getModel());
-			System.out.println(pc.getHdd().getFreeSize());
-			
-			
-			pcData.add(new PCInfoViewWrapper(pc));
-		}
+//		//pcData.add(SystemInfoRecuperator.retrievePCInfo());
+//		SystemInfoRetrieverServer sirs = null;
+//		try {
+//			sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
+//			sirs.retrieveInfosFromClients();
+//			
+//		} catch (SocketException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		LinkedList<PCInfo> pcInfos = sirs.getPcInfos();
+//		
+//		
+//		
+//		for(PCInfo pc : pcInfos){
+//			System.out.println(pc.getHostname());
+//			System.out.println(pc.getIpAddress());
+//			System.out.println(pc.getMacAddress());
+//			System.out.println(pc.getOs());
+//			System.out.println(pc.getRamSize());
+//			System.out.println(pc.getCpu().getConstructor());
+//			System.out.println(pc.getCpu().getModel());
+//			System.out.println(pc.getHdd().getFreeSize());
+//			
+//			
+//			pcData.add(new PCInfoViewWrapper(pc));
+//		}
 		
 		
 		
