@@ -39,7 +39,7 @@ public class SystemInfoRetrieverClient {
 	public void startListening() throws IOException{
 		
 		udpSocket = new MulticastSocket(udpPort);
-		udpSocket.joinGroup(InetAddress.getByName("224.0.0.1"));
+		udpSocket.joinGroup(InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS));
 		
 		byte[] buffer = new byte[SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length];
 		

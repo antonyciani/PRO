@@ -15,10 +15,12 @@
 	<section name="FatJarPackageWizard">
 		<item value="D:\HEIG\S4\PRO\GitHub\PRO_SystemInfoVisualizer" key="FatJarPackageWizardPage.ANTSCRIPT_LOCATION"/>
 		<item value="ClientApp - MonitorServerApp" key="FatJarPackageWizardPage.LAUNCH_CONFIGURATION_SELECTION_NAME"/>
-		<item value="C:\Users\Antony\Desktop\PROJARS\Client.jar" key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION"/>
+		<item value="D:\HEIG\S4\PRO\GitHub\PRO_SystemInfoVisualizer\PROJARS\Client.jar" key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION"/>
 		<item value="false" key="FatJarPackageWizardPage.ANTSCRIPT_SAVE"/>
 		<item value="1" key="FatJarPackageWizardPage.LIBRARY_HANDLING"/>
 		<list key="FatJarPackageWizardPage.DESTINATION_NAMES_ID">
+			<item value="D:\HEIG\S4\PRO\GitHub\PRO_SystemInfoVisualizer\PROJARS\Client.jar"/>
+			<item value="D:\HEIG\S4\PRO\GitHub\PRO_SystemInfoVisualizer\PROJARS\Server.jar"/>
 			<item value="C:\Users\Antony\Desktop\PROJARS\Client.jar"/>
 			<item value="C:\Users\Antony\Desktop\PROJARS\Server.jar"/>
 			<item value="C:\Users\Antony\Desktop\PROJARS/Client.jar"/>

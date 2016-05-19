@@ -38,10 +38,10 @@
 <fullyQualifiedTypeName name="communication.SystemInfoRetrieverServer"/>
 <fullyQualifiedTypeName name="java.net.SocketException"/>
 <fullyQualifiedTypeName name="java.util.LinkedList"/>
-<fullyQualifiedTypeName name="communication.SystemInfoRetrieverProtocol"/>
 <fullyQualifiedTypeName name="monitor.database.Database"/>
 <fullyQualifiedTypeName name="monitor.model.PCInfo"/>
 <fullyQualifiedTypeName name="monitor.model.Program"/>
 <fullyQualifiedTypeName name="monitor.model.CPUInfo"/>
 <fullyQualifiedTypeName name="monitor.model.HDDInfo"/>
+<fullyQualifiedTypeName name="communication.SystemInfoRetrieverProtocol"/>
 </qualifiedTypeNameHistroy>
