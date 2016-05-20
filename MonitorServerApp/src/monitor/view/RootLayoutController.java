@@ -12,9 +12,21 @@ public class RootLayoutController {
 		this.serverApp = serverApp;
 	}
 
+
+	@FXML
+	public void handleAverageLoadStorage(){
+
+		serverApp.showAverageStorageLoadDialog();
+	}
+
 	@FXML
 	public void handleArchive(){
 
+	}
+
+	@FXML
+	public void handleGeneralStatistics(){
+		serverApp.showGeneralStatistics();
 	}
 
 	@FXML

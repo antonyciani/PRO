@@ -76,9 +76,7 @@ public class SystemInfoRetrieverServer {
 					udpSocket = new MulticastSocket();
 					udpSocket.joinGroup(InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS));
 					
-					udpSocket.send(new DatagramPacket(SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes(), 
-							SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length, 
-							InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS), udpPort ));
+					udpSocket.send(new DatagramPacket(SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes(), SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length, InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS), udpPort ));
 					
 				} catch (IOException ex) {
 					LOG.log(Level.SEVERE, null, ex);

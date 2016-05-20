@@ -17,7 +17,8 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Statistics">
             <items>
-              <MenuItem mnemonicParsing="false" />
+              <MenuItem mnemonicParsing="false" onAction="#handleGeneralStatistics" text="General Statistics" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleAverageLoadStorage" text="Average Storage Load" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">

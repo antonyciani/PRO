@@ -1,47 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="java.io.ObjectOutput"/>
-<fullyQualifiedTypeName name="java.net.Socket"/>
-<fullyQualifiedTypeName name="java.io.BufferedOutputStream"/>
-<fullyQualifiedTypeName name="java.io.BufferedInputStream"/>
-<fullyQualifiedTypeName name="java.net.DatagramSocket"/>
-<fullyQualifiedTypeName name="java.net.DatagramPacket"/>
-<fullyQualifiedTypeName name="javafx.beans.property.DoubleProperty"/>
-<fullyQualifiedTypeName name="javafx.beans.property.IntegerProperty"/>
-<fullyQualifiedTypeName name="javafx.beans.property.StringProperty"/>
-<fullyQualifiedTypeName name="javafx.collections.ObservableList"/>
-<fullyQualifiedTypeName name="monitor.model.ProgramViewWrapper"/>
-<fullyQualifiedTypeName name="java.io.Serializable"/>
-<fullyQualifiedTypeName name="communication.SystemInfoRetrieverClient"/>
-<fullyQualifiedTypeName name="java.io.BufferedWriter"/>
-<fullyQualifiedTypeName name="java.io.PrintWriter"/>
-<fullyQualifiedTypeName name="java.io.InputStream"/>
-<fullyQualifiedTypeName name="java.io.OutputStream"/>
-<fullyQualifiedTypeName name="java.io.InputStreamReader"/>
-<fullyQualifiedTypeName name="java.io.BufferedReader"/>
-<fullyQualifiedTypeName name="utils.SystemInfoRecuperator"/>
-<fullyQualifiedTypeName name="java.io.ObjectOutputStream"/>
-<fullyQualifiedTypeName name="java.io.ObjectInputStream"/>
-<fullyQualifiedTypeName name="monitor.model.PCInfoViewWrapper"/>
-<fullyQualifiedTypeName name="java.util.concurrent.ExecutorService"/>
-<fullyQualifiedTypeName name="java.util.concurrent.Executors"/>
-<fullyQualifiedTypeName name="java.util.Arrays"/>
-<fullyQualifiedTypeName name="communication.SystemInfoRetrieverServer.ReceptionistWorker"/>
-<fullyQualifiedTypeName name="java.util.concurrent.TimeUnit"/>
-<fullyQualifiedTypeName name="java.net.MulticastSocket"/>
-<fullyQualifiedTypeName name="java.net.InetAddress"/>
-<fullyQualifiedTypeName name="model.HDDInfo"/>
-<fullyQualifiedTypeName name="model.CPUInfo"/>
-<fullyQualifiedTypeName name="model.PCInfoViewWrapper"/>
-<fullyQualifiedTypeName name="model.Program"/>
-<fullyQualifiedTypeName name="model.ProgramViewWrapper"/>
-<fullyQualifiedTypeName name="communication.SystemInfoRetrieverServer"/>
-<fullyQualifiedTypeName name="java.net.SocketException"/>
-<fullyQualifiedTypeName name="java.util.LinkedList"/>
-<fullyQualifiedTypeName name="monitor.database.Database"/>
-<fullyQualifiedTypeName name="monitor.model.PCInfo"/>
-<fullyQualifiedTypeName name="monitor.model.Program"/>
-<fullyQualifiedTypeName name="monitor.model.CPUInfo"/>
-<fullyQualifiedTypeName name="monitor.model.HDDInfo"/>
 <fullyQualifiedTypeName name="communication.SystemInfoRetrieverProtocol"/>
 </qualifiedTypeNameHistroy>

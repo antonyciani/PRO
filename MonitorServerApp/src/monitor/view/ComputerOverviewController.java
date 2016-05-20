@@ -2,7 +2,15 @@ package monitor.view;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
+
+import javax.xml.crypto.dsig.spec.HMACParameterSpec;
+
+import com.mysql.jdbc.PingTarget;
 
 import communication.SystemInfoRetrieverProtocol;
 import communication.SystemInfoRetrieverServer;
@@ -14,7 +22,11 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -30,6 +42,7 @@ import monitor.model.PCInfoViewWrapper;
 import monitor.model.Program;
 import monitor.model.ProgramViewWrapper;
 import utils.AdvancedFilters;
+import utils.PlatformExecutor;
 
 public class ComputerOverviewController {
 
@@ -86,14 +99,24 @@ public class ComputerOverviewController {
     private Label status;
     private ObservableList<PieChart.Data> pieChartData;
 
+    @FXML
+    private LineChart<LocalDateTime, Double> lineChart;
+    @FXML
+	private CategoryAxis xAxis;
+    @FXML
+    private NumberAxis yAxis;
+
 
     private AdvancedFilters filter;
     private ServerApp serverApp;
     private FilteredList<PCInfoViewWrapper> filteredList;
     private FilteredList<PCInfoViewWrapper> filteredListCopy;
 
+    private Database db;
+
     public void setServerApp(ServerApp serverApp){
 		this.serverApp = serverApp;
+		db = this.serverApp.getDatabase();
 		// 1. Wrap the ObservableList in a FilteredList (initially display all data).
 		filteredList = new FilteredList<>(serverApp.getPcInfo(), p -> true);
 
@@ -122,6 +145,8 @@ public class ComputerOverviewController {
         		(observable, oldValue, newValue) -> showPieChartDetails(newValue));
         pcTable.getSelectionModel().selectedItemProperty().addListener(
         		(observable, oldValue, newValue) -> showProgrammsDetails(newValue));
+        pcTable.getSelectionModel().selectedItemProperty().addListener(
+        		(observable, oldValue, newValue) -> showLineChartDetails(newValue));
 
         //FilteredList<PCInfo> filteredList; = new FilteredList<>(pcList, p -> true);
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -188,6 +213,24 @@ public class ComputerOverviewController {
     	}
     }
 
+    private void showLineChartDetails(PCInfoViewWrapper newValue){
+
+    	lineChart.getData().clear();
+
+    	//Récupère les infos de la base de donnée
+    	HashMap<String, Double> map = db.freeHardDriveSizeRate(newValue);
+
+    	//Ajout des données au graphique
+
+    	XYChart.Series series = new XYChart.Series();
+
+    	for(Entry<String, Double> e : map.entrySet()){
+			series.getData().add(new XYChart.Data(e.getKey(), e.getValue()));
+		}
+
+    	lineChart.getData().add(series);
+    }
+
     private void showPieChartDetails(PCInfoViewWrapper newValue){
     	if(newValue != null){
 
@@ -241,6 +284,23 @@ public class ComputerOverviewController {
 	}
 
     @FXML
+    public void handleCaptureDate(){
+    	String date = serverApp.showCaptureSelectionDialog();
+
+    	if(!date.equals("")){
+    		serverApp.setCurentPcView(date);
+        	serverApp.getPcInfo().clear();
+    		serverApp.getPcInfo().addAll(serverApp.getDatabase().loadPCInfo(date));
+    	}
+    }
+
+    @FXML
+    public void handleDeleteCapture(){
+    	String date = serverApp.showCaptureSelectionDialog();
+    	serverApp.getDatabase().deleteCapture(date);
+    }
+
+    @FXML
 	public void handleAdvancedFilter(){
     	filterField.clear();
     	filteredListCopy = filteredList;
@@ -261,33 +321,34 @@ public class ComputerOverviewController {
     	filter.clearFilter();
     	pcTable.setItems(filteredList);
     }
-    
+
     @FXML
     public void handleRefresh(){
 
-    	
-    	ObservableList<PCInfoViewWrapper> pcData = serverApp.getPcInfo();
-    	Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
-    	db.connect();
-    	
-    	pcData.clear();
-    	
-		SystemInfoRetrieverServer sirs = null;
-		try {
-			sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
-			sirs.retrieveInfosFromClients();
-			
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+//    	ObservableList<PCInfoViewWrapper> pcData = serverApp.getPcInfo();
+//    	pcData.clear();
+
+       //games = FXCollections.observableArrayList();
+
+    	CompletableFuture.supplyAsync(() -> {
+    		SystemInfoRetrieverServer sirs = null;
+    		try {
+    			sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
+    			sirs.retrieveInfosFromClients();
+    		} catch (SocketException e) {
+    			e.printStackTrace();
+    		}
+			return sirs.getPcInfos();
+		}).whenCompleteAsync((list, ex) -> {
+			db.storePCs(list);
+			serverApp.setCurentPcView(db.getLastCapture());
+		}, PlatformExecutor.instance);
 
 		
-		LinkedList<PCInfo> pcInfos = sirs.getPcInfos();
-		db.storePCs(pcInfos);
-		
-		
-		for(PCInfo pc : pcInfos){
+
+
+		/*for(PCInfo pc : pcInfos){
 			System.out.println(pc.getHostname());
 			System.out.println(pc.getIpAddress());
 			System.out.println(pc.getMacAddress());
@@ -296,10 +357,10 @@ public class ComputerOverviewController {
 			System.out.println(pc.getCpu().getConstructor());
 			System.out.println(pc.getCpu().getModel());
 			System.out.println(pc.getHdd().getFreeSize());
-			
+
 			pcData.add(new PCInfoViewWrapper(pc));
-		}
+		}*/
 
     }
-    
+
 }
