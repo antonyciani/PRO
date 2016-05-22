@@ -25,23 +25,23 @@ public class SystemInfoRetrieverServer {
 		private int udpPort;
 		private int tcpPort;
 		private LinkedList<PCInfo> pcInfos;
-		
+
 
 		/**
 		 * Constructor
 		 *
 		 * @param port the port to listen on
-		 * @throws SocketException 
+		 * @throws SocketException
 		 */
 		public SystemInfoRetrieverServer(int udpPort, int tcpPort) throws SocketException {
-			
+
 			this.udpPort = udpPort;
 			this.tcpPort = tcpPort;
 			this.pcInfos = new LinkedList<>();
-			
+
 		}
 
-		
+
 		public void retrieveInfosFromClients() {
 			LOG.info("Starting the Receptionist Worker on a new thread...");
 			Thread receptionist = new Thread(new ReceptionistWorker());
@@ -52,18 +52,18 @@ public class SystemInfoRetrieverServer {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
-		
+
 		public LinkedList<PCInfo> getPcInfos(){
-			
+
 			return pcInfos;
 		}
-		
+
 
 		private class ReceptionistWorker implements Runnable {
 
-			
+
 			@Override
 			public void run() {
 				ServerSocket serverSocket;
@@ -75,15 +75,15 @@ public class SystemInfoRetrieverServer {
 					serverSocket = new ServerSocket(tcpPort);
 					udpSocket = new MulticastSocket();
 					udpSocket.joinGroup(InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS));
-					
+
 					udpSocket.send(new DatagramPacket(SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes(), SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length, InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS), udpPort ));
-					
+
 				} catch (IOException ex) {
 					LOG.log(Level.SEVERE, null, ex);
 					return;
 				}
-				
-				
+
+
 				boolean listening = true;
 				try {
 					serverSocket.setSoTimeout(20000);
@@ -92,7 +92,7 @@ public class SystemInfoRetrieverServer {
 					e.printStackTrace();
 				}
 				while (listening) {
-					
+
 					LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {0}", tcpPort);
 					try {
 						Socket clientSocket = serverSocket.accept();
@@ -106,7 +106,7 @@ public class SystemInfoRetrieverServer {
 						Logger.getLogger(SystemInfoRetrieverServer.class.getName()).log(Level.SEVERE, null, ex);
 					}
 				}
-				
+
 				for(Thread t : servants){
 					try {
 						t.join();
@@ -135,7 +135,7 @@ public class SystemInfoRetrieverServer {
 				private Socket clientSocket;
 				private BufferedReader in;
 				private PrintWriter out;
-				
+
 
 				public ServantWorker(Socket clientSocket) {
 					try {
@@ -157,30 +157,32 @@ public class SystemInfoRetrieverServer {
 					boolean isInfoReceived = false;
 					boolean isInfoReady = false;
 					String msg = "";
-					
-					
+
+
 					try {
-						
+
 						LOG.info("Waiting for client INFOISREADY");
-						
+
 						LOG.info(msg);
 						while ((!isInfoReady) && (msg = in.readLine()) != null) {
 							LOG.info(msg);
 							if(msg.equals(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO)){
-								
+
 								LOG.info("RECEIVED READY");
 								isInfoReady = true;
+								//TODO Récupérer clé publique, générer clé secrète symétrique, la chiffrer avec clé publique et l'envoyer
 								out.println(SystemInfoRetrieverProtocol.READY_TO_READ_INFO);
 								out.flush();
-								
+
 							}
 						}
 						PCInfo pc = null;
 						ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
 						try {
+							//TODO déchiffrer message avec clé secrète symétrique
 							while (!isInfoReceived && ((pc = (PCInfo)ois.readObject()) != null)){
 								LOG.info("READING OBJECT");
-								
+
 								pcInfos.add(pc);
 								isInfoReceived = true;
 								System.out.println(pc.getHostname());
@@ -191,7 +193,7 @@ public class SystemInfoRetrieverServer {
 								System.out.println(pc.getCpu().getConstructor());
 								System.out.println(pc.getCpu().getModel());
 								System.out.println(pc.getHdd().getFreeSize());
-								
+
 							}
 
 

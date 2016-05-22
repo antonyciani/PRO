@@ -28,32 +28,32 @@ public class SystemInfoRetrieverClient {
 
 	int udpPort;
 	int tcpPort;
-	
-	
+
+
 	public SystemInfoRetrieverClient(int udpPort, int tcpPort) throws SocketException {
 		this.udpPort = udpPort;
 		this.tcpPort = tcpPort;
-		
+
 	}
 
 	public void startListening() throws IOException{
-		
+
 		udpSocket = new MulticastSocket(udpPort);
 		udpSocket.joinGroup(InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS));
-		
+
 		byte[] buffer = new byte[SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length];
-		
+
 		DatagramPacket udpPacket = new DatagramPacket(buffer, buffer.length);
 		while(!sendInfoMsgReceived){
-			
+
 			udpSocket.receive(udpPacket);
 			String msg = new String(udpPacket.getData());
 			LOG.info("Received: " +msg);
 			if(msg.equals(SystemInfoRetrieverProtocol.REQUEST_INFO)){
-				
+
 				sendInfoMsgReceived = true;
 				LOG.info("Server requested infos");
-				
+
 			}
 		}
 		LOG.info("Connecting to server via TCP");
@@ -63,19 +63,22 @@ public class SystemInfoRetrieverClient {
 		boolean ready = false;
 		String msg = "";
 		while(connected){
-			
+
 			if(!ready){
 				pc = SystemInfoRecuperator.retrievePCInfo();
 				ready = true;
 			}
 			else{
+				//TODO générer paire de clé RSA et envoyer clé pulbique
 				out.println(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO);
 				out.flush();
 				LOG.info("SENT SOMETHING");
 				while((msg = in.readLine()) != null){
-					
+
 					if(msg.equals(SystemInfoRetrieverProtocol.READY_TO_READ_INFO)){
+						//TODO récupérer clé secrète symétrique
 						ObjectOutputStream oos = new ObjectOutputStream(tcpSocket.getOutputStream());
+						//TODO chiffrer avec clé secrète symétrique avant envoi
 						oos.writeObject(pc);
 						LOG.info("INFO HAS BEEN SENT");
 					}
@@ -84,12 +87,12 @@ public class SystemInfoRetrieverClient {
 				sendInfoMsgReceived = false;
 			}
 		}
-		
-		
+
+
 	}
-	
+
 	public void connect(InetAddress serverAddress, int serverPort) {
-		
+
 		try {
 			tcpSocket = new Socket(serverAddress, serverPort);
 			in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
@@ -101,8 +104,8 @@ public class SystemInfoRetrieverClient {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
+
+
+
 
 }
