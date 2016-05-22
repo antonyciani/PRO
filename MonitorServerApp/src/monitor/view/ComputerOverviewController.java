@@ -3,7 +3,7 @@ package monitor.view;
 import java.io.IOException;
 import java.net.SocketException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
@@ -218,7 +218,7 @@ public class ComputerOverviewController {
     	lineChart.getData().clear();
 
     	//Récupère les infos de la base de donnée
-    	HashMap<String, Double> map = db.freeHardDriveSizeRate(newValue);
+    	TreeMap<String, Double> map = db.freeHardDriveSizeRate(newValue);
 
     	//Ajout des données au graphique
 
@@ -345,7 +345,7 @@ public class ComputerOverviewController {
 			serverApp.setCurentPcView(db.getLastCapture());
 		}, PlatformExecutor.instance);
 
-		
+
 
 
 		/*for(PCInfo pc : pcInfos){
