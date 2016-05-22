@@ -218,12 +218,12 @@ public class ComputerOverviewController {
     	lineChart.getData().clear();
 
     	//Récupère les infos de la base de donnée
-    	TreeMap<String, Double> map = db.freeHardDriveSizeRate(newValue);
+    	TreeMap<String, Double> map = db.storageLoadRate(newValue);
 
     	//Ajout des données au graphique
 
     	XYChart.Series series = new XYChart.Series();
-
+    	series.setName("Storage Load Rate");
     	for(Entry<String, Double> e : map.entrySet()){
 			series.getData().add(new XYChart.Data(e.getKey(), e.getValue()));
 		}
