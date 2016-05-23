@@ -3,8 +3,11 @@ package communication;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -167,7 +170,6 @@ public class SystemInfoRetrieverServer {
 					SecretKey secretKey = null;
 
 					try {
-						ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
 						LOG.info("Waiting for client INFOISREADY");
 
 						LOG.info(msg);
@@ -177,49 +179,63 @@ public class SystemInfoRetrieverServer {
 
 								LOG.info("RECEIVED READY");
 								isInfoReady = true;
+								out.println("WAITING_FOR_PUBLIC_KEY");
+								out.flush();
 
+								RSAPublicKey publicKey;
+								ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
 								//Récupérer clé publique du client
-								RSAPublicKey publicKey = (RSAPublicKey)ois.readObject();
+								while((publicKey = (RSAPublicKey)ois.readObject()) != null){
+									LOG.info("RECEIVED PUBLIC KEY");
+									//Générer clé secrète symétrique
+									secretKey = Cryptography.generateAESSecretKey();
+									//Chiffrer clé secrète avec clé publique
+									byte[] encryptedSecretKey = Cryptography.RSAEncrypt(secretKey.getEncoded(), publicKey);
+									out.println(SystemInfoRetrieverProtocol.READY_TO_READ_INFO);
+									out.flush();
+									LOG.info("SENT READY TO READ");
+									//Envoyer la clé secrète
+									System.out.println(encryptedSecretKey);
+									OutputStream tmpOut = clientSocket.getOutputStream();
+									tmpOut.write(encryptedSecretKey);
+									break;
+								}
+								//}
 
-								//Générer clé secrète symétrique
-								secretKey = Cryptography.generateAESSecretKey();
-
-								//Chiffrer clé secrète avec clé publique
-								byte[] encryptedSecretKey = Cryptography.RSAEncrypt(secretKey.getEncoded(), publicKey);
-
-								out.println(SystemInfoRetrieverProtocol.READY_TO_READ_INFO);
-								out.flush();
-
-								//Envoyer la clé secrète
-								out.println(encryptedSecretKey);
-								out.flush();
 
 							}
 						}
 						PCInfo pc = null;
 
+
 						while (!isInfoReceived && (msg = in.readLine()) != null){
-							LOG.info("READING OBJECT");
-							//Déchiffrer le message avec la clé secrète
-							byte[] decryptedPC = Cryptography.AESDecrypt(msg.getBytes(), secretKey);
+							int msgSize = Integer.parseInt(msg);
+							InputStream tmpIn = clientSocket.getInputStream();
+							byte[] encryptedPC = new byte[msgSize];
+							while (tmpIn.read(encryptedPC) != -1){
 
-							//Reconstruire l'objet à partir des bytes
-							ObjectInputStream tmpInput = new ObjectInputStream(new ByteArrayInputStream(decryptedPC));
-							pc = (PCInfo)tmpInput.readObject();
+								LOG.info("READING OBJECT");
+								//Déchiffrer le message avec la clé secrète
+								byte[] decryptedPC = Cryptography.AESDecrypt(encryptedPC, secretKey);
 
-							pcInfos.add(pc);
-							isInfoReceived = true;
-							System.out.println(pc.getHostname());
-							System.out.println(pc.getIpAddress());
-							System.out.println(pc.getMacAddress());
-							System.out.println(pc.getOs());
-							System.out.println(pc.getRamSize());
-							System.out.println(pc.getCpu().getConstructor());
-							System.out.println(pc.getCpu().getModel());
-							System.out.println(pc.getHdd().getFreeSize());
+								//Reconstruire l'objet à partir des bytes
+								ObjectInputStream tmpInput = new ObjectInputStream(new ByteArrayInputStream(decryptedPC));
+								pc = (PCInfo)tmpInput.readObject();
+
+								pcInfos.add(pc);
+								isInfoReceived = true;
+								System.out.println(pc.getHostname());
+								System.out.println(pc.getIpAddress());
+								System.out.println(pc.getMacAddress());
+								System.out.println(pc.getOs());
+								System.out.println(pc.getRamSize());
+								System.out.println(pc.getCpu().getConstructor());
+								System.out.println(pc.getCpu().getModel());
+								System.out.println(pc.getHdd().getFreeSize());
 
 
-							LOG.info("Cleaning up resources...");
+								LOG.info("Cleaning up resources...");
+							}
 						}
 						clientSocket.close();
 						in.close();
