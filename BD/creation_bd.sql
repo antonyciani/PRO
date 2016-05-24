@@ -19,7 +19,7 @@ CREATE TABLE program (
 CREATE TABLE processor (
 	 ID INT NOT NULL AUTO_INCREMENT,
      Constructor VARCHAR(100) NOT NULL,
-     Frequency DECIMAL(4,2) NOT NULL,
+     Frequency DECIMAL(5,3) NOT NULL,
      Model VARCHAR(100) NOT NULL,
      NmbrCores INT (2) NOT NULL,
      PRIMARY KEY(ID)
