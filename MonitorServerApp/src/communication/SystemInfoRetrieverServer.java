@@ -177,6 +177,7 @@ public class SystemInfoRetrieverServer {
 						LOG.info(msg);
 
 						ObjectInputStream ois = null;
+						OutputStream tmpOut = null;
 						while ((!isInfoReady) && (msg = in.readLine()) != null) {
 							LOG.info(msg);
 							if(msg.equals(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO)){
@@ -201,7 +202,7 @@ public class SystemInfoRetrieverServer {
 								}
 
 								//Génération et envoi de la clé secrète chiffrée avec la clé publique
-								OutputStream tmpOut = clientSocket.getOutputStream();
+								tmpOut = clientSocket.getOutputStream();
 								while((msg = in.readLine()) != null){
 									if(msg.equals(SystemInfoRetrieverProtocol.WAITING_FOR_SECRET_KEY)){
 
@@ -217,9 +218,6 @@ public class SystemInfoRetrieverServer {
 										break;
 									}
 								}
-								//tmpOut.close();
-
-
 							}
 						}
 
@@ -227,6 +225,7 @@ public class SystemInfoRetrieverServer {
 
 						//Réception et déchiffrement des données
 						PCInfo pc = null;
+						InputStream tmpIn = null;
 						while (!isInfoReceived && (msg = in.readLine()) != null){
 
 							//Réception de la taille du message
@@ -235,7 +234,7 @@ public class SystemInfoRetrieverServer {
 
 							//Röception des données chiffrées
 
-							InputStream tmpIn = clientSocket.getInputStream();
+							tmpIn = clientSocket.getInputStream();
 							while (tmpIn.read(encryptedPC) != -1){
 
 								isInfoReceived = true;
@@ -265,7 +264,8 @@ public class SystemInfoRetrieverServer {
 
 							}
 						}
-						//tmpIn.close();
+						tmpIn.close();
+						tmpOut.close();
 						clientSocket.close();
 						in.close();
 						out.close();
