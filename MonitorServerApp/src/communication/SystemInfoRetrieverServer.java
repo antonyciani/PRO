@@ -110,7 +110,7 @@ public class SystemInfoRetrieverServer {
 						servants.add(newServant);
 					} catch (IOException ex) {
 						listening = false;
-						Logger.getLogger(SystemInfoRetrieverServer.class.getName()).log(Level.SEVERE, null, ex);
+						Logger.getLogger("Receptionist is no longer accepting connections");
 					}
 				}
 
@@ -163,8 +163,10 @@ public class SystemInfoRetrieverServer {
 					boolean shouldRun = true;
 					boolean isInfoReceived = false;
 					boolean isInfoReady = false;
+					boolean isKeysExchanged = false;
 					String msg = "";
 					SecretKey secretKey = null;
+					RSAPublicKey publicKey = null;
 
 					try {
 						ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
@@ -177,22 +179,31 @@ public class SystemInfoRetrieverServer {
 
 								LOG.info("RECEIVED READY");
 								isInfoReady = true;
+								
+								while((!isKeysExchanged)){
+									
+									//Récupérer clé publique du client
+									publicKey = (RSAPublicKey)ois.readObject();
 
-								//Récupérer clé publique du client
-								RSAPublicKey publicKey = (RSAPublicKey)ois.readObject();
+									//Générer clé secrète symétrique
+									secretKey = Cryptography.generateAESSecretKey();
 
-								//Générer clé secrète symétrique
-								secretKey = Cryptography.generateAESSecretKey();
-
-								//Chiffrer clé secrète avec clé publique
-								byte[] encryptedSecretKey = Cryptography.RSAEncrypt(secretKey.getEncoded(), publicKey);
-
+									//Chiffrer clé secrète avec clé publique
+									byte[] encryptedSecretKey = Cryptography.RSAEncrypt(secretKey.getEncoded(), publicKey);
+									
+									//Envoyer la clé secrète
+									out.println(encryptedSecretKey);
+									out.flush();
+									
+									isKeysExchanged = true;
+									
+									
+								}
+								
 								out.println(SystemInfoRetrieverProtocol.READY_TO_READ_INFO);
 								out.flush();
 
-								//Envoyer la clé secrète
-								out.println(encryptedSecretKey);
-								out.flush();
+								
 
 							}
 						}
