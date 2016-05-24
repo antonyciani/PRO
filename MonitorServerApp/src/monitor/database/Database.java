@@ -266,13 +266,14 @@ public class Database{
 		}
 	}
 
-	public TreeMap<String, Double> freeHardDriveSizeRate(PCInfoViewWrapper pc){
+	public TreeMap<String, Double> storageLoadRate(PCInfoViewWrapper pc){
 		TreeMap<String, Double> map = new TreeMap<>();
 		try{
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery("SELECT captureTime, freeHardDriveSize, totalHardDriveSize FROM machineState WHERE MacAddress ='"+pc.getMacAddress()+"';");
 			while(result.next()){
-				double rate = result.getDouble(2)/result.getDouble(3);
+				double load = result.getDouble(3) - result.getDouble(2);
+				double rate = load/result.getDouble(3);
 				map.put(result.getString(1), rate);
 			}
 		}
@@ -281,13 +282,14 @@ public class Database{
 		}
 		return map;
 	}
-	public TreeMap<String, Double> averageFreeHardDriveSizeRate(){
+	public TreeMap<String, Double> averageStorageLoadRate(){
 		TreeMap<String, Double> map = new TreeMap<>();
 		try{
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery("SELECT captureTime, SUM(freeHardDriveSize), SUM(totalHardDriveSize) FROM machineState GROUP BY captureTime;");
 			while(result.next()){
-				double rate = result.getDouble(2)/result.getDouble(3);
+				double load = result.getDouble(3) - result.getDouble(2);
+				double rate = load/result.getDouble(3);
 				map.put(result.getString(1), rate);
 			}
 
@@ -297,7 +299,7 @@ public class Database{
 		}
 		return map;
 	}
-	public HashMap<String, Integer> nbProgramsInstalledByVersion(String program){
+	public HashMap<String, Integer> nbProgramsInstalledByVersion(String program, String captureTime){
 		HashMap<String, Integer> map = new HashMap<>();
 		try{
 			Statement statement = connection.createStatement();
@@ -305,7 +307,8 @@ public class Database{
 													+ "FROM pc_program "
 													+ "INNER JOIN program "
 													+ "ON pc_program.programID = program.ID "
-													+ "WHERE program.name = '"+program+"' GROUP BY program.version;");
+													+ "WHERE program.name = '"+program+"' "
+													+ "AND pcCaptureTime = '"+captureTime+"' GROUP BY program.version;");
 			while(result.next()){
 				map.put(result.getString(1), result.getInt(2));
 			}
@@ -315,7 +318,7 @@ public class Database{
 		}
 		return map;
 	}
-	public HashMap<String, Integer> mostFrequentlyInstalledPrograms(int max){
+	public HashMap<String, Integer> mostFrequentlyInstalledPrograms(int max, String captureTime){
 		HashMap<String, Integer> map = new HashMap<>();
 		try{
 			Statement statement = connection.createStatement();
@@ -323,6 +326,7 @@ public class Database{
 													+ "FROM pc_program "
 													+ "INNER JOIN program "
 													+ "ON pc_program.programID = program.ID "
+													+ "WHERE pcCaptureTime = '"+captureTime+"' "
 													+ "GROUP BY name;");
 			int counter = 0;
 			while(result.next() && counter < max){
@@ -333,6 +337,22 @@ public class Database{
 			e.printStackTrace();
 		}
 		return map;
+	}
+	public ArrayList<String> getProgramsName(String captureTime){
+		ArrayList<String> programs = new ArrayList<>();
+		try{
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT DISTINCT name FROM program "
+													+ "INNER JOIN pc_program "
+													+ "ON pc_program.programID = program.ID "
+													+ "WHERE pcCaptureTime = '"+captureTime+"';");
+			while(result.next()){
+				programs.add(result.getString(1));
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		return programs;
 	}
 	public void finalize(){
 		if(connection != null){
@@ -364,6 +384,10 @@ public class Database{
 		HDDInfo hdd = new HDDInfo(500.8, 400.4);
 		long ramSize = 8;
 		LinkedList<Program> programs = new LinkedList<>();
+		programs.add(new Program("ls", "1.4"));
+		programs.add(new Program("cat", "2.4"));
+
+		LinkedList<Program> programs2 = new LinkedList<>();
 		programs.add(new Program("ls", "1.3"));
 		programs.add(new Program("cat", "2.3"));
 		PCInfo pc = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs);
@@ -375,11 +399,11 @@ public class Database{
 		hdd = new HDDInfo(500.8, 209.4);
 		ramSize = 16;
 
-		PCInfo pc2 = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, new LinkedList<Program>());
+		PCInfo pc2 = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs2);
 		LinkedList<PCInfo> pcs = new LinkedList<>();
 		pcs.add(pc);
 		pcs.add(pc2);
-		//db.storePCs(pcs);
+		db.storePCs(pcs);
 
 		/*
 		ArrayList<String> capt = db.getCaptures();
@@ -449,7 +473,7 @@ public class Database{
 			String key = entry.getKey();
 			Integer value = entry.getValue();
 			System.out.println(key + " : "+ value);}
-
+/*
 		System.out.println("\n===== Versions =====");
 		HashMap<String, Integer> map6 = db.nbProgramsInstalledByVersion("ls");
 		for(Entry<String, Integer> entry : map6.entrySet()){
@@ -462,7 +486,7 @@ public class Database{
 		for(Entry<String, Integer> entry : map7.entrySet()){
 			String key = entry.getKey();
 			Integer value = entry.getValue();
-			System.out.println(key + " : "+ value);}
+			System.out.println(key + " : "+ value);}*/
 	}
 
 }

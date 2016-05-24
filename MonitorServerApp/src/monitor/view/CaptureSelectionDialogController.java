@@ -33,7 +33,6 @@ public class CaptureSelectionDialogController {
 
 	@FXML
     private void initialize(){
-
 		dateColumn.setCellValueFactory(cellData -> cellData.getValue().getDateProperty());
 		//Listen for selection changes and show the person details when changed.
         dateTable.getSelectionModel().selectedItemProperty().addListener(

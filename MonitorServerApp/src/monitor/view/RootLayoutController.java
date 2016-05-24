@@ -33,4 +33,9 @@ public class RootLayoutController {
 	public void handleExit(){
 		System.exit(0);
 	}
+
+	@FXML
+	public void handleProgramsStatistics(){
+		serverApp.showProgramsStatistics();
+	}
 }
