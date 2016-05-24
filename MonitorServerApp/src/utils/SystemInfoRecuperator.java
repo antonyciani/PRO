@@ -65,21 +65,20 @@ public class SystemInfoRecuperator {
 	public static LinkedList<Program> retrieveInstalledPrograms() {
 
 		try {
-			
+
 			LinkedList<Program> programs = new LinkedList<>();
 //			Process proc = Runtime.getRuntime().exec(
 //					"powershell.exe Get-ItemProperty HKLM:\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select-Object DisplayName"); //DisplayVersion, Publisher, InstallDate
 //			Process proc = Runtime.getRuntime().exec(
 //					"powershell.exe Get-WmiObject -Class Win32_Product | Select-Object -Property Name,Version | Sort-Object Name| Format-List"); //DisplayVersion, Publisher, InstallDate
-			Process proc = Runtime.getRuntime().exec(
-					"wmic product get name,version /format:csv"); //DisplayVersion, Publisher, InstallDate
+			Process proc = Runtime.getRuntime().exec("wmic product get name,version /format:\""+System.getenv("SystemRoot")+"\\System32\\wbem\\fr-FR\\csv\"");
 
 			BufferedInputStream bs = new BufferedInputStream(proc.getInputStream());
 			BufferedReader br = new BufferedReader(new InputStreamReader(bs));
 			String program = "";
-			
+
 			while ((program = br.readLine()) != null) {
-				    
+
 					if(!program.equals("") && !program.equals("Node,Name,Version") ){
 						String[] elems = program.split(",");
 						String name = "";
@@ -88,7 +87,7 @@ public class SystemInfoRecuperator {
 						for(int i = 0; i < elems.length; i++){
 							System.out.println(elems[i]);
 						}
-						
+
 						System.out.println("P:" + program);
 						if(elems.length > 1){
 							name = elems[1];
@@ -98,14 +97,14 @@ public class SystemInfoRecuperator {
 							}
 							Program p = new Program(name, version);
 							programs.add(p);
-						}					
+						}
 
-						
+
 					}
-					
-				
+
+
 			}
-			
+
 			return programs;
 
 		} catch (IOException e) {
@@ -145,21 +144,21 @@ public class SystemInfoRecuperator {
 			}
 			macAddress = sb.toString();
 			System.out.println(sb.toString());
-			
+
 			Properties prop = System.getProperties();
 			os = prop.getProperty("os.name");
-			
-			cpu = retrieveCPUInfo(); 
+
+			cpu = retrieveCPUInfo();
 			hdd = retrieveHDDInfo();
-			
+
 			Sigar s = new Sigar();
 			ramSize = (long) (Math.ceil(s.getMem().getRam()/1024.0));
 			System.out.println("RAM: " + ramSize);
-			
+
 			programs.addAll(retrieveInstalledPrograms());
-			
+
 			return new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs);
-			
+
 
 		} catch (UnknownHostException e) {
 
