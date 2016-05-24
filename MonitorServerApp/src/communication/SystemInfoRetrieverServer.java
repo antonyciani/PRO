@@ -170,68 +170,87 @@ public class SystemInfoRetrieverServer {
 					String msg = "";
 					SecretKey secretKey = null;
 					RSAPublicKey publicKey = null;
+
 					try {
 						LOG.info("Waiting for client INFOISREADY");
 
 						LOG.info(msg);
+
+						ObjectInputStream ois = null;
 						while ((!isInfoReady) && (msg = in.readLine()) != null) {
 							LOG.info(msg);
 							if(msg.equals(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO)){
 
 								LOG.info("RECEIVED READY");
 								isInfoReady = true;
-								out.println("WAITING_FOR_PUBLIC_KEY");
+
+								out.println(SystemInfoRetrieverProtocol.WAITING_FOR_PUBLIC_KEY);
 								out.flush();
 
-
-								ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
 								//Récupérer clé publique du client
+								ois = new ObjectInputStream(clientSocket.getInputStream());
 								while((!isPublicKeyReceived) && (publicKey = (RSAPublicKey)ois.readObject()) != null){
+
+									isPublicKeyReceived = true;
 									LOG.info("RECEIVED PUBLIC KEY");
 
 									out.println(SystemInfoRetrieverProtocol.READY_TO_READ_INFO);
 									out.flush();
-									isPublicKeyReceived = true;
 									LOG.info("SENT READY TO READ");
 
 								}
+
+								//Génération et envoi de la clé secrète chiffrée avec la clé publique
+								OutputStream tmpOut = clientSocket.getOutputStream();
 								while((msg = in.readLine()) != null){
-									if(msg.equals("WAITING_FOR_SECRET_KEY")){
+									if(msg.equals(SystemInfoRetrieverProtocol.WAITING_FOR_SECRET_KEY)){
+
 										//Générer clé secrète symétrique
 										secretKey = Cryptography.generateAESSecretKey();
+
 										//Chiffrer clé secrète avec clé publique
 										byte[] encryptedSecretKey = Cryptography.RSAEncrypt(secretKey.getEncoded(), publicKey);
+
 										//Envoyer la clé secrète
-										System.out.println(encryptedSecretKey);
-										OutputStream tmpOut = clientSocket.getOutputStream();
+
 										tmpOut.write(encryptedSecretKey);
 										break;
 									}
 								}
-								//}
+								//tmpOut.close();
 
 
 							}
 						}
+
+
+
+						//Réception et déchiffrement des données
 						PCInfo pc = null;
-
-
 						while (!isInfoReceived && (msg = in.readLine()) != null){
+
+							//Réception de la taille du message
 							int msgSize = Integer.parseInt(msg);
-							InputStream tmpIn = clientSocket.getInputStream();
 							byte[] encryptedPC = new byte[msgSize];
+
+							//Röception des données chiffrées
+
+							InputStream tmpIn = clientSocket.getInputStream();
 							while (tmpIn.read(encryptedPC) != -1){
 
+								isInfoReceived = true;
 								LOG.info("READING OBJECT");
+
 								//Déchiffrer le message avec la clé secrète
 								byte[] decryptedPC = Cryptography.AESDecrypt(encryptedPC, secretKey);
 
 								//Reconstruire l'objet à partir des bytes
-								ObjectInputStream tmpInput = new ObjectInputStream(new ByteArrayInputStream(decryptedPC));
-								pc = (PCInfo)tmpInput.readObject();
+								ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(decryptedPC));
+								pc = (PCInfo)objIn.readObject();
 
 								pcInfos.add(pc);
-								isInfoReceived = true;
+								objIn.close();
+
 								System.out.println(pc.getHostname());
 								System.out.println(pc.getIpAddress());
 								System.out.println(pc.getMacAddress());
@@ -240,15 +259,17 @@ public class SystemInfoRetrieverServer {
 								System.out.println(pc.getCpu().getConstructor());
 								System.out.println(pc.getCpu().getModel());
 								System.out.println(pc.getHdd().getFreeSize());
-
+								System.out.println(pc.getPrograms().size());
 
 								LOG.info("Cleaning up resources...");
-								break;
+
 							}
 						}
+						//tmpIn.close();
 						clientSocket.close();
 						in.close();
 						out.close();
+						ois.close();
 
 					} catch (IOException | ClassNotFoundException ex) {
 						if (in != null) {
