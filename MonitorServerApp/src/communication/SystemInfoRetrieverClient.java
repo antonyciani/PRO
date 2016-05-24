@@ -53,19 +53,6 @@ public class SystemInfoRetrieverClient {
 	}
 
 	public void startListening() throws IOException{
-		//test
-		/*
-		KeyPair keyPairT = Cryptography.generateRSAKeyPair();
-		RSAPublicKey publicKeyT = (RSAPublicKey)keyPairT.getPublic();
-		RSAPrivateKey privateKeyT = (RSAPrivateKey)keyPairT.getPrivate();
-		String test = "test";
-		byte[] encrypted = Cryptography.RSAEncrypt(test.getBytes(), publicKeyT);
-		byte[] decrypted = Cryptography.RSADecrypt(encrypted, privateKeyT);
-		System.out.println(new String(decrypted));
-
-		SecretKey secret = Cryptography.generateAESSecretKey();
-		encrypted = Cryptography.RSAEncrypt(secret.getEncoded(), publicKeyT);
-		decrypted = Cryptography.RSADecrypt(encrypted, privateKeyT);*/
 
 		udpSocket = new MulticastSocket(udpPort);
 		udpSocket.joinGroup(InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS));
@@ -90,6 +77,9 @@ public class SystemInfoRetrieverClient {
 		connect(udpPacket.getAddress(), tcpPort);
 		PCInfo pc = null;
 		boolean ready = false;
+		boolean isPublicKeySent = false;
+		boolean receivedReady = false;
+		boolean isInfoSent = false;
 		String msg = "";
 		while(connected){
 
@@ -108,24 +98,28 @@ public class SystemInfoRetrieverClient {
 				out.flush();
 				LOG.info("SENT SOMETHING");
 
-				while((msg = in.readLine()) != null){
+				while((!isPublicKeySent) && (msg = in.readLine()) != null){
 					if(msg.equals("WAITING_FOR_PUBLIC_KEY")){
 					//Envoi de la clé publique
 						ObjectOutputStream oos = new ObjectOutputStream(tcpSocket.getOutputStream());
 						oos.writeObject(publicKey);
 						LOG.info("PUBLIC KEY HAS BEEN SENT");
-						break;
+						isPublicKeySent = true;
 					}
 				}
-				while((msg = in.readLine()) != null){
+
+				while((!receivedReady) &&(msg = in.readLine()) != null){
 
 					if(msg.equals(SystemInfoRetrieverProtocol.READY_TO_READ_INFO)){
 						LOG.info("RECEIVED READY");
+						receivedReady = true;
+						out.println("WAITING_FOR_SECRET_KEY");
+						out.flush();
 						//Récupérer la clé secrète et la déchiffrer avec la clé privée RSA
 						byte encryptedSecretKey[] = new byte[128];
 						InputStream tmpIn= tcpSocket.getInputStream();
 						OutputStream tmpOut = tcpSocket.getOutputStream();
-						while(tmpIn.read(encryptedSecretKey) != -1){
+						while((!isInfoSent) && tmpIn.read(encryptedSecretKey) != -1){
 							byte[] decryptedSecretKey = Cryptography.RSADecrypt(encryptedSecretKey, privateKey);
 							SecretKey secretKey = new SecretKeySpec(decryptedSecretKey, "AES");
 							LOG.info("RECEIVED SECRET KEY");
@@ -136,14 +130,20 @@ public class SystemInfoRetrieverClient {
 							byte[] encryptedPC = Cryptography.AESEncrypt(byteArrayOutputStream.toByteArray(), secretKey);
 							out.println(encryptedPC.length);
 							out.flush();
+							objOut.close();
 							tmpOut.write(encryptedPC);
+							isInfoSent = true;
 							LOG.info("SENT INFOS");
-							break;
+							//break;
 						}
-
+						tmpIn.close();
+						tmpOut.close();
 
 					}
+					//break;
 				}
+				in.close();
+				out.close();
 				connected = false;
 				sendInfoMsgReceived = false;
 			}

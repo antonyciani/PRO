@@ -165,10 +165,11 @@ public class SystemInfoRetrieverServer {
 					PCInfo data;
 					boolean shouldRun = true;
 					boolean isInfoReceived = false;
+					boolean isPublicKeyReceived = false;
 					boolean isInfoReady = false;
 					String msg = "";
 					SecretKey secretKey = null;
-
+					RSAPublicKey publicKey = null;
 					try {
 						LOG.info("Waiting for client INFOISREADY");
 
@@ -182,23 +183,30 @@ public class SystemInfoRetrieverServer {
 								out.println("WAITING_FOR_PUBLIC_KEY");
 								out.flush();
 
-								RSAPublicKey publicKey;
+
 								ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
 								//Récupérer clé publique du client
-								while((publicKey = (RSAPublicKey)ois.readObject()) != null){
+								while((!isPublicKeyReceived) && (publicKey = (RSAPublicKey)ois.readObject()) != null){
 									LOG.info("RECEIVED PUBLIC KEY");
-									//Générer clé secrète symétrique
-									secretKey = Cryptography.generateAESSecretKey();
-									//Chiffrer clé secrète avec clé publique
-									byte[] encryptedSecretKey = Cryptography.RSAEncrypt(secretKey.getEncoded(), publicKey);
+
 									out.println(SystemInfoRetrieverProtocol.READY_TO_READ_INFO);
 									out.flush();
+									isPublicKeyReceived = true;
 									LOG.info("SENT READY TO READ");
-									//Envoyer la clé secrète
-									System.out.println(encryptedSecretKey);
-									OutputStream tmpOut = clientSocket.getOutputStream();
-									tmpOut.write(encryptedSecretKey);
-									break;
+
+								}
+								while((msg = in.readLine()) != null){
+									if(msg.equals("WAITING_FOR_SECRET_KEY")){
+										//Générer clé secrète symétrique
+										secretKey = Cryptography.generateAESSecretKey();
+										//Chiffrer clé secrète avec clé publique
+										byte[] encryptedSecretKey = Cryptography.RSAEncrypt(secretKey.getEncoded(), publicKey);
+										//Envoyer la clé secrète
+										System.out.println(encryptedSecretKey);
+										OutputStream tmpOut = clientSocket.getOutputStream();
+										tmpOut.write(encryptedSecretKey);
+										break;
+									}
 								}
 								//}
 
@@ -235,6 +243,7 @@ public class SystemInfoRetrieverServer {
 
 
 								LOG.info("Cleaning up resources...");
+								break;
 							}
 						}
 						clientSocket.close();
