@@ -1,7 +1,6 @@
 package monitor.database;
 
 import java.sql.Connection;
-import java.util.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import monitor.model.CPUInfo;
 import monitor.model.HDDInfo;
@@ -266,13 +266,14 @@ public class Database{
 		}
 	}
 
-	public HashMap<String, Double> freeHardDriveSizeRate(PCInfoViewWrapper pc){
-		HashMap<String, Double> map = new HashMap<>();
+	public TreeMap<String, Double> storageLoadRate(PCInfoViewWrapper pc){
+		TreeMap<String, Double> map = new TreeMap<>();
 		try{
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery("SELECT captureTime, freeHardDriveSize, totalHardDriveSize FROM machineState WHERE MacAddress ='"+pc.getMacAddress()+"';");
 			while(result.next()){
-				double rate = result.getDouble(2)/result.getDouble(3);
+				double load = result.getDouble(3) - result.getDouble(2);
+				double rate = load/result.getDouble(3);
 				map.put(result.getString(1), rate);
 			}
 		}
@@ -281,13 +282,14 @@ public class Database{
 		}
 		return map;
 	}
-	public HashMap<String, Double> averageFreeHardDriveSizeRate(){
-		HashMap<String, Double> map = new HashMap<>();
+	public TreeMap<String, Double> averageStorageLoadRate(){
+		TreeMap<String, Double> map = new TreeMap<>();
 		try{
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery("SELECT captureTime, SUM(freeHardDriveSize), SUM(totalHardDriveSize) FROM machineState GROUP BY captureTime;");
 			while(result.next()){
-				double rate = result.getDouble(2)/result.getDouble(3);
+				double load = result.getDouble(3) - result.getDouble(2);
+				double rate = load/result.getDouble(3);
 				map.put(result.getString(1), rate);
 			}
 
@@ -296,6 +298,61 @@ public class Database{
 			e.printStackTrace();
 		}
 		return map;
+	}
+	public HashMap<String, Integer> nbProgramsInstalledByVersion(String program, String captureTime){
+		HashMap<String, Integer> map = new HashMap<>();
+		try{
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT program.version, count(program.version)"
+													+ "FROM pc_program "
+													+ "INNER JOIN program "
+													+ "ON pc_program.programID = program.ID "
+													+ "WHERE program.name = '"+program+"' "
+													+ "AND pcCaptureTime = '"+captureTime+"' GROUP BY program.version;");
+			while(result.next()){
+				map.put(result.getString(1), result.getInt(2));
+			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+		return map;
+	}
+	public HashMap<String, Integer> mostFrequentlyInstalledPrograms(int max, String captureTime){
+		HashMap<String, Integer> map = new HashMap<>();
+		try{
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT name, count(name)"
+													+ "FROM pc_program "
+													+ "INNER JOIN program "
+													+ "ON pc_program.programID = program.ID "
+													+ "WHERE pcCaptureTime = '"+captureTime+"' "
+													+ "GROUP BY name;");
+			int counter = 0;
+			while(result.next() && counter < max){
+				map.put(result.getString(1), result.getInt(2));
+			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+		return map;
+	}
+	public ArrayList<String> getProgramsName(String captureTime){
+		ArrayList<String> programs = new ArrayList<>();
+		try{
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery("SELECT DISTINCT name FROM program "
+													+ "INNER JOIN pc_program "
+													+ "ON pc_program.programID = program.ID "
+													+ "WHERE pcCaptureTime = '"+captureTime+"';");
+			while(result.next()){
+				programs.add(result.getString(1));
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		return programs;
 	}
 	public void finalize(){
 		if(connection != null){
@@ -309,7 +366,7 @@ public class Database{
 	}
 
 	public static void main(String args[]){
-		Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "root");
+		Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
 		db.connect();
 		/*HashMap<Integer,Integer> map = db.nbPcByNbCores();
 
@@ -327,7 +384,11 @@ public class Database{
 		HDDInfo hdd = new HDDInfo(500.8, 400.4);
 		long ramSize = 8;
 		LinkedList<Program> programs = new LinkedList<>();
-		programs.add(new Program("ls", "1.2"));
+		programs.add(new Program("ls", "1.4"));
+		programs.add(new Program("cat", "2.4"));
+
+		LinkedList<Program> programs2 = new LinkedList<>();
+		programs.add(new Program("ls", "1.3"));
 		programs.add(new Program("cat", "2.3"));
 		PCInfo pc = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs);
 		hostname = "MichaelPc";
@@ -338,7 +399,7 @@ public class Database{
 		hdd = new HDDInfo(500.8, 209.4);
 		ramSize = 16;
 
-		PCInfo pc2 = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, new LinkedList<Program>());
+		PCInfo pc2 = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs2);
 		LinkedList<PCInfo> pcs = new LinkedList<>();
 		pcs.add(pc);
 		pcs.add(pc2);
@@ -358,7 +419,7 @@ public class Database{
 		for(String s : capt){
 			System.out.println(s);
 		}*/
-		db.deleteCapture("2016-05-06 15:36:07");
+		//db.deleteCapture("2016-05-06 15:36:07");
 		/*
 		HashMap<String, Double> map = db.freeHardDriveSizeRate(pc2);
 		for(Entry<String, Double> entry : map.entrySet()){
@@ -412,7 +473,20 @@ public class Database{
 			String key = entry.getKey();
 			Integer value = entry.getValue();
 			System.out.println(key + " : "+ value);}
+/*
+		System.out.println("\n===== Versions =====");
+		HashMap<String, Integer> map6 = db.nbProgramsInstalledByVersion("ls");
+		for(Entry<String, Integer> entry : map6.entrySet()){
+			String key = entry.getKey();
+			Integer value = entry.getValue();
+			System.out.println(key + " : "+ value);}
 
+		System.out.println("\n===== Most frequently installed programs =====");
+		HashMap<String, Integer> map7 = db.mostFrequentlyInstalledPrograms(10);
+		for(Entry<String, Integer> entry : map7.entrySet()){
+			String key = entry.getKey();
+			Integer value = entry.getValue();
+			System.out.println(key + " : "+ value);}*/
 	}
 
 }

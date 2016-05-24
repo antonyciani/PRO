@@ -1,6 +1,6 @@
 package monitor.view;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import javafx.fxml.FXML;
@@ -38,11 +38,12 @@ public class AverageStorageLoadStatisticDialogController {
 		lineChart.getData().clear();
 
     	//Récupère les infos de la base de donnée
-    	HashMap<String, Double> map = database.averageFreeHardDriveSizeRate();
+    	TreeMap<String, Double> map = database.averageStorageLoadRate();
 
     	//Ajout des données au graphique
 
     	XYChart.Series series = new XYChart.Series();
+    	series.setName("Average Storage Load Rate");
 
     	for(Entry<String, Double> e : map.entrySet()){
 			series.getData().add(new XYChart.Data(e.getKey(), e.getValue()));

@@ -231,11 +231,38 @@ public class ServerApp extends Application {
 		curentPcView = date;
 		pcData.clear();
 		pcData.addAll(database.loadPCInfo(curentPcView));
-		
+
 	}
 
 	public String getCurentPcView(){
 		return curentPcView;
+	}
+
+	public void showProgramsStatistics(){
+
+		try {
+            // Load the fxml file and create a new stage for the popup.
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(ServerApp.class.getResource("view/ProgramStatistics.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Program Statistics");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(primaryStage);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Set the persons into the controller.
+            ProgramStatisticsController controller = loader.getController();
+            controller.setServerApp(this);
+            controller.setDatabase(database);
+            controller.showStatistics();
+
+            dialogStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 
 //	public void showFilterEditDialog(){
