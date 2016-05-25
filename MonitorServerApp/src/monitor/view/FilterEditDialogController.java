@@ -3,7 +3,7 @@ package monitor.view;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import utils.AdvancedFilters;
+import monitor.ServerApp;
 
 public class FilterEditDialogController {
 
@@ -19,8 +19,7 @@ public class FilterEditDialogController {
 	private TextField programField;
 
 	private Stage dialogStage;
-
-	private AdvancedFilters filter;
+	private ServerApp serverApp;
 
 	/**
      * Sets the stage of this dialog.
@@ -31,14 +30,9 @@ public class FilterEditDialogController {
     	this.dialogStage = dialogStage;
     }
 
-    /**
-     * Set the list which contain the pc to sort
-     *
-     * @param pcList
-     */
-    public void setAdvancedFilter(AdvancedFilters filter){
-    	this.filter = filter;
-    }
+    public void setServerApp(ServerApp serverApp){
+		this.serverApp = serverApp;
+	}
 
     /**
      * Called when the user clicks ok.
@@ -52,7 +46,7 @@ public class FilterEditDialogController {
     	System.out.println(hddOccupRateField.getText());
     	System.out.println(programField.getText());
 
-    	filter.applyFilter(osField.getText(), ramSizeField.getText(), hddSizeField.getText(), hddOccupRateField.getText(), programField.getText());
+    	serverApp.getAdvancedFilters().applyFilter(osField.getText(), ramSizeField.getText(), hddSizeField.getText(), hddOccupRateField.getText(), programField.getText());
     	dialogStage.close();
 
     }

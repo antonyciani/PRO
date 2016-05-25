@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import monitor.database.Database;
 import monitor.model.*;
 import monitor.view.*;
+import utils.AdvancedFilters;
 
 
 public class ServerApp extends Application {
@@ -25,62 +26,17 @@ public class ServerApp extends Application {
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 
+
 	private Database database;
+	private AdvancedFilters filters;
+
 	private String curentPcView;
 	private ObservableList<PCInfoViewWrapper> pcData = FXCollections.observableArrayList();
 
 	public ServerApp(){
+		filters = new AdvancedFilters(pcData);
 		database = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
 		database.connect();
-		String hostname = "MichaelPc";
-		String ipAddress = "192.168.1.10";
-		String macAddress = "5E:FF:56:A2:AF:15";
-		String os = "Windows 10";
-		CPUInfo cpu = new CPUInfo("Intell", "i7", 2.7, 4);
-		HDDInfo hdd = new HDDInfo(500.8, 209.4);
-		int ramSize = 16;
-		ObservableList<Program> programViewWrappers = FXCollections.observableArrayList();
-		programViewWrappers.add(new Program("ls", "1.2"));
-		programViewWrappers.add(new Program("cat", "2.3"));
-
-		//pcData.add(new PCInfoViewWrapper(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programViewWrappers));
-
-		hostname = "LuciePc";
-		ipAddress = "192.168.1.11";
-		macAddress = "5E:FF:56:A2:AF:30";
-		os = "Windows 7";
-		cpu = new CPUInfo("Intel", "i5", 2.3, 4);
-		hdd = new HDDInfo(500.8, 400.4);
-		ramSize = 8;
-
-		//pcData.add(new PCInfoViewWrapper(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programViewWrappers));
-		//pcData.add(SystemInfoRecuperator.retrievePCInfo());
-//		SystemInfoRetrieverServer sirs = null;
-//		try {
-//			sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
-//			sirs.retrieveInfosFromClients();
-//
-//		} catch (SocketException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		LinkedList<PCInfo> pcInfos = sirs.getPcInfos();
-//
-//
-//
-//		for(PCInfo pc : pcInfos){
-//			System.out.println(pc.getHostname());
-//			System.out.println(pc.getIpAddress());
-//			System.out.println(pc.getMacAddress());
-//			System.out.println(pc.getOs());
-//			System.out.println(pc.getRamSize());
-//			System.out.println(pc.getCpu().getConstructor());
-//			System.out.println(pc.getCpu().getModel());
-//			System.out.println(pc.getHdd().getFreeSize());
-//
-//
-//			pcData.add(new PCInfoViewWrapper(pc));
-//		}
 	}
 
 	public ObservableList<PCInfoViewWrapper> getPcInfo() {
@@ -265,34 +221,37 @@ public class ServerApp extends Application {
         }
 	}
 
-//	public void showFilterEditDialog(){
-//		try {
-//			// Load the fxml file and create a new stage for the popup dialog.
-//			FXMLLoader loader = new FXMLLoader();
-//			loader.setLocation(ServerApp.class.getResource("view/FilterEditDialog.fxml"));
-//			AnchorPane filterEditDialog = (AnchorPane) loader.load();
-//
-//			Stage filterStage = new Stage();
-//			filterStage.setTitle("Filter");
-//			filterStage.initModality(Modality.WINDOW_MODAL);
-//			filterStage.initOwner(primaryStage);
-//			Scene scene = new Scene(filterEditDialog);
-//			filterStage.setScene(scene);
-//
-//			FilterEditDialogController controller = loader.getController();
-//			controller.setDialogStage(filterStage);
-//
-//			controller.setPcList(pcData);
-//
-//            // Show the dialog and wait until the user closes it
-//            filterStage.showAndWait();
-//
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//	}
+	public void showFilterEditDialog(){
+		try {
+			// Load the fxml file and create a new stage for the popup dialog.
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(ServerApp.class.getResource("view/FilterEditDialog.fxml"));
+			AnchorPane filterEditDialog = (AnchorPane) loader.load();
+
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Filter");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(primaryStage);
+			Scene scene = new Scene(filterEditDialog);
+			dialogStage.setScene(scene);
+
+			FilterEditDialogController controller = loader.getController();
+			controller.setServerApp(this);
+			controller.setDialogStage(dialogStage);
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public AdvancedFilters getAdvancedFilters(){
+		return filters;
+	}
 
 	public static void main(String[] args) {
 		launch(args);

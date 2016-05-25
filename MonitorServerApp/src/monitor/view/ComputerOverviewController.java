@@ -1,47 +1,36 @@
 package monitor.view;
 
-import java.io.IOException;
 import java.net.SocketException;
-import java.time.LocalDateTime;
 import java.util.TreeMap;
-import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
-import javax.xml.crypto.dsig.spec.HMACParameterSpec;
-
-import com.mysql.jdbc.PingTarget;
-
-import communication.SystemInfoRetrieverProtocol;
-import communication.SystemInfoRetrieverServer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+
 import monitor.ServerApp;
 import monitor.database.Database;
-import monitor.model.PCInfo;
 import monitor.model.PCInfoViewWrapper;
-import monitor.model.Program;
 import monitor.model.ProgramViewWrapper;
-import utils.AdvancedFilters;
+import communication.SystemInfoRetrieverProtocol;
+import communication.SystemInfoRetrieverServer;
 import utils.PlatformExecutor;
 
 public class ComputerOverviewController {
@@ -100,17 +89,18 @@ public class ComputerOverviewController {
     private ObservableList<PieChart.Data> pieChartData;
 
     @FXML
-    private LineChart<LocalDateTime, Double> lineChart;
+    private LineChart<String, Double> lineChart;
     @FXML
 	private CategoryAxis xAxis;
     @FXML
     private NumberAxis yAxis;
 
+    private Alert alert;
 
-    private AdvancedFilters filter;
+
     private ServerApp serverApp;
     private FilteredList<PCInfoViewWrapper> filteredList;
-    private FilteredList<PCInfoViewWrapper> filteredListCopy;
+    private SortedList<PCInfoViewWrapper> sortedList;
 
     private Database db;
 
@@ -120,10 +110,8 @@ public class ComputerOverviewController {
 		// 1. Wrap the ObservableList in a FilteredList (initially display all data).
 		filteredList = new FilteredList<>(serverApp.getPcInfo(), p -> true);
 
-		filter = new AdvancedFilters(serverApp.getPcInfo());
-
 		// 3. Wrap the FilteredList in a SortedList.
-        SortedList<PCInfoViewWrapper> sortedList = new SortedList<>(filteredList);
+        sortedList = new SortedList<>(filteredList);
         // 4. Bind the SortedList comparator to the TableView comparator.
         sortedList.comparatorProperty().bind(pcTable.comparatorProperty());
         // 5. Add sorted (and filtered) data to the table.
@@ -215,24 +203,27 @@ public class ComputerOverviewController {
 
     private void showLineChartDetails(PCInfoViewWrapper newValue){
 
-    	lineChart.getData().clear();
+    	if(newValue != null){
 
-    	//Récupère les infos de la base de donnée
-    	TreeMap<String, Double> map = db.storageLoadRate(newValue);
+    		lineChart.getData().clear();
 
-    	//Ajout des données au graphique
+        	//Récupère les infos de la base de donnée
+        	TreeMap<String, Double> map = db.storageLoadRate(newValue);
 
-    	XYChart.Series series = new XYChart.Series();
-    	series.setName("Storage Load Rate");
-    	for(Entry<String, Double> e : map.entrySet()){
-			series.getData().add(new XYChart.Data(e.getKey(), e.getValue()));
-		}
+        	//Ajout des données au graphique
+        	Series<String, Double> series = new Series<>();
+        	series.setName("Storage Load Rate");
+        	for(Entry<String, Double> e : map.entrySet()){
+    			series.getData().add(new Data<String, Double>(e.getKey(), e.getValue()));
+    		}
 
-    	lineChart.getData().add(series);
+        	lineChart.getData().add(series);
+    	}
     }
 
     private void showPieChartDetails(PCInfoViewWrapper newValue){
     	if(newValue != null){
+    		chart.getData().clear();
 
     		double availableSpace = newValue.getHdd().getFreeSize();
     		double unavailableSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
@@ -254,34 +245,17 @@ public class ComputerOverviewController {
     		        });
     		}
     	}
+    	else {
+    		chart.getData().clear();
+    	}
     }
 
-    private void showFilterEditDialog(){
-		try {
-			// Load the fxml file and create a new stage for the popup dialog.
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(ServerApp.class.getResource("view/FilterEditDialog.fxml"));
-			AnchorPane filterEditDialog = (AnchorPane) loader.load();
-
-			Stage filterStage = new Stage();
-			filterStage.setTitle("Filter");
-			filterStage.initModality(Modality.WINDOW_MODAL);
-			filterStage.initOwner(serverApp.getPrimaryStage());
-			Scene scene = new Scene(filterEditDialog);
-			filterStage.setScene(scene);
-
-			FilterEditDialogController controller = loader.getController();
-			controller.setDialogStage(filterStage);
-
-			controller.setAdvancedFilter(filter);
-
-            // Show the dialog and wait until the user closes it
-            filterStage.showAndWait();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    private void showAlertDialog(){
+    	Alert alert = new Alert(AlertType.INFORMATION);
+    	alert.setTitle("Alert");
+    	alert.setHeaderText("Retriving PCs Information...");
+    	alert.show();
+    }
 
     @FXML
     public void handleCaptureDate(){
@@ -302,35 +276,32 @@ public class ComputerOverviewController {
 
     @FXML
 	public void handleAdvancedFilter(){
+    	FilteredList<PCInfoViewWrapper> advancedFilteredList;
     	filterField.clear();
-    	filteredListCopy = filteredList;
-		showFilterEditDialog();
-		filteredList = filter.getFilteredList();
+    	//filteredListCopy = filteredList;
+		serverApp.showFilterEditDialog();
+		advancedFilteredList = serverApp.getAdvancedFilters().getFilteredList();
 
 		// 3. Wrap the FilteredList in a SortedList.
-        SortedList<PCInfoViewWrapper> sortedList = new SortedList<>(filteredList);
+        SortedList<PCInfoViewWrapper> sortedList = new SortedList<>(advancedFilteredList);
         // 4. Bind the SortedList comparator to the TableView comparator.
         sortedList.comparatorProperty().bind(pcTable.comparatorProperty());
-
 		pcTable.setItems(sortedList);
 	}
 
     @FXML
     public void handleClearFilter(){
-    	filteredList = filteredListCopy;
-    	filter.clearFilter();
-    	pcTable.setItems(filteredList);
+    	serverApp.getAdvancedFilters().clearFilter();
+    	// 3. Wrap the FilteredList in a SortedList.
+        SortedList<PCInfoViewWrapper> sortedList = new SortedList<>(filteredList);
+        // 4. Bind the SortedList comparator to the TableView comparator.
+        sortedList.comparatorProperty().bind(pcTable.comparatorProperty());
+    	pcTable.setItems(sortedList);
     }
 
     @FXML
     public void handleRefresh(){
-
-
-//    	ObservableList<PCInfoViewWrapper> pcData = serverApp.getPcInfo();
-//    	pcData.clear();
-
-       //games = FXCollections.observableArrayList();
-
+    	showAlertDialog();
     	CompletableFuture.supplyAsync(() -> {
     		SystemInfoRetrieverServer sirs = null;
     		try {
@@ -343,24 +314,7 @@ public class ComputerOverviewController {
 		}).whenCompleteAsync((list, ex) -> {
 			db.storePCs(list);
 			serverApp.setCurentPcView(db.getLastCapture());
+			alert.close();
 		}, PlatformExecutor.instance);
-
-
-
-
-		/*for(PCInfo pc : pcInfos){
-			System.out.println(pc.getHostname());
-			System.out.println(pc.getIpAddress());
-			System.out.println(pc.getMacAddress());
-			System.out.println(pc.getOs());
-			System.out.println(pc.getRamSize());
-			System.out.println(pc.getCpu().getConstructor());
-			System.out.println(pc.getCpu().getModel());
-			System.out.println(pc.getHdd().getFreeSize());
-
-			pcData.add(new PCInfoViewWrapper(pc));
-		}*/
-
     }
-
 }

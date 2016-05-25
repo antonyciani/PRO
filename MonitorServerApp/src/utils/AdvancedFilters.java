@@ -2,9 +2,7 @@ package utils;
 
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import monitor.model.PCInfo;
 import monitor.model.PCInfoViewWrapper;
-import monitor.model.Program;
 import monitor.model.ProgramViewWrapper;
 
 public class AdvancedFilters {
