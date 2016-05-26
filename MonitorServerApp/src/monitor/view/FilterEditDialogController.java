@@ -21,17 +21,10 @@ public class FilterEditDialogController {
 	private Stage dialogStage;
 	private ServerApp serverApp;
 
-	/**
-     * Sets the stage of this dialog.
-     *
-     * @param dialogStage
-     */
-    public void setDialogStage(Stage dialogStage) {
-    	this.dialogStage = dialogStage;
-    }
 
-    public void setServerApp(ServerApp serverApp){
+	public void init(ServerApp serverApp, Stage dialogStage){
 		this.serverApp = serverApp;
+		this.dialogStage = dialogStage;
 	}
 
     /**

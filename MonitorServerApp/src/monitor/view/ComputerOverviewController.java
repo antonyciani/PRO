@@ -5,6 +5,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -52,8 +53,6 @@ public class ComputerOverviewController {
 	private TableColumn<ProgramViewWrapper, String> nameColumn;
 	@FXML
 	private TableColumn<ProgramViewWrapper, String> versionColumn;
-	@FXML
-	private TableColumn<ProgramViewWrapper, String> lastUpdateColumn;
 
 
 	@FXML
@@ -83,9 +82,11 @@ public class ComputerOverviewController {
 
 
     @FXML
-    private PieChart chart;
+    private PieChart pieChart;
     @FXML
-    private Label status;
+    private Label spaceLabel;
+    @FXML
+    private Label statusLabel;
     private ObservableList<PieChart.Data> pieChartData;
 
     @FXML
@@ -95,18 +96,24 @@ public class ComputerOverviewController {
     @FXML
     private NumberAxis yAxis;
 
+    @FXML
+    private Label captureDateLabel;
+
     private Alert alert;
 
 
     private ServerApp serverApp;
+    private SimpleStringProperty currentDateView;
     private FilteredList<PCInfoViewWrapper> filteredList;
     private SortedList<PCInfoViewWrapper> sortedList;
 
-    private Database db;
+    private Database database;
 
-    public void setServerApp(ServerApp serverApp){
+    public void init(ServerApp serverApp){
 		this.serverApp = serverApp;
-		db = this.serverApp.getDatabase();
+		database = serverApp.getDatabase();
+		currentDateView = serverApp.getCurentDateView();
+		captureDateLabel.textProperty().bind(currentDateView);
 		// 1. Wrap the ObservableList in a FilteredList (initially display all data).
 		filteredList = new FilteredList<>(serverApp.getPcInfo(), p -> true);
 
@@ -163,16 +170,16 @@ public class ComputerOverviewController {
     		osLabel.setText(newValue.getOs());
     		cpuConstructorLabel.setText(newValue.getCpu().getConstructor());
     		cpuModelLabel.setText(newValue.getCpu().getModel());
-    		cpuFrequencyLabel.setText(Double.toString(newValue.getCpu().getFrequency()));
-    		cpuNumbCorelLabel.setText(Integer.toString(newValue.getCpu().getNbCore()));
-    		hddTotalSizeLabel.setText(Double.toString(newValue.getHdd().getTotalSize()));
-    		hddFreeSizeLabel.setText(Double.toString(newValue.getHdd().getFreeSize()));
-    		ramSizeLabel.setText(Long.toString(newValue.getRamSize()));
+    		cpuFrequencyLabel.setText(Double.toString(newValue.getCpu().getFrequency()) + " GHz");
+    		cpuNumbCorelLabel.setText(Integer.toString(newValue.getCpu().getNbCore()) + " Cores");
+    		hddTotalSizeLabel.setText(Double.toString(newValue.getHdd().getTotalSize()) + " GB");
+    		hddFreeSizeLabel.setText(Double.toString(newValue.getHdd().getFreeSize()) + " GB");
+    		ramSizeLabel.setText(Long.toString(newValue.getRamSize()) + " GB");
     		if(newValue.getPrograms() != null){
     			installedProgrammsLabel.setText(Integer.toString(newValue.getPrograms().size()));
         	}
     		else{
-    			installedProgrammsLabel.setText("");
+    			installedProgrammsLabel.setText("0");
     		}
     	}
 
@@ -197,7 +204,6 @@ public class ComputerOverviewController {
     		programTable.setItems(newValue.getPrograms());
     		nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
     		versionColumn.setCellValueFactory(cellData -> cellData.getValue().versionProperty());
-    		lastUpdateColumn.setCellValueFactory(cellData -> cellData.getValue().lastUpdateProperty());
     	}
     }
 
@@ -205,10 +211,12 @@ public class ComputerOverviewController {
 
     	if(newValue != null){
 
+    		spaceLabel.setText("");
+    		statusLabel.setText("");
     		lineChart.getData().clear();
 
         	//Récupère les infos de la base de donnée
-        	TreeMap<String, Double> map = db.storageLoadRate(newValue);
+        	TreeMap<String, Double> map = database.storageLoadRate(newValue);
 
         	//Ajout des données au graphique
         	Series<String, Double> series = new Series<>();
@@ -223,30 +231,31 @@ public class ComputerOverviewController {
 
     private void showPieChartDetails(PCInfoViewWrapper newValue){
     	if(newValue != null){
-    		chart.getData().clear();
+    		pieChart.getData().clear();
 
-    		double availableSpace = newValue.getHdd().getFreeSize();
-    		double unavailableSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
+    		double freeSpace = newValue.getHdd().getFreeSize();
+    		double fullSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
 
     		pieChartData = FXCollections.observableArrayList(
-    				new PieChart.Data("Available", availableSpace),
-    				new PieChart.Data("Unavailable", unavailableSpace));
+    				new PieChart.Data("Free Space", freeSpace),
+    				new PieChart.Data("Full Space", fullSpace));
 
-    		chart.setData(pieChartData);
+    		pieChart.setData(pieChartData);
 
-    		for (final PieChart.Data data : chart.getData()) {
+    		for (final PieChart.Data data : pieChart.getData()) {
     		    data.getNode().addEventHandler(MouseEvent.MOUSE_CLICKED,
     		        new EventHandler<MouseEvent>() {
-    		            @Override public void handle(MouseEvent e) {
-    		            	String tmp = String.valueOf((data.getPieValue() / (newValue.getHdd().getTotalSize() / 100)));
-    		            	int i = tmp.indexOf(".");
-    		                status.setText(tmp.substring(0, i + 3) + "%");
+    		            @Override
+    		            public void handle(MouseEvent e) {
+    		            	String tmp = String.format("%.1f%%", 100*data.getPieValue()/newValue.getHdd().getTotalSize()) ;
+    		            	spaceLabel.setText(data.getName() + ": ");
+    		            	statusLabel.setText(tmp);
     		             }
     		        });
     		}
     	}
     	else {
-    		chart.getData().clear();
+    		pieChart.getData().clear();
     	}
     }
 
@@ -259,12 +268,13 @@ public class ComputerOverviewController {
 
     @FXML
     public void handleCaptureDate(){
-    	String date = serverApp.showCaptureSelectionDialog();
+    	String date = "";
+    	date = serverApp.showCaptureSelectionDialog();
 
     	if(!date.equals("")){
-    		serverApp.setCurentPcView(date);
+    		currentDateView.setValue(date);
         	serverApp.getPcInfo().clear();
-    		serverApp.getPcInfo().addAll(serverApp.getDatabase().loadPCInfo(date));
+    		serverApp.getPcInfo().addAll(database.loadPCInfo(date));
     	}
     }
 
@@ -312,8 +322,10 @@ public class ComputerOverviewController {
     		}
 			return sirs.getPcInfos();
 		}).whenCompleteAsync((list, ex) -> {
-			db.storePCs(list);
-			serverApp.setCurentPcView(db.getLastCapture());
+			database.storePCs(list);
+			serverApp.getPcInfo().clear();
+			serverApp.getPcInfo().setAll(database.loadPCInfo(database.getLastCapture()));
+			currentDateView.setValue(database.getLastCapture());
 			alert.close();
 		}, PlatformExecutor.instance);
     }

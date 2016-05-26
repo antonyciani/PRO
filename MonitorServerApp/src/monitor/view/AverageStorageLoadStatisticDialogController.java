@@ -13,10 +13,11 @@ import monitor.database.Database;
 
 public class AverageStorageLoadStatisticDialogController {
 	private Database database;
+	@SuppressWarnings("unused")
 	private ServerApp serverApp;
 
 	@FXML
-	private LineChart lineChart;
+	private LineChart<String, Double> lineChart;
 	@FXML
 	private CategoryAxis xAxis;
 	@FXML
@@ -27,14 +28,13 @@ public class AverageStorageLoadStatisticDialogController {
 
 	}
 
-	public void setDatabase(Database database){
-		this.database = database;
+	public void init(ServerApp serverApp){
+		this.serverApp = serverApp;
+		this.database = serverApp.getDatabase();
+		showStatistics();
 	}
 
-	public void setServerApp(ServerApp serverApp){
-		this.serverApp = serverApp;
-	}
-	public void showStatistics(){
+	private void showStatistics(){
 		lineChart.getData().clear();
 
     	//Récupère les infos de la base de donnée
@@ -42,13 +42,12 @@ public class AverageStorageLoadStatisticDialogController {
 
     	//Ajout des données au graphique
 
-    	XYChart.Series series = new XYChart.Series();
+    	XYChart.Series<String, Double> series = new XYChart.Series<>();
     	series.setName("Average Storage Load Rate");
 
     	for(Entry<String, Double> e : map.entrySet()){
-			series.getData().add(new XYChart.Data(e.getKey(), e.getValue()));
+			series.getData().add(new XYChart.Data<String, Double>(e.getKey(), e.getValue()));
 		}
-
     	lineChart.getData().add(series);
 	}
 }

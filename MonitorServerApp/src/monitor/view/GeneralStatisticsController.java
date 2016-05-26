@@ -3,17 +3,12 @@ package monitor.view;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import javax.xml.crypto.dsig.spec.HMACParameterSpec;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
-import javafx.scene.input.MouseEvent;
 import monitor.ServerApp;
 import monitor.database.Database;
-import monitor.model.PCInfoViewWrapper;
 
 public class GeneralStatisticsController {
 
@@ -35,15 +30,9 @@ public class GeneralStatisticsController {
 
     }
 
-	public void setDatabase(Database database){
-		this.database = database;
-	}
-
-	public void setServerApp(ServerApp serverApp){
+	public void init(ServerApp serverApp){
 		this.serverApp = serverApp;
-	}
-
-	public void showStatistics(){
+		this.database = serverApp.getDatabase();
 		showNumberOfCoreStatistics();
 		showConstructorStatistics();
 		showHardDriveStatistics();
@@ -52,7 +41,7 @@ public class GeneralStatisticsController {
 
 	public void showNumberOfCoreStatistics(){
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-		HashMap<Integer, Integer> nbCore = database.nbPcByNbCores(serverApp.getCurentPcView());
+		HashMap<Integer, Integer> nbCore = database.nbPcByNbCores(serverApp.getCurentDateView().get());
 		for(Entry<Integer, Integer> e : nbCore.entrySet()){
 			pieChartData.add(new PieChart.Data(e.getKey() + " Cores", e.getValue()));
 		}
@@ -62,7 +51,7 @@ public class GeneralStatisticsController {
 
 	public void showConstructorStatistics(){
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-		HashMap<String, Integer> constructor = database.nbPcByConstructor(serverApp.getCurentPcView());
+		HashMap<String, Integer> constructor = database.nbPcByConstructor(serverApp.getCurentDateView().get());
 		for(Entry<String, Integer> e : constructor.entrySet()){
 			pieChartData.add(new PieChart.Data(e.getKey(), e.getValue()));
 		}
@@ -71,7 +60,7 @@ public class GeneralStatisticsController {
 
 	public void showHardDriveStatistics(){
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-		HashMap<Float, Integer> hdd = database.nbPcByHddSize(serverApp.getCurentPcView());
+		HashMap<Float, Integer> hdd = database.nbPcByHddSize(serverApp.getCurentDateView().get());
 		for(Entry<Float, Integer> e : hdd.entrySet()){
 			pieChartData.add(new PieChart.Data(e.getKey() + " GB", e.getValue()));
 		}
@@ -80,7 +69,7 @@ public class GeneralStatisticsController {
 
 	public void showRamStatistics(){
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-		HashMap<Integer, Integer> ram = database.nbPcByRamSize(serverApp.getCurentPcView());
+		HashMap<Integer, Integer> ram = database.nbPcByRamSize(serverApp.getCurentDateView().get());
 		for(Entry<Integer, Integer> e : ram.entrySet()){
 			pieChartData.add(new PieChart.Data(e.getKey() + " GB", e.getValue()));
 		}

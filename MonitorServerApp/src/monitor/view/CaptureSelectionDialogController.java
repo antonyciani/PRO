@@ -1,26 +1,21 @@
 package monitor.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import monitor.ServerApp;
-import monitor.database.Database;
 import monitor.model.ObservableDate;
-import monitor.model.PCInfoViewWrapper;
+
 
 public class CaptureSelectionDialogController {
 
-	private Database database;
 	private Stage dialogStage;
+	@SuppressWarnings("unused")
 	private ServerApp serverApp;
 	private String selectedDate;
 	private ObservableList<ObservableDate> list;
@@ -39,24 +34,12 @@ public class CaptureSelectionDialogController {
                 (observable, oldValue, newValue) -> setDate(newValue));
     }
 
-	public void setDatabase(Database database){
-		this.database = database;
-		list = createObservableDate(database.getCaptures());
+	public void init(ServerApp serverApp, Stage dialogStage){
+		this.serverApp = serverApp;
+		this.dialogStage = dialogStage;
+		list = createObservableDate(serverApp.getDatabase().getCaptures());
 		dateTable.setItems(list);
 	}
-
-	public void setServerApp(ServerApp serverApp){
-		this.serverApp = serverApp;
-	}
-
-	/**
-     * Sets the stage of this dialog.
-     *
-     * @param dialogStage
-     */
-    public void setDialogStage(Stage dialogStage) {
-    	this.dialogStage = dialogStage;
-    }
 
     private void setDate(ObservableDate date){
     	selectedDate = date.getDate();

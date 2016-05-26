@@ -14,35 +14,31 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import monitor.ServerApp;
 import monitor.database.Database;
-import monitor.model.Program;
 
 public class ProgramStatisticsController {
 
 	private Database database;
 	private ServerApp serverApp;
-
 	private String currentProgram;
 
 	@FXML
 	TableView<String> programTable;
 	@FXML
 	TableColumn<String, String> programColumn;
-	@FXML
-	BarChart<String, Integer> numberOfInstalledProgramsByVersion;
+
 
 	@FXML
 	BarChart<String, Integer> mostFrequentlyInstalledPrograms;
-
 	@FXML
 	private CategoryAxis xAxisA;
-
 	@FXML
 	private NumberAxis yAxisA;
 
 
 	@FXML
+	BarChart<String, Integer> numberOfInstalledProgramsByVersion;
+	@FXML
 	private CategoryAxis xAxisB;
-
 	@FXML
 	private NumberAxis yAxisB;
 
@@ -55,47 +51,32 @@ public class ProgramStatisticsController {
 
     }
 
-	public void setDatabase(Database database){
-		this.database = database;
-		programTable.setItems(FXCollections.observableArrayList(database.getProgramsName(serverApp.getCurentPcView())));
-
-	}
-
-	public void setServerApp(ServerApp serverApp){
+	public void init(ServerApp serverApp){
 		this.serverApp = serverApp;
-	}
-
-	public void showStatistics(){
+		this.database = serverApp.getDatabase();
+		programTable.setItems(FXCollections.observableArrayList(database.getProgramsName(serverApp.getCurentDateView().get())));
 		showMostFrequentlyInstalledProgramsBarChart();
 	}
 
-
 	public void showMostFrequentlyInstalledProgramsBarChart(){
-		HashMap<String, Integer> map = database.mostFrequentlyInstalledPrograms(10, serverApp.getCurentPcView());
+		HashMap<String, Integer> map = database.mostFrequentlyInstalledPrograms(10, serverApp.getCurentDateView().get());
 		XYChart.Series<String, Integer> series = new XYChart.Series<>();
 		series.setName("Programs");
 		for(Entry<String, Integer> entry : map.entrySet()){
 			series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
 		}
-
 		mostFrequentlyInstalledPrograms.getData().add(series);
 	}
 
 	public void showNumberOfInstalledProgramsByVersionBarChart(String newValue){
 		currentProgram = newValue;
 		numberOfInstalledProgramsByVersion.getData().clear();
-        HashMap<String, Integer> map = database.nbProgramsInstalledByVersion(currentProgram, serverApp.getCurentPcView());
+        HashMap<String, Integer> map = database.nbProgramsInstalledByVersion(currentProgram, serverApp.getCurentDateView().get());
         XYChart.Series<String, Integer> series = new XYChart.Series<>();
         series.setName("Versions");
         for(Entry<String, Integer> entry : map.entrySet()){
 			series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
 		}
-
         numberOfInstalledProgramsByVersion.getData().add(series);
 	}
-/*
-	private void setProgram(Program program){
-		currentProgram = program.getName();
-		showNumberOfInstalledProgramsByVersionBarChart(program);
-	}*/
 }

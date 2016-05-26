@@ -73,7 +73,7 @@
                <children>
                   <TabPane prefHeight="598.0" prefWidth="553.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <tabs>
-                      <Tab text="PC Info">
+                      <Tab text="Computer Informations">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="565.0" prefWidth="640.0">
                                  <children>
@@ -97,34 +97,37 @@
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                        </rowConstraints>
                                        <children>
-                                          <Label text="Hostname" />
-                                          <Label text="IP Address" GridPane.rowIndex="1" />
-                                          <Label text="MAC Address" GridPane.rowIndex="2" />
-                                          <Label text="Total HDD Size" GridPane.rowIndex="8" />
+                                          <Label text="Hostname:" />
+                                          <Label text="IP Address:" GridPane.rowIndex="1" />
+                                          <Label text="MAC Address:" GridPane.rowIndex="2" />
+                                          <Label text="Storage Capacity:" GridPane.rowIndex="8" />
                                           <Label fx:id="hostnameLabel" text="Label" GridPane.columnIndex="1" />
                                           <Label fx:id="ipAddressLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                           <Label fx:id="macAddressLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                           <Label fx:id="osLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                           <Label fx:id="hddTotalSizeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                                           <Label fx:id="ramSizeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-                                          <Label text="Total RAM Size" GridPane.rowIndex="10" />
-                                          <Label text="Operating System" GridPane.rowIndex="3" />
-                                          <Label text="Free HDD Size" GridPane.rowIndex="9" />
+                                          <Label text="Memory Size:" GridPane.rowIndex="10" />
+                                          <Label text="Operating System:" GridPane.rowIndex="3" />
+                                          <Label text="Free Storage Space:" GridPane.rowIndex="9" />
                                           <Label fx:id="hddFreeSizeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-                                          <Label text="CPU Constructor" GridPane.rowIndex="4" />
+                                          <Label text="CPU Constructor:" GridPane.rowIndex="4" />
                                           <Label fx:id="cpuConstructorLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                          <Label text="CPU Model" GridPane.rowIndex="5" />
-                                          <Label text="CPU Frequency" GridPane.rowIndex="6" />
+                                          <Label text="CPU Model:" GridPane.rowIndex="5" />
+                                          <Label text="CPU Frequency:" GridPane.rowIndex="6" />
                                           <Label fx:id="cpuModelLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                           <Label fx:id="cpuFrequencyLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                                           <Label fx:id="cpuNumbCorelLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                                          <Label text="CPU Number of Cores " GridPane.rowIndex="7" />
-                                          <Label text="Installed Programs" GridPane.rowIndex="11" />
+                                          <Label text="CPU Number of Cores: " GridPane.rowIndex="7" />
+                                          <Label text="Installed Programs:" GridPane.rowIndex="11" />
                                           <Label fx:id="installedProgrammsLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11" />
                                        </children>
                                     </GridPane>
-                                    <PieChart fx:id="chart" layoutX="228.0" layoutY="306.0" prefHeight="401.0" prefWidth="410.0" title="HDD Statistics" AnchorPane.leftAnchor="228.0" AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="306.0" />
-                                    <Label fx:id="status" layoutX="635.0" layoutY="357.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="20.0" />
+                                    <PieChart fx:id="pieChart" layoutX="228.0" layoutY="306.0" prefHeight="401.0" prefWidth="410.0" title="HDD Statistics" AnchorPane.leftAnchor="228.0" AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="306.0" />
+                                    <Label fx:id="statusLabel" layoutX="98.0" layoutY="682.0" prefHeight="17.0" prefWidth="40.0" AnchorPane.rightAnchor="522.0" AnchorPane.topAnchor="682.0" />
+                                    <Label fx:id="spaceLabel" layoutX="10.0" layoutY="682.0" />
+                                    <Label layoutX="392.0" layoutY="14.0" text="Capture Date:" />
+                                    <Label fx:id="captureDateLabel" layoutX="495.0" layoutY="14.0" />
                                  </children>
                               </AnchorPane>
                         </content>
@@ -137,7 +140,6 @@
                                       <columns>
                                         <TableColumn fx:id="nameColumn" prefWidth="75.0" text="Program" />
                                         <TableColumn fx:id="versionColumn" prefWidth="75.0" text="Version" />
-                                          <TableColumn fx:id="lastUpdateColumn" prefWidth="75.0" text="Update Date" />
                                       </columns>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

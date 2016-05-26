@@ -1,12 +1,9 @@
 package monitor;
 
 import java.io.IOException;
-import java.net.SocketException;
-import java.util.LinkedList;
 
-import communication.SystemInfoRetrieverProtocol;
-import communication.SystemInfoRetrieverServer;
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -30,11 +27,12 @@ public class ServerApp extends Application {
 	private Database database;
 	private AdvancedFilters filters;
 
-	private String curentPcView;
+	private SimpleStringProperty currentDateView;
 	private ObservableList<PCInfoViewWrapper> pcData = FXCollections.observableArrayList();
 
 	public ServerApp(){
 		filters = new AdvancedFilters(pcData);
+		currentDateView = new SimpleStringProperty();
 		database = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
 		database.connect();
 	}
@@ -70,7 +68,7 @@ public class ServerApp extends Application {
 
             // Give the controller access to the main app.
             RootLayoutController controller = loader.getController();
-            controller.setServerApp(this);
+            controller.init(this);
 
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
@@ -90,7 +88,7 @@ public class ServerApp extends Application {
 
             // Give the controller access to the main app.
             ComputerOverviewController controller = loader.getController();
-            controller.setServerApp(this);
+            controller.init(this);
 
             // Set person overview into the center of root layout.
             rootLayout.setCenter(personOverview);
@@ -115,9 +113,7 @@ public class ServerApp extends Application {
 
             // Set the persons into the controller.
             GeneralStatisticsController controller = loader.getController();
-            controller.setServerApp(this);
-            controller.setDatabase(database);
-            controller.showStatistics();
+            controller.init(this);
 
             dialogStage.show();
 
@@ -134,20 +130,19 @@ public class ServerApp extends Application {
 			loader.setLocation(ServerApp.class.getResource("view/CaptureSelectionDialog.fxml"));
 			AnchorPane captureSelectionDialog = (AnchorPane) loader.load();
 
-			Stage captureStage = new Stage();
-			captureStage.setTitle("Capture Selection");
-			captureStage.initModality(Modality.WINDOW_MODAL);
-			captureStage.initOwner(primaryStage);
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Capture Selection");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(primaryStage);
 			Scene scene = new Scene(captureSelectionDialog);
-			captureStage.setScene(scene);
+			dialogStage.setScene(scene);
 
 
 			CaptureSelectionDialogController controller = loader.getController();
-			controller.setServerApp(this);
-			controller.setDatabase(database);
-			controller.setDialogStage(captureStage);
+			controller.init(this, dialogStage);
 
-			captureStage.showAndWait();
+
+			dialogStage.showAndWait();
 			return controller.getDate();
 
 		} catch (IOException e) {
@@ -172,9 +167,7 @@ public class ServerApp extends Application {
 
             // Set the persons into the controller.
             AverageStorageLoadStatisticDialogController controller = loader.getController();
-            controller.setServerApp(this);
-            controller.setDatabase(database);
-            controller.showStatistics();
+            controller.init(this);
 
             dialogStage.show();
 
@@ -183,16 +176,13 @@ public class ServerApp extends Application {
         }
 	}
 
-	public void setCurentPcView(String date){
-		curentPcView = date;
-		pcData.clear();
-		pcData.addAll(database.loadPCInfo(curentPcView));
-
+	public SimpleStringProperty getCurentDateView(){
+		return currentDateView;
 	}
 
-	public String getCurentPcView(){
+	/*public String getCurentPcView(){
 		return curentPcView;
-	}
+	}*/
 
 	public void showProgramsStatistics(){
 
@@ -210,9 +200,7 @@ public class ServerApp extends Application {
 
             // Set the persons into the controller.
             ProgramStatisticsController controller = loader.getController();
-            controller.setServerApp(this);
-            controller.setDatabase(database);
-            controller.showStatistics();
+            controller.init(this);
 
             dialogStage.show();
 
@@ -236,8 +224,7 @@ public class ServerApp extends Application {
 			dialogStage.setScene(scene);
 
 			FilterEditDialogController controller = loader.getController();
-			controller.setServerApp(this);
-			controller.setDialogStage(dialogStage);
+			controller.init(this, dialogStage);
 
             // Show the dialog and wait until the user closes it
             dialogStage.showAndWait();
