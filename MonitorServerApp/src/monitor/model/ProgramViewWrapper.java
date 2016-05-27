@@ -35,12 +35,4 @@ public class ProgramViewWrapper {
 	public StringProperty versionProperty(){
 		return version;
 	}
-
-	public String getLastUpdate() {
-		return lastUpdate.get();
-	}
-
-	public StringProperty lastUpdateProperty(){
-		return lastUpdate;
-	}
 }

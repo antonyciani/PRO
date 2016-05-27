@@ -25,6 +25,7 @@ import javafx.scene.input.MouseEvent;
 import monitor.ServerApp;
 import monitor.database.Database;
 import monitor.model.PCInfoViewWrapper;
+import monitor.model.Program;
 import monitor.model.ProgramViewWrapper;
 
 public class ComputerOverviewController {
@@ -192,10 +193,10 @@ public class ComputerOverviewController {
 
     private void showProgrammsDetails(PCInfoViewWrapper newValue){
 
-    	ObservableList<ProgramViewWrapper> progs = newValue.getPrograms();
+    	programTable.getItems().clear();
 
     	if(newValue != null){
-    		programTable.setItems(progs);
+    		programTable.setItems(newValue.getPrograms());
     		nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
     		versionColumn.setCellValueFactory(cellData -> cellData.getValue().versionProperty());
     	}
