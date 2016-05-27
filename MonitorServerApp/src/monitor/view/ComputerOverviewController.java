@@ -1,9 +1,7 @@
 package monitor.view;
 
-import java.net.SocketException;
 import java.util.TreeMap;
 import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -18,8 +16,6 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -30,9 +26,6 @@ import monitor.ServerApp;
 import monitor.database.Database;
 import monitor.model.PCInfoViewWrapper;
 import monitor.model.ProgramViewWrapper;
-import communication.SystemInfoRetrieverProtocol;
-import communication.SystemInfoRetrieverServer;
-import utils.PlatformExecutor;
 
 public class ComputerOverviewController {
 
@@ -98,8 +91,6 @@ public class ComputerOverviewController {
 
     @FXML
     private Label captureDateLabel;
-
-    private Alert alert;
 
 
     private ServerApp serverApp;
@@ -200,8 +191,11 @@ public class ComputerOverviewController {
     }
 
     private void showProgrammsDetails(PCInfoViewWrapper newValue){
+
+    	ObservableList<ProgramViewWrapper> progs = newValue.getPrograms();
+
     	if(newValue != null){
-    		programTable.setItems(newValue.getPrograms());
+    		programTable.setItems(progs);
     		nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
     		versionColumn.setCellValueFactory(cellData -> cellData.getValue().versionProperty());
     	}
@@ -227,6 +221,9 @@ public class ComputerOverviewController {
 
         	lineChart.getData().add(series);
     	}
+    	else {
+    		lineChart.getData().clear();
+    	}
     }
 
     private void showPieChartDetails(PCInfoViewWrapper newValue){
@@ -239,6 +236,7 @@ public class ComputerOverviewController {
     		pieChartData = FXCollections.observableArrayList(
     				new PieChart.Data("Free Space", freeSpace),
     				new PieChart.Data("Full Space", fullSpace));
+
 
     		pieChart.setData(pieChartData);
 
@@ -257,31 +255,6 @@ public class ComputerOverviewController {
     	else {
     		pieChart.getData().clear();
     	}
-    }
-
-    private void showAlertDialog(){
-    	Alert alert = new Alert(AlertType.INFORMATION);
-    	alert.setTitle("Alert");
-    	alert.setHeaderText("Retriving PCs Information...");
-    	alert.show();
-    }
-
-    @FXML
-    public void handleCaptureDate(){
-    	String date = "";
-    	date = serverApp.showCaptureSelectionDialog();
-
-    	if(!date.equals("")){
-    		currentDateView.setValue(date);
-        	serverApp.getPcInfo().clear();
-    		serverApp.getPcInfo().addAll(database.loadPCInfo(date));
-    	}
-    }
-
-    @FXML
-    public void handleDeleteCapture(){
-    	String date = serverApp.showCaptureSelectionDialog();
-    	serverApp.getDatabase().deleteCapture(date);
     }
 
     @FXML
@@ -307,26 +280,5 @@ public class ComputerOverviewController {
         // 4. Bind the SortedList comparator to the TableView comparator.
         sortedList.comparatorProperty().bind(pcTable.comparatorProperty());
     	pcTable.setItems(sortedList);
-    }
-
-    @FXML
-    public void handleRefresh(){
-    	showAlertDialog();
-    	CompletableFuture.supplyAsync(() -> {
-    		SystemInfoRetrieverServer sirs = null;
-    		try {
-    			sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.UDP_PORT, SystemInfoRetrieverProtocol.TCP_PORT);
-    			sirs.retrieveInfosFromClients();
-    		} catch (SocketException e) {
-    			e.printStackTrace();
-    		}
-			return sirs.getPcInfos();
-		}).whenCompleteAsync((list, ex) -> {
-			database.storePCs(list);
-			serverApp.getPcInfo().clear();
-			serverApp.getPcInfo().setAll(database.loadPCInfo(database.getLastCapture()));
-			currentDateView.setValue(database.getLastCapture());
-			alert.close();
-		}, PlatformExecutor.instance);
     }
 }

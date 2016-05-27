@@ -53,13 +53,10 @@
                               <Insets left="10.0" />
                            </padding>
                         </TextField>
-                        <MenuButton mnemonicParsing="false" prefHeight="27.0" prefWidth="87.0" text="Option">
+                        <MenuButton mnemonicParsing="false" prefHeight="27.0" prefWidth="87.0" text="Filters">
                           <items>
-                              <MenuItem mnemonicParsing="false" onAction="#handleRefresh" text="Refresh" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleCaptureDate" text="Select Capture" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleDeleteCapture" text="Delete Capture" />
-                            <MenuItem mnemonicParsing="false" onAction="#handleAdvancedFilter" text="Advanced Filters" />
-                            <MenuItem mnemonicParsing="false" onAction="#handleClearFilter" text="Clear Filter" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleAdvancedFilter" text="Filters" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleClearFilter" text="Clear Filters" />
                           </items>
                            <HBox.margin>
                               <Insets bottom="5.0" left="5.0" top="5.0" />
@@ -149,7 +146,7 @@
                               </AnchorPane>
                         </content>
                       </Tab>
-                        <Tab text="HDD Load Evolution">
+                        <Tab text="Storage Evolution">
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>

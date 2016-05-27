@@ -6,7 +6,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 public class HDDInfo implements Serializable{
-	
+
 	private double totalSize;
 	private double freeSize;
 
@@ -21,6 +21,12 @@ public class HDDInfo implements Serializable{
 
 	public double getFreeSize() {
 		return freeSize;
+	}
+
+	public void setFreeSize(double d) {
+		// TODO Auto-generated method stub
+		freeSize = d;
+
 	}
 
 }

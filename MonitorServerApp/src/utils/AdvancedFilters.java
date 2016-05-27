@@ -27,7 +27,7 @@ public class AdvancedFilters {
 
 
     		if(!(os == null || os.isEmpty())){
-    			if(!(pc.getOs().contains(os))){
+    			if(!(pc.getOs().toLowerCase().contains(os.toLowerCase()))){
     				return false;
     			}
     		}
@@ -56,15 +56,23 @@ public class AdvancedFilters {
 
     		if(!(installedProgram == null || installedProgram.isEmpty())){
 
-    			boolean contains = false;
+    			boolean contains;
+    			boolean containsAll;
+    			String[] progs = installedProgram.split(":");
 
-    			for(ProgramViewWrapper p : pc.getPrograms()){
-    				if(p.getName().contains(installedProgram)){
-        				contains = true;
-        				break;
+    			containsAll = true;
+    			for(String prog : progs){
+    				contains = false;
+    				for(ProgramViewWrapper p : pc.getPrograms()){
+        				if(p.getName().toLowerCase().equals(prog.toLowerCase())){
+            				contains = true;
+            				break;
+            			}
         			}
+    				containsAll &= contains;
     			}
-    			return contains;
+
+    			return containsAll;
     		}
     		return true;
     	});

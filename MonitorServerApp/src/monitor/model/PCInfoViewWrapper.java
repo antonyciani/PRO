@@ -30,12 +30,12 @@ public class PCInfoViewWrapper {
 		this.ramSize = new SimpleLongProperty(ramSize);
 		this.programs = FXCollections.observableArrayList();
 		for(Program p : programs){
-			
+
 			this.programs.add(new ProgramViewWrapper(p));
-			
+
 		}
 	}
-	
+
 	public PCInfoViewWrapper(PCInfo pc){
 		this.hostname = new SimpleStringProperty(pc.getHostname());
 		this.ipAddress = new SimpleStringProperty(pc.getIpAddress());
@@ -46,9 +46,9 @@ public class PCInfoViewWrapper {
 		this.ramSize = new SimpleLongProperty(pc.getRamSize());
 		this.programs = FXCollections.observableArrayList();
 		for(Program p : pc.getPrograms()){
-			
+
 			this.programs.add(new ProgramViewWrapper(p));
-			
+
 		}
 	}
 
@@ -111,7 +111,7 @@ public class PCInfoViewWrapper {
 	public ObservableList<ProgramViewWrapper> getPrograms() {
 		return programs;
 	}
-	
+
 	public ObservableList<ProgramViewWrapper> programsProperties() {
 		return programs;
 	}

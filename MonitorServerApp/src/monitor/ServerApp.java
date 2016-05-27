@@ -84,14 +84,14 @@ public class ServerApp extends Application {
             // Load person overview.
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(ServerApp.class.getResource("view/ComputerOverview.fxml"));
-            AnchorPane personOverview = (AnchorPane) loader.load();
+            AnchorPane computerOverview = (AnchorPane) loader.load();
 
             // Give the controller access to the main app.
             ComputerOverviewController controller = loader.getController();
             controller.init(this);
 
             // Set person overview into the center of root layout.
-            rootLayout.setCenter(personOverview);
+            rootLayout.setCenter(computerOverview);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,7 +122,7 @@ public class ServerApp extends Application {
         }
 	}
 
-	public String showCaptureSelectionDialog(){
+	public String showCaptureSelectionDialog(String title){
 
 		try {
 			//Load the fxml file and create a new stage for the popup dialog.
@@ -131,7 +131,7 @@ public class ServerApp extends Application {
 			AnchorPane captureSelectionDialog = (AnchorPane) loader.load();
 
 			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Capture Selection");
+			dialogStage.setTitle(title);
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(primaryStage);
 			Scene scene = new Scene(captureSelectionDialog);
@@ -140,7 +140,6 @@ public class ServerApp extends Application {
 
 			CaptureSelectionDialogController controller = loader.getController();
 			controller.init(this, dialogStage);
-
 
 			dialogStage.showAndWait();
 			return controller.getDate();

@@ -25,8 +25,8 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="RAM Size" GridPane.rowIndex="1" />
-            <Label text="HDD Size" GridPane.rowIndex="2" />
+            <Label text="Memory Size:" GridPane.rowIndex="1" />
+            <Label text="Storage Size:" GridPane.rowIndex="2" />
             <Label GridPane.rowIndex="3" />
             <TextField fx:id="ramSizeField" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <GridPane.margin>
@@ -40,14 +40,14 @@
                <GridPane.margin>
                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                </GridPane.margin></TextField>
-            <Label text="HDD Occupancy Rate" GridPane.rowIndex="3" />
-            <Label text="OS" />
+            <Label text="Storage Load Rate:" GridPane.rowIndex="3" />
+            <Label text="OS:" />
             <TextField fx:id="osField" GridPane.columnIndex="1">
                <GridPane.margin>
                   <Insets bottom="2.0" left="2.0" right="2.0" top="3.0" />
                </GridPane.margin>
             </TextField>
-            <Label text="Installed Program" GridPane.rowIndex="4" />
+            <Label text="Installed Program:" GridPane.rowIndex="4" />
             <TextField fx:id="programField" prefHeight="43.0" prefWidth="171.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                <GridPane.margin>
                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />

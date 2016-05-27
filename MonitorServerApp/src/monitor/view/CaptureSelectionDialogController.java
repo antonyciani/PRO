@@ -4,10 +4,12 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import monitor.ServerApp;
 import monitor.model.ObservableDate;
 
@@ -39,6 +41,11 @@ public class CaptureSelectionDialogController {
 		this.dialogStage = dialogStage;
 		list = createObservableDate(serverApp.getDatabase().getCaptures());
 		dateTable.setItems(list);
+		dialogStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+	          public void handle(WindowEvent event) {
+	              handleCancel();
+	          }
+	     });
 	}
 
     private void setDate(ObservableDate date){

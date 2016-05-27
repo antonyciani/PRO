@@ -9,22 +9,28 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-                  <MenuItem mnemonicParsing="false" onAction="#handleArchive" text="Archive" />
+            <Menu mnemonicParsing="false" text="System">
+              <items>
               <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
+              </items>
+            </Menu>
+          <Menu mnemonicParsing="false" text="Capture">
+            <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleSelectCapture" text="Select Capture" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleDeleteCapture" text="Delete Capture" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleRefreshCapture" text="Refresh Capture" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Statistics">
             <items>
-                  <MenuItem mnemonicParsing="false" onAction="#handleAverageLoadStorage" text="Average Storage Load" />
+              <MenuItem mnemonicParsing="false" onAction="#handleParkStatistics" text="Park Statistics" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleStorageStatistic" text="Storage Statistics" />
                   <MenuItem mnemonicParsing="false" onAction="#handleProgramsStatistics" text="Program Statistics" />
-              <MenuItem mnemonicParsing="false" onAction="#handleGeneralStatistics" text="Computer Park Statistics" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About" />
             </items>
           </Menu>
         </menus>
