@@ -25,7 +25,6 @@ import javafx.scene.input.MouseEvent;
 import monitor.ServerApp;
 import monitor.database.Database;
 import monitor.model.PCInfoViewWrapper;
-import monitor.model.Program;
 import monitor.model.ProgramViewWrapper;
 
 public class ComputerOverviewController {

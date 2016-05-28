@@ -2,6 +2,7 @@ package monitor.model;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class Program implements Serializable{
 	String name;
 	String version;

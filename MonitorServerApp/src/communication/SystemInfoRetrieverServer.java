@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -15,13 +14,11 @@ import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import monitor.model.PCInfo;
@@ -87,6 +84,7 @@ public class SystemInfoRetrieverServer {
 					udpSocket.joinGroup(InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS));
 
 					udpSocket.send(new DatagramPacket(SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes(), SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length, InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS), udpPort ));
+					udpSocket.close();
 
 				} catch (IOException ex) {
 					LOG.log(Level.SEVERE, null, ex);
@@ -162,12 +160,9 @@ public class SystemInfoRetrieverServer {
 
 				@Override
 				public void run() {
-					PCInfo data;
-					boolean shouldRun = true;
 					boolean isInfoReceived = false;
 					boolean isPublicKeyReceived = false;
 					boolean isInfoReady = false;
-					boolean isKeysExchanged = false;
 					String msg = "";
 					SecretKey secretKey = null;
 					RSAPublicKey publicKey = null;

@@ -2,9 +2,7 @@ package monitor.model;
 
 import java.io.Serializable;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-
+@SuppressWarnings("serial")
 public class HDDInfo implements Serializable{
 
 	private double totalSize;

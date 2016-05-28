@@ -1,10 +1,6 @@
 package monitor.model;
 
-import java.util.List;
-
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 public class ObservableDate {
 

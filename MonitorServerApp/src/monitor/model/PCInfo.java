@@ -4,6 +4,7 @@ package monitor.model;
 import java.io.Serializable;
 import java.util.LinkedList;
 
+@SuppressWarnings("serial")
 public class PCInfo implements Serializable{
 
 	private String hostname;

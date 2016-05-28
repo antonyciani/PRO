@@ -2,6 +2,7 @@ package monitor.model;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class CPUInfo implements Serializable{
 	private String constructor;
 	private String model;
