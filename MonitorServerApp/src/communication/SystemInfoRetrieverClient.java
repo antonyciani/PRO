@@ -27,22 +27,23 @@ import utils.SystemInfoRecuperator;
 import utils.Cryptography;
 
 /**
- * @author Antony
+ * @author CIANI Antony
+ * @author STEINER Lucie
  *
  */
 public class SystemInfoRetrieverClient {
 
 	private static final Logger LOG = Logger.getLogger(SystemInfoRetrieverClient.class.getName());
 
-	MulticastSocket udpSocket;
-	Socket tcpSocket;
-	BufferedReader in;
-	PrintWriter out;
-	boolean sendInfoMsgReceived = false;
-	boolean connected = false;
+	private MulticastSocket udpSocket;
+	private Socket tcpSocket;
+	private BufferedReader in;
+	private PrintWriter out;
+	private boolean sendInfoMsgReceived = false;
+	private boolean connected = false;
 
-	int udpPort;
-	int tcpPort;
+	private int udpPort;
+	private int tcpPort;
 
 	/**
 	 * @param udpPort

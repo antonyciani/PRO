@@ -8,8 +8,8 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class Program implements Serializable {
-	String name;
-	String version;
+	private String name;
+	private String version;
 
 	/**
 	 * @param name

@@ -8,9 +8,9 @@ import javafx.beans.property.StringProperty;
  *
  */
 public class ProgramViewWrapper {
-	StringProperty name;
-	StringProperty version;
-	StringProperty lastUpdate;
+	private StringProperty name;
+	private StringProperty version;
+	private StringProperty lastUpdate;
 
 	/**
 	 * @param name
