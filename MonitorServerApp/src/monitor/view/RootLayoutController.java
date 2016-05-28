@@ -119,14 +119,17 @@ public class RootLayoutController {
 			}
 			return sirs.getPcInfos();
 		}).whenCompleteAsync((list, ex) -> {
-			System.out.println("COUCOU");
-			System.out.println("COUCOU2");
-			database.storePCs(list);
-			System.out.println("COUCOU3");
-			showCompletedAlertDialog();
-			serverApp.getPcInfo().clear();
-			serverApp.getPcInfo().setAll(database.loadPCInfo(database.getLastCapture()));
-			currentDateView.setValue(database.getLastCapture());
+			if(!list.isEmpty()){
+				database.storePCs(list);
+				showCompletedAlertDialog();
+				serverApp.getPcInfo().clear();
+				serverApp.getPcInfo().setAll(database.loadPCInfo(database.getLastCapture()));
+				currentDateView.setValue(database.getLastCapture());
+			}
+			else{
+				showNoPCAlertDialog();
+			}
+			
 		} , PlatformExecutor.instance);
 	}
 
@@ -149,9 +152,18 @@ public class RootLayoutController {
 	private void showCompletedAlertDialog() {
 		refreshingAlert.close();
 		refreshingAlert = new Alert(AlertType.INFORMATION);
-		refreshingAlert.setTitle("New Capure Available");
-		refreshingAlert.setHeaderText("Your capture is completed !");
+		refreshingAlert.setTitle("Capture completed");
+		refreshingAlert.setHeaderText("Your capture is finished !");
 		refreshingAlert.setContentText("The new capture is now available in the capture selection window !");
+		refreshingAlert.show();
+	}
+	
+	private void showNoPCAlertDialog() {
+		refreshingAlert.close();
+		refreshingAlert = new Alert(AlertType.WARNING);
+		refreshingAlert.setTitle("Capture completed");
+		refreshingAlert.setHeaderText("Your capture is finished !");
+		refreshingAlert.setContentText("Unfortunately no PC's have been detected!");
 		refreshingAlert.show();
 	}
 }
