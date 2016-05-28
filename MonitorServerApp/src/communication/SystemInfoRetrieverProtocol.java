@@ -1,5 +1,9 @@
 package communication;
 
+/**
+ * @author CIANI Antony
+ *
+ */
 public class SystemInfoRetrieverProtocol {
 
 	public static final String REQUEST_INFO = "GIVEMEINFO";

@@ -16,22 +16,16 @@ import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
 import monitor.model.*;
-/*
- -----------------------------------------------------------------------------------
- Laboratoire : <nn>
- Fichier     : <nom du fichier>.java
- Auteur(s)   : CIANI Antony
- Date        : <jj.mm.aaaa>
 
- But         : <à compléter>
-
- Remarque(s) : <à compléter>
-
- Compilateur : jdk1.8.0_60
- -----------------------------------------------------------------------------------
-*/
+/**
+ * @author CIANI Antony
+ *
+ */
 public class SystemInfoRecuperator {
 
+	/**
+	 * @return
+	 */
 	public static HDDInfo retrieveHDDInfo() {
 		File f = new File("C:");
 		double freeSpaceGB = f.getFreeSpace() / Math.pow(1024.0, 3);
@@ -41,6 +35,9 @@ public class SystemInfoRecuperator {
 
 	}
 
+	/**
+	 * @return
+	 */
 	public static CPUInfo retrieveCPUInfo() {
 
 		Sigar s = new Sigar();
@@ -48,7 +45,7 @@ public class SystemInfoRecuperator {
 		try {
 			String vendor = s.getCpuInfoList()[0].getVendor();
 			String model = s.getCpuInfoList()[0].getModel();
-			double frequency  = s.getCpuInfoList()[0].getMhz()/1000.0;
+			double frequency = s.getCpuInfoList()[0].getMhz() / 1000.0;
 			int nbCores = s.getCpuInfoList()[0].getTotalCores();
 
 			return new CPUInfo(vendor, model, frequency, nbCores);
@@ -62,16 +59,16 @@ public class SystemInfoRecuperator {
 
 	}
 
+	/**
+	 * @return
+	 */
 	public static LinkedList<Program> retrieveInstalledPrograms() {
 
 		try {
 
 			LinkedList<Program> programs = new LinkedList<>();
-//			Process proc = Runtime.getRuntime().exec(
-//					"powershell.exe Get-ItemProperty HKLM:\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select-Object DisplayName"); //DisplayVersion, Publisher, InstallDate
-//			Process proc = Runtime.getRuntime().exec(
-//					"powershell.exe Get-WmiObject -Class Win32_Product | Select-Object -Property Name,Version | Sort-Object Name| Format-List"); //DisplayVersion, Publisher, InstallDate
-			Process proc = Runtime.getRuntime().exec("wmic product get name,version /format:\""+System.getenv("SystemRoot")+"\\System32\\wbem\\fr-FR\\csv\"");
+			Process proc = Runtime.getRuntime().exec("wmic product get name,version /format:\""
+					+ System.getenv("SystemRoot") + "\\System32\\wbem\\fr-FR\\csv\"");
 
 			BufferedInputStream bs = new BufferedInputStream(proc.getInputStream());
 			BufferedReader br = new BufferedReader(new InputStreamReader(bs));
@@ -79,29 +76,27 @@ public class SystemInfoRecuperator {
 
 			while ((program = br.readLine()) != null) {
 
-					if(!program.equals("") && !program.equals("Node,Name,Version") ){
-						String[] elems = program.split(",");
-						String name = "";
-						String version = "";
-						System.out.println("YOOO: " + elems.length);
-						for(int i = 0; i < elems.length; i++){
-							System.out.println(elems[i]);
-						}
-
-						System.out.println("P:" + program);
-						if(elems.length > 1){
-							name = elems[1];
-							if(elems.length == 3){
-								version = elems[2];
-								System.out.println(elems[2]);
-							}
-							Program p = new Program(name, version);
-							programs.add(p);
-						}
-
-
+				if (!program.equals("") && !program.equals("Node,Name,Version")) {
+					String[] elems = program.split(",");
+					String name = "";
+					String version = "";
+					System.out.println("YOOO: " + elems.length);
+					for (int i = 0; i < elems.length; i++) {
+						System.out.println(elems[i]);
 					}
 
+					System.out.println("P:" + program);
+					if (elems.length > 1) {
+						name = elems[1];
+						if (elems.length == 3) {
+							version = elems[2];
+							System.out.println(elems[2]);
+						}
+						Program p = new Program(name, version);
+						programs.add(p);
+					}
+
+				}
 
 			}
 
@@ -116,6 +111,9 @@ public class SystemInfoRecuperator {
 
 	}
 
+	/**
+	 * @return
+	 */
 	public static PCInfo retrievePCInfo() {
 
 		String hostname = "";
@@ -152,13 +150,12 @@ public class SystemInfoRecuperator {
 			hdd = retrieveHDDInfo();
 
 			Sigar s = new Sigar();
-			ramSize = (long) (Math.ceil(s.getMem().getRam()/1024.0));
+			ramSize = (long) (Math.ceil(s.getMem().getRam() / 1024.0));
 			System.out.println("RAM: " + ramSize);
 
 			programs.addAll(retrieveInstalledPrograms());
 
 			return new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs);
-
 
 		} catch (UnknownHostException e) {
 

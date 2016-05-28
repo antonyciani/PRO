@@ -1,10 +1,14 @@
 package monitor.model;
 
-
 import java.io.Serializable;
 import java.util.LinkedList;
 
-public class PCInfo implements Serializable{
+/**
+ * @author CIANI Antony
+ *
+ */
+@SuppressWarnings("serial")
+public class PCInfo implements Serializable {
 
 	private String hostname;
 	private String ipAddress;
@@ -15,7 +19,18 @@ public class PCInfo implements Serializable{
 	private long ramSize;
 	private LinkedList<Program> programs;
 
-	public PCInfo(String hostname, String ipAddress, String macAddress, String os, CPUInfo cpu, HDDInfo hdd, long ramSize, LinkedList<Program> programs){
+	/**
+	 * @param hostname
+	 * @param ipAddress
+	 * @param macAddress
+	 * @param os
+	 * @param cpu
+	 * @param hdd
+	 * @param ramSize
+	 * @param programs
+	 */
+	public PCInfo(String hostname, String ipAddress, String macAddress, String os, CPUInfo cpu, HDDInfo hdd,
+			long ramSize, LinkedList<Program> programs) {
 		this.hostname = hostname;
 		this.ipAddress = ipAddress;
 		this.macAddress = macAddress;
@@ -26,40 +41,58 @@ public class PCInfo implements Serializable{
 		this.programs = new LinkedList<>(programs);
 	}
 
+	/**
+	 * @return
+	 */
 	public String getHostname() {
 		return hostname;
 	}
 
-
+	/**
+	 * @return
+	 */
 	public String getIpAddress() {
 		return ipAddress;
 	}
 
-
+	/**
+	 * @return
+	 */
 	public String getMacAddress() {
 		return macAddress;
 	}
 
-
+	/**
+	 * @return
+	 */
 	public String getOs() {
 		return os;
 	}
 
-
+	/**
+	 * @return
+	 */
 	public CPUInfo getCpu() {
 		return cpu;
 	}
 
-
+	/**
+	 * @return
+	 */
 	public HDDInfo getHdd() {
 		return hdd;
 	}
 
+	/**
+	 * @return
+	 */
 	public long getRamSize() {
 		return ramSize;
 	}
 
-
+	/**
+	 * @return
+	 */
 	public LinkedList<Program> getPrograms() {
 		return programs;
 	}

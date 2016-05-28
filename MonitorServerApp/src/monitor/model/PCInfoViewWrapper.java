@@ -9,6 +9,10 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * @author CIANI Antony
+ *
+ */
 public class PCInfoViewWrapper {
 
 	private StringProperty hostname;
@@ -20,7 +24,18 @@ public class PCInfoViewWrapper {
 	private LongProperty ramSize;
 	private ObservableList<ProgramViewWrapper> programs;
 
-	public PCInfoViewWrapper(String hostname, String ipAddress, String macAddress, String os, CPUInfo cpu, HDDInfo hdd, long ramSize, ObservableList<Program> programs){
+	/**
+	 * @param hostname
+	 * @param ipAddress
+	 * @param macAddress
+	 * @param os
+	 * @param cpu
+	 * @param hdd
+	 * @param ramSize
+	 * @param programs
+	 */
+	public PCInfoViewWrapper(String hostname, String ipAddress, String macAddress, String os, CPUInfo cpu, HDDInfo hdd,
+			long ramSize, ObservableList<Program> programs) {
 		this.hostname = new SimpleStringProperty(hostname);
 		this.ipAddress = new SimpleStringProperty(ipAddress);
 		this.macAddress = new SimpleStringProperty(macAddress);
@@ -29,14 +44,17 @@ public class PCInfoViewWrapper {
 		this.hdd = new SimpleObjectProperty<HDDInfo>(hdd);
 		this.ramSize = new SimpleLongProperty(ramSize);
 		this.programs = FXCollections.observableArrayList();
-		for(Program p : programs){
+		for (Program p : programs) {
 
 			this.programs.add(new ProgramViewWrapper(p));
 
 		}
 	}
 
-	public PCInfoViewWrapper(PCInfo pc){
+	/**
+	 * @param pc
+	 */
+	public PCInfoViewWrapper(PCInfo pc) {
 		this.hostname = new SimpleStringProperty(pc.getHostname());
 		this.ipAddress = new SimpleStringProperty(pc.getIpAddress());
 		this.macAddress = new SimpleStringProperty(pc.getMacAddress());
@@ -45,73 +63,121 @@ public class PCInfoViewWrapper {
 		this.hdd = new SimpleObjectProperty<HDDInfo>(pc.getHdd());
 		this.ramSize = new SimpleLongProperty(pc.getRamSize());
 		this.programs = FXCollections.observableArrayList();
-		for(Program p : pc.getPrograms()){
+		for (Program p : pc.getPrograms()) {
 
 			this.programs.add(new ProgramViewWrapper(p));
 
 		}
 	}
 
+	/**
+	 * @return
+	 */
 	public String getHostname() {
 		return hostname.get();
 	}
 
+	/**
+	 * @return
+	 */
 	public StringProperty hostnameProperty() {
 		return hostname;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getIpAddress() {
 		return ipAddress.get();
 	}
 
+	/**
+	 * @return
+	 */
 	public StringProperty ipAddressProperty() {
 		return ipAddress;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getMacAddress() {
 		return macAddress.get();
 	}
 
+	/**
+	 * @return
+	 */
 	public StringProperty macAddressProperty() {
 		return macAddress;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getOs() {
 		return os.get();
 	}
 
+	/**
+	 * @return
+	 */
 	public StringProperty osProperty() {
 		return os;
 	}
 
+	/**
+	 * @return
+	 */
 	public CPUInfo getCpu() {
 		return cpu.getValue();
 	}
 
+	/**
+	 * @return
+	 */
 	public ObjectProperty<CPUInfo> cpuProperty() {
 		return cpu;
 	}
 
+	/**
+	 * @return
+	 */
 	public HDDInfo getHdd() {
 		return hdd.getValue();
 	}
 
+	/**
+	 * @return
+	 */
 	public ObjectProperty<HDDInfo> hddProperty() {
 		return hdd;
 	}
 
+	/**
+	 * @return
+	 */
 	public long getRamSize() {
 		return ramSize.get();
 	}
 
+	/**
+	 * @return
+	 */
 	public LongProperty ramSizeProperty() {
 		return ramSize;
 	}
 
+	/**
+	 * @return
+	 */
 	public ObservableList<ProgramViewWrapper> getPrograms() {
 		return programs;
 	}
 
+	/**
+	 * @return
+	 */
 	public ObservableList<ProgramViewWrapper> programsProperties() {
 		return programs;
 	}

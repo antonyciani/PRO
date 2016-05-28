@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -16,10 +15,6 @@ import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.logging.Logger;
@@ -31,28 +26,40 @@ import monitor.model.PCInfo;
 import utils.SystemInfoRecuperator;
 import utils.Cryptography;
 
+/**
+ * @author CIANI Antony
+ * @author STEINER Lucie
+ *
+ */
 public class SystemInfoRetrieverClient {
 
 	private static final Logger LOG = Logger.getLogger(SystemInfoRetrieverClient.class.getName());
 
-	MulticastSocket udpSocket;
-	Socket tcpSocket;
-	BufferedReader in;
-	PrintWriter out;
-	boolean sendInfoMsgReceived = false;
-	boolean connected = false;
+	private MulticastSocket udpSocket;
+	private Socket tcpSocket;
+	private BufferedReader in;
+	private PrintWriter out;
+	private boolean sendInfoMsgReceived = false;
+	private boolean connected = false;
 
-	int udpPort;
-	int tcpPort;
+	private int udpPort;
+	private int tcpPort;
 
-
+	/**
+	 * @param udpPort
+	 * @param tcpPort
+	 * @throws SocketException
+	 */
 	public SystemInfoRetrieverClient(int udpPort, int tcpPort) throws SocketException {
 		this.udpPort = udpPort;
 		this.tcpPort = tcpPort;
 
 	}
 
-	public void startListening() throws IOException{
+	/**
+	 * @throws IOException
+	 */
+	public void startListening() throws IOException {
 		PCInfo pc = null;
 		boolean ready = false;
 		boolean isPublicKeySent = false;
@@ -68,12 +75,12 @@ public class SystemInfoRetrieverClient {
 		byte[] buffer = new byte[SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length];
 
 		DatagramPacket udpPacket = new DatagramPacket(buffer, buffer.length);
-		while(!sendInfoMsgReceived){
+		while (!sendInfoMsgReceived) {
 
 			udpSocket.receive(udpPacket);
 			String msg = new String(udpPacket.getData());
-			LOG.info("Received: " +msg);
-			if(msg.equals(SystemInfoRetrieverProtocol.REQUEST_INFO)){
+			LOG.info("Received: " + msg);
+			if (msg.equals(SystemInfoRetrieverProtocol.REQUEST_INFO)) {
 
 				sendInfoMsgReceived = true;
 				LOG.info("Server requested infos");
@@ -85,28 +92,26 @@ public class SystemInfoRetrieverClient {
 		connect(udpPacket.getAddress(), tcpPort);
 
 		String msg = "";
-		while(connected){
+		while (connected) {
 
-			if(!ready){
+			if (!ready) {
 				pc = SystemInfoRecuperator.retrievePCInfo();
-				System.out.println("Nb programs: " +pc.getPrograms().size());
+				System.out.println("Nb programs: " + pc.getPrograms().size());
 				ready = true;
-			}
-			else{
-				//Génération de la paire de clés RSA
+			} else {
+				// Gï¿½nï¿½ration de la paire de clï¿½s RSA
 				keyPair = Cryptography.generateRSAKeyPair();
-				publicKey = (RSAPublicKey)keyPair.getPublic();
-				privateKey = (RSAPrivateKey)keyPair.getPrivate();
-
+				publicKey = (RSAPublicKey) keyPair.getPublic();
+				privateKey = (RSAPrivateKey) keyPair.getPrivate();
 
 				out.println(SystemInfoRetrieverProtocol.READY_TO_SEND_INFO);
 				out.flush();
 				LOG.info("SENT SOMETHING");
 				ObjectOutputStream oos = null;
-				while((!isPublicKeySent) && (msg = in.readLine()) != null){
-					if(msg.equals(SystemInfoRetrieverProtocol.WAITING_FOR_PUBLIC_KEY)){
+				while ((!isPublicKeySent) && (msg = in.readLine()) != null) {
+					if (msg.equals(SystemInfoRetrieverProtocol.WAITING_FOR_PUBLIC_KEY)) {
 
-						//Envoi de la clé publique
+						// Envoi de la clï¿½ publique
 						oos = new ObjectOutputStream(tcpSocket.getOutputStream());
 						oos.writeObject(publicKey);
 						LOG.info("PUBLIC KEY HAS BEEN SENT");
@@ -115,42 +120,42 @@ public class SystemInfoRetrieverClient {
 					}
 				}
 
-
 				InputStream tmpIn = null;
 				OutputStream tmpOut = null;
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 				ObjectOutput objOut = new ObjectOutputStream(byteArrayOutputStream);
 
-				while((!receivedReady) &&(msg = in.readLine()) != null){
+				while ((!receivedReady) && (msg = in.readLine()) != null) {
 
-					if(msg.equals(SystemInfoRetrieverProtocol.READY_TO_READ_INFO)){
+					if (msg.equals(SystemInfoRetrieverProtocol.READY_TO_READ_INFO)) {
 						LOG.info("RECEIVED READY");
 						receivedReady = true;
 						out.println(SystemInfoRetrieverProtocol.WAITING_FOR_SECRET_KEY);
 						out.flush();
 
-						//Récupérer la clé secrète et la déchiffrer avec la clé privée RSA
+						// Rï¿½cupï¿½rer la clï¿½ secrï¿½te et la dï¿½chiffrer avec la clï¿½
+						// privï¿½e RSA
 						byte encryptedSecretKey[] = new byte[128];
 						tmpIn = tcpSocket.getInputStream();
-						while((!isInfoSent) && tmpIn.read(encryptedSecretKey) != -1){
+						while ((!isInfoSent) && tmpIn.read(encryptedSecretKey) != -1) {
 
 							byte[] decryptedSecretKey = Cryptography.RSADecrypt(encryptedSecretKey, privateKey);
 							SecretKey secretKey = new SecretKeySpec(decryptedSecretKey, "AES");
 
 							LOG.info("RECEIVED SECRET KEY");
 
-							//Chiffrement des informations avec la clé secrète
+							// Chiffrement des informations avec la clï¿½ secrï¿½te
 							objOut.writeObject(pc);
-							byte[] encryptedPC = Cryptography.AESEncrypt(byteArrayOutputStream.toByteArray(), secretKey);
+							byte[] encryptedPC = Cryptography.AESEncrypt(byteArrayOutputStream.toByteArray(),
+									secretKey);
 
-							//Envoi de la taille du message
+							// Envoi de la taille du message
 							out.println(encryptedPC.length);
 							out.flush();
 							byteArrayOutputStream.close();
 							objOut.close();
 
-
-							//Envoi du message chiffré
+							// Envoi du message chiffrï¿½
 							tmpOut = tcpSocket.getOutputStream();
 							tmpOut.write(encryptedPC);
 							isInfoSent = true;
@@ -168,10 +173,12 @@ public class SystemInfoRetrieverClient {
 				sendInfoMsgReceived = false;
 			}
 		}
-
-
 	}
 
+	/**
+	 * @param serverAddress
+	 * @param serverPort
+	 */
 	public void connect(InetAddress serverAddress, int serverPort) {
 
 		try {
@@ -185,8 +192,5 @@ public class SystemInfoRetrieverClient {
 			e.printStackTrace();
 		}
 	}
-
-
-
 
 }
