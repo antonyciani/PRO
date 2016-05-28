@@ -141,7 +141,6 @@ public class RootLayoutController {
 		refreshingAlert.setTitle("New Capture");
 		refreshingAlert.setHeaderText("Retrieving PCs Information...");
 		refreshingAlert.setContentText("You will be notified when it's done!");
-		// refreshingAlert.getButtonTypes().clear();
 		refreshingAlert.show();
 
 	}
