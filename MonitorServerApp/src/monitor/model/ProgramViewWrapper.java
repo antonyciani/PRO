@@ -3,36 +3,59 @@ package monitor.model;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+/**
+ * @author CIANI Antony
+ *
+ */
 public class ProgramViewWrapper {
 	StringProperty name;
 	StringProperty version;
 	StringProperty lastUpdate;
 
-	public ProgramViewWrapper(String name, String version){
+	/**
+	 * @param name
+	 * @param version
+	 */
+	public ProgramViewWrapper(String name, String version) {
 		this.name = new SimpleStringProperty(name);
 		this.version = new SimpleStringProperty(version);
 
 	}
-	
-	public ProgramViewWrapper(Program program){
+
+	/**
+	 * @param program
+	 */
+	public ProgramViewWrapper(Program program) {
 		this.name = new SimpleStringProperty(program.getName());
 		this.version = new SimpleStringProperty(program.getVersion());
 
 	}
 
+	/**
+	 * @return
+	 */
 	public String getName() {
 		return name.get();
 	}
 
-	public StringProperty nameProperty(){
+	/**
+	 * @return
+	 */
+	public StringProperty nameProperty() {
 		return name;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getVersion() {
 		return version.get();
 	}
 
-	public StringProperty versionProperty(){
+	/**
+	 * @return
+	 */
+	public StringProperty versionProperty() {
 		return version;
 	}
 }

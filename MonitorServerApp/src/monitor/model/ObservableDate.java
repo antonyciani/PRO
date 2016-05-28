@@ -2,19 +2,32 @@ package monitor.model;
 
 import javafx.beans.property.SimpleStringProperty;
 
+/**
+ * @author ROHRER Michaël
+ *
+ */
 public class ObservableDate {
 
 	private SimpleStringProperty date;
 
-	public ObservableDate(String date){
+	/**
+	 * @param date
+	 */
+	public ObservableDate(String date) {
 		this.date = new SimpleStringProperty(date);
 	}
 
-	public SimpleStringProperty getDateProperty(){
+	/**
+	 * @return
+	 */
+	public SimpleStringProperty getDateProperty() {
 		return date;
 	}
 
-	public String getDate(){
+	/**
+	 * @return
+	 */
+	public String getDate() {
 		return date.get();
 	}
 }

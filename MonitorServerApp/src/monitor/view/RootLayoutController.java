@@ -2,7 +2,6 @@ package monitor.view;
 
 import java.net.SocketException;
 import java.util.concurrent.CompletableFuture;
-
 import communication.SystemInfoRetrieverProtocol;
 import communication.SystemInfoRetrieverServer;
 import javafx.beans.property.SimpleStringProperty;
@@ -13,6 +12,11 @@ import monitor.ServerApp;
 import monitor.database.Database;
 import utils.PlatformExecutor;
 
+/**
+ * @author ROHRER Michaël
+ * @author CIANI Antony
+ *
+ */
 public class RootLayoutController {
 
 	private Alert refreshingAlert;
@@ -20,37 +24,58 @@ public class RootLayoutController {
 	private ServerApp serverApp;
 	private SimpleStringProperty currentDateView;
 
+	/**
+	 * @param serverApp
+	 */
 	public void init(ServerApp serverApp) {
 		this.serverApp = serverApp;
 		this.database = serverApp.getDatabase();
 		this.currentDateView = serverApp.getCurentDateView();
 	}
 
+	/**
+	 * 
+	 */
 	@FXML
 	public void handleAbout() {
 
 	}
 
+	/**
+	 * 
+	 */
 	@FXML
 	public void handleStorageStatistic() {
 		serverApp.showAverageStorageLoadDialog();
 	}
 
+	/**
+	 * 
+	 */
 	@FXML
 	public void handleParkStatistics() {
 		serverApp.showGeneralStatistics();
 	}
 
+	/**
+	 * 
+	 */
 	@FXML
 	public void handleExit() {
 		System.exit(0);
 	}
 
+	/**
+	 * 
+	 */
 	@FXML
 	public void handleProgramsStatistics() {
 		serverApp.showProgramsStatistics();
 	}
 
+	/**
+	 * 
+	 */
 	@FXML
 	public void handleSelectCapture() {
 		String date = serverApp.showCaptureSelectionDialog("Select Capture");
@@ -61,6 +86,9 @@ public class RootLayoutController {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	@FXML
 	public void handleDeleteCapture() {
 		String date = serverApp.showCaptureSelectionDialog("Delete Capture");
@@ -74,6 +102,9 @@ public class RootLayoutController {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	@FXML
 	public void handleRefreshCapture() {
 		showRetrievingAlertDialog();
@@ -99,16 +130,22 @@ public class RootLayoutController {
 		} , PlatformExecutor.instance);
 	}
 
+	/**
+	 * 
+	 */
 	private void showRetrievingAlertDialog() {
 		refreshingAlert = new Alert(AlertType.INFORMATION);
 		refreshingAlert.setTitle("New Capture");
 		refreshingAlert.setHeaderText("Retrieving PCs Information...");
 		refreshingAlert.setContentText("You will be notified when it's done!");
-		//refreshingAlert.getButtonTypes().clear();
+		// refreshingAlert.getButtonTypes().clear();
 		refreshingAlert.show();
-		
+
 	}
 
+	/**
+	 * 
+	 */
 	private void showCompletedAlertDialog() {
 		refreshingAlert.close();
 		refreshingAlert = new Alert(AlertType.INFORMATION);
