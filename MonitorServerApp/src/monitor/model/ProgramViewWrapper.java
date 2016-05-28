@@ -10,8 +10,6 @@ import javafx.beans.property.StringProperty;
 public class ProgramViewWrapper {
 	private StringProperty name;
 	private StringProperty version;
-	private StringProperty lastUpdate;
-
 	/**
 	 * @param name
 	 * @param version
