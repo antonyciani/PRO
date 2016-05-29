@@ -27,6 +27,9 @@ import utils.SystemInfoRecuperator;
 import utils.Cryptography;
 
 /**
+ * Cette classe permet d'écouter la requête de récupération des informations système
+ * du serveur et d'initier la communication avec ce dernier afin de les lui envoyer
+ * 
  * @author CIANI Antony
  * @author STEINER Lucie
  *
@@ -46,6 +49,9 @@ public class SystemInfoRetrieverClient {
 	private int tcpPort;
 
 	/**
+	 * Constructeur, prends en paramètre le port udp surlequel écouter 
+	 * la requête UDP du serveur et le port tcp surlequel se connecter au serveur
+	 * 
 	 * @param udpPort
 	 * @param tcpPort
 	 * @throws SocketException
@@ -57,6 +63,9 @@ public class SystemInfoRetrieverClient {
 	}
 
 	/**
+	 * Permet de commencer le processus d'écoute de la requête du serveur et
+	 * le processus d'envoi des informations à ce dernier
+	 * 
 	 * @throws IOException
 	 */
 	public void startListening() throws IOException {
@@ -87,8 +96,7 @@ public class SystemInfoRetrieverClient {
 
 			}
 		}
-		LOG.info("Connecting to server via TCP");
-		LOG.info(udpPacket.getAddress().toString());
+		LOG.info("Connecting to server via TCP on " + udpPacket.getAddress().toString());
 		connect(udpPacket.getAddress(), tcpPort);
 
 		String msg = "";
