@@ -40,13 +40,13 @@ public class GeneralStatisticsController {
 		this.serverApp = serverApp;
 		this.database = serverApp.getDatabase();
 		showNumberOfCoreStatistics();
-		showConstructorStatistics();
+		showModelStatistics();
 		showHardDriveStatistics();
 		showRamStatistics();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void showNumberOfCoreStatistics() {
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
@@ -59,11 +59,11 @@ public class GeneralStatisticsController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	public void showConstructorStatistics() {
+	public void showModelStatistics() {
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-		HashMap<String, Integer> constructor = database.nbPcByConstructor(serverApp.getCurentDateView().get());
+		HashMap<String, Integer> constructor = database.nbPcByModel(serverApp.getCurentDateView().get());
 		for (Entry<String, Integer> e : constructor.entrySet()) {
 			pieChartData.add(new PieChart.Data(e.getKey(), e.getValue()));
 		}
@@ -71,7 +71,7 @@ public class GeneralStatisticsController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void showHardDriveStatistics() {
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
@@ -83,7 +83,7 @@ public class GeneralStatisticsController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void showRamStatistics() {
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();

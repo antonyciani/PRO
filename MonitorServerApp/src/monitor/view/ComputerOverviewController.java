@@ -26,6 +26,7 @@ import monitor.ServerApp;
 import monitor.database.Database;
 import monitor.model.PCInfoViewWrapper;
 import monitor.model.ProgramViewWrapper;
+import utils.TestPDF;
 
 /**
  * @author ROHRER Michaël
@@ -117,7 +118,7 @@ public class ComputerOverviewController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	private void initialize() {
@@ -179,6 +180,7 @@ public class ComputerOverviewController {
 			} else {
 				installedProgrammsLabel.setText("0");
 			}
+
 		}
 
 		else {
@@ -223,7 +225,7 @@ public class ComputerOverviewController {
 			lineChart.getData().clear();
 
 			// Récupère les infos de la base de donnée
-			TreeMap<String, Double> map = database.storageLoadRate(newValue);
+			TreeMap<String, Double> map = database.storageLoadRate(newValue, currentDateView.get());
 
 			// Ajout des données au graphique
 			Series<String, Double> series = new Series<>();
@@ -244,7 +246,8 @@ public class ComputerOverviewController {
 	private void showPieChartDetails(PCInfoViewWrapper newValue) {
 		if (newValue != null) {
 			pieChart.getData().clear();
-
+			//A supprimer une fois probl�me regl�
+			pieChart.setAnimated(false);
 			double freeSpace = newValue.getHdd().getFreeSize();
 			double fullSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
 
@@ -252,7 +255,6 @@ public class ComputerOverviewController {
 					new PieChart.Data("Full Space", fullSpace));
 
 			pieChart.setData(pieChartData);
-
 			for (final PieChart.Data data : pieChart.getData()) {
 				data.getNode().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 					@Override
@@ -264,13 +266,15 @@ public class ComputerOverviewController {
 					}
 				});
 			}
+			//TestPDF.generatePdfMachine(newValue, currentDateView.getValue(), pieChart);
+
 		} else {
 			pieChart.getData().clear();
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleAdvancedFilter() {
@@ -288,7 +292,7 @@ public class ComputerOverviewController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleClearFilter() {

@@ -28,7 +28,7 @@ public class AverageStorageLoadStatisticDialogController {
 	private NumberAxis yAxis;
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	private void initialize() {
@@ -45,13 +45,13 @@ public class AverageStorageLoadStatisticDialogController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void showStatistics() {
 		lineChart.getData().clear();
 
 		// Récupère les infos de la base de donnée
-		TreeMap<String, Double> map = database.averageStorageLoadRate();
+		TreeMap<String, Double> map = database.averageStorageLoadRate(serverApp.getCurentDateView().getValue());
 
 		// Ajout des données au graphique
 
