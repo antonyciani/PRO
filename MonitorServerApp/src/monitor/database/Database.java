@@ -41,7 +41,7 @@ public class Database {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void connect() {
 		try {
@@ -200,11 +200,11 @@ public class Database {
 	 * @param captureTime
 	 * @return
 	 */
-	public HashMap<String, Integer> nbPcByConstructor(String captureTime) {
+	public HashMap<String, Integer> nbPcByModel(String captureTime) {
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		try {
 			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery("SELECT constructor, count(constructor)"
+			ResultSet result = statement.executeQuery("SELECT model, count(model)"
 					+ "FROM machineState INNER JOIN processor ON machineState.processorId = processor.ID WHERE captureTime ='"
 					+ captureTime + "' GROUP BY constructor;");
 			while (result.next()) {
@@ -319,7 +319,7 @@ public class Database {
 	 * @param pc
 	 * @return
 	 */
-	public TreeMap<String, Double> storageLoadRate(PCInfoViewWrapper pc) {
+	public TreeMap<String, Double> storageLoadRate(PCInfoViewWrapper pc, String captureTime) {
 		TreeMap<String, Double> map = new TreeMap<>();
 		try {
 			Statement statement = connection.createStatement();
@@ -340,7 +340,7 @@ public class Database {
 	/**
 	 * @return
 	 */
-	public TreeMap<String, Double> averageStorageLoadRate() {
+	public TreeMap<String, Double> averageStorageLoadRate(String captureTime) {
 		TreeMap<String, Double> map = new TreeMap<>();
 		try {
 			Statement statement = connection.createStatement();
@@ -423,7 +423,7 @@ public class Database {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#finalize()
 	 */
 	public void finalize() {
@@ -444,7 +444,7 @@ public class Database {
 		db.connect();
 		/*
 		 * HashMap<Integer,Integer> map = db.nbPcByNbCores();
-		 * 
+		 *
 		 * for(Entry<Integer, Integer> entry : map.entrySet()){ Integer key =
 		 * entry.getKey(); Integer value = entry.getValue();
 		 * System.out.println(key + " : "+ value); }
@@ -531,7 +531,7 @@ public class Database {
 			System.out.println(key + " : " + value);
 		}
 		System.out.println("Nb PCs by constructor");
-
+		/*
 		HashMap<String, Integer> map5 = db.nbPcByConstructor(lastCapture);
 
 		for (Entry<String, Integer> entry : map5.entrySet()) {
@@ -539,13 +539,13 @@ public class Database {
 			Integer value = entry.getValue();
 			System.out.println(key + " : " + value);
 		}
-		/*
+
 		 * System.out.println("\n===== Versions ====="); HashMap<String,
 		 * Integer> map6 = db.nbProgramsInstalledByVersion("ls");
 		 * for(Entry<String, Integer> entry : map6.entrySet()){ String key =
 		 * entry.getKey(); Integer value = entry.getValue();
 		 * System.out.println(key + " : "+ value);}
-		 * 
+		 *
 		 * System.out.println("\n===== Most frequently installed programs ====="
 		 * ); HashMap<String, Integer> map7 =
 		 * db.mostFrequentlyInstalledPrograms(10); for(Entry<String, Integer>
