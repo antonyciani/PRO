@@ -202,8 +202,6 @@ public class ComputerOverviewController {
 	 */
 	private void showProgrammsDetails(PCInfoViewWrapper newValue) {
 
-		//programTable.getItems().clear();
-
 		if (newValue != null) {
 			programTable.setItems(newValue.getPrograms());
 			nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
