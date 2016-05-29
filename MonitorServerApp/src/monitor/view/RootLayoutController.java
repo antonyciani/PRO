@@ -93,9 +93,10 @@ public class RootLayoutController {
 	public void handleDeleteCapture() {
 		String date = serverApp.showCaptureSelectionDialog("Delete Capture");
 		if (!date.equals("")) {
-			if (!currentDateView.get().equals(date)) {
-				serverApp.getDatabase().deleteCapture(date);
-			} else {
+			
+			serverApp.getDatabase().deleteCapture(date);
+			
+			if (currentDateView.get().equals(date)) {
 				currentDateView.setValue("");
 				serverApp.getPcInfo().clear();
 			}

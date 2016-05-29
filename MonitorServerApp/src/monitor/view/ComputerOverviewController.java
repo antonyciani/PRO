@@ -138,7 +138,7 @@ public class ComputerOverviewController {
 		pcTable.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showLineChartDetails(newValue));
 		pcTable.setPlaceholder(new Label("PC list is empty"));
-		programTable.setPlaceholder(new Label("Installed programs list is empty"));
+		//programTable.setPlaceholder(new Label("Installed programs list is empty"));
 		// FilteredList<PCInfo> filteredList; = new FilteredList<>(pcList, p ->
 		// true);
 		filterField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -202,7 +202,7 @@ public class ComputerOverviewController {
 	 */
 	private void showProgrammsDetails(PCInfoViewWrapper newValue) {
 
-		programTable.getItems().clear();
+		//programTable.getItems().clear();
 
 		if (newValue != null) {
 			programTable.setItems(newValue.getPrograms());

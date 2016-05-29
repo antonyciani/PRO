@@ -248,6 +248,7 @@ public class SystemInfoRetrieverServer {
 
 						// Réception de la taille du message
 						int msgSize = Integer.parseInt(msg);
+						LOG.info("LOL" + msg);
 						byte[] encryptedPC = new byte[msgSize];
 
 						// Réception des données chiffrées
