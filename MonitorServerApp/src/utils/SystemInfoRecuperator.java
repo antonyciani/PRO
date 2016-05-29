@@ -18,13 +18,22 @@ import org.hyperic.sigar.SigarException;
 import monitor.model.*;
 
 /**
+ * Cette classe utilitaire fournis des méthodes permettant la récupération
+ * d'informations système d'une machine Windows et de les retourner sous forme
+ * d'objet PCInfo
+ * 
  * @author CIANI Antony
+ * @see monitor.model
  *
  */
 public class SystemInfoRecuperator {
 
 	/**
-	 * @return
+	 * Permet de récupérer l'espace libre et l'espace total disponible du disque
+	 * dur sur lequel le système est installé
+	 * 
+	 * @return l'objet HDDInfo contenant l'espace libre et l'espace total
+	 *         disponible
 	 */
 	public static HDDInfo retrieveHDDInfo() {
 		File f = new File("C:");
@@ -36,7 +45,11 @@ public class SystemInfoRecuperator {
 	}
 
 	/**
-	 * @return
+	 * Permet de récupérer les informations concernant le processeur de la
+	 * machine - Constructeur - Modèle - Fréquence d'horloge - Nombre de coeurs
+	 * physiques
+	 * 
+	 * @return l'objet CPUInfo contenant les informations récupérées
 	 */
 	public static CPUInfo retrieveCPUInfo() {
 
@@ -51,16 +64,16 @@ public class SystemInfoRecuperator {
 			return new CPUInfo(vendor, model, frequency, nbCores);
 
 		} catch (SigarException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return null;
 
 	}
 
 	/**
-	 * @return
+	 * Permet de récupérer la liste des programmes installés sur le système
+	 * 
+	 * @return la liste des programmes récupérés avec nom et numéro de version
 	 */
 	public static LinkedList<Program> retrieveInstalledPrograms() {
 
@@ -103,16 +116,19 @@ public class SystemInfoRecuperator {
 			return programs;
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return null;
 
 	}
 
 	/**
-	 * @return
+	 * Permet de récupérer toutes les informations système de la machine, les
+	 * informations récupérées sont stockées dans un objet PCInfo.
+	 * 
+	 * @see monitor.model.PCInfo
+	 * @return l'objet PCInfo contenant les informations récupérées
+	 * 
 	 */
 	public static PCInfo retrievePCInfo() {
 
@@ -158,15 +174,12 @@ public class SystemInfoRecuperator {
 			return new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs);
 
 		} catch (UnknownHostException e) {
-
 			e.printStackTrace();
 
 		} catch (SocketException e) {
-
 			e.printStackTrace();
 
 		} catch (SigarException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
