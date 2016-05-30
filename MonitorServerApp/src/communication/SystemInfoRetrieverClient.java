@@ -27,6 +27,9 @@ import utils.SystemInfoRecuperator;
 import utils.Cryptography;
 
 /**
+ * Cette classe permet d'écouter la requête de récupération des informations système
+ * du serveur et d'initier la communication avec ce dernier afin de les lui envoyer
+ * 
  * @author CIANI Antony
  * @author STEINER Lucie
  *
@@ -46,6 +49,9 @@ public class SystemInfoRetrieverClient {
 	private int tcpPort;
 
 	/**
+	 * Constructeur, prends en paramètre le port udp surlequel écouter 
+	 * la requête UDP du serveur et le port tcp surlequel se connecter au serveur
+	 * 
 	 * @param udpPort
 	 * @param tcpPort
 	 * @throws SocketException
@@ -57,6 +63,9 @@ public class SystemInfoRetrieverClient {
 	}
 
 	/**
+	 * Permet de commencer le processus d'écoute de la requête du serveur et
+	 * le processus d'envoi des informations à ce dernier
+	 * 
 	 * @throws IOException
 	 */
 	public void startListening() throws IOException {
@@ -87,8 +96,7 @@ public class SystemInfoRetrieverClient {
 
 			}
 		}
-		LOG.info("Connecting to server via TCP");
-		LOG.info(udpPacket.getAddress().toString());
+		LOG.info("Connecting to server via TCP on " + udpPacket.getAddress().toString());
 		connect(udpPacket.getAddress(), tcpPort);
 
 		String msg = "";
@@ -99,7 +107,7 @@ public class SystemInfoRetrieverClient {
 				System.out.println("Nb programs: " + pc.getPrograms().size());
 				ready = true;
 			} else {
-				// G�n�ration de la paire de cl�s RSA
+				// Génération de la paire de clés RSA
 				keyPair = Cryptography.generateRSAKeyPair();
 				publicKey = (RSAPublicKey) keyPair.getPublic();
 				privateKey = (RSAPrivateKey) keyPair.getPrivate();
@@ -111,7 +119,7 @@ public class SystemInfoRetrieverClient {
 				while ((!isPublicKeySent) && (msg = in.readLine()) != null) {
 					if (msg.equals(SystemInfoRetrieverProtocol.WAITING_FOR_PUBLIC_KEY)) {
 
-						// Envoi de la cl� publique
+						// Envoi de la clé publique
 						oos = new ObjectOutputStream(tcpSocket.getOutputStream());
 						oos.writeObject(publicKey);
 						LOG.info("PUBLIC KEY HAS BEEN SENT");
@@ -133,8 +141,7 @@ public class SystemInfoRetrieverClient {
 						out.println(SystemInfoRetrieverProtocol.WAITING_FOR_SECRET_KEY);
 						out.flush();
 
-						// R�cup�rer la cl� secr�te et la d�chiffrer avec la cl�
-						// priv�e RSA
+						// Récupération de la clé secrète et déchiffrment avec la clé privée RSA
 						byte encryptedSecretKey[] = new byte[128];
 						tmpIn = tcpSocket.getInputStream();
 						while ((!isInfoSent) && tmpIn.read(encryptedSecretKey) != -1) {
@@ -144,7 +151,7 @@ public class SystemInfoRetrieverClient {
 
 							LOG.info("RECEIVED SECRET KEY");
 
-							// Chiffrement des informations avec la cl� secr�te
+							// Chiffrement des informations avec la clé secrète
 							objOut.writeObject(pc);
 							byte[] encryptedPC = Cryptography.AESEncrypt(byteArrayOutputStream.toByteArray(),
 									secretKey);
@@ -155,7 +162,7 @@ public class SystemInfoRetrieverClient {
 							byteArrayOutputStream.close();
 							objOut.close();
 
-							// Envoi du message chiffr�
+							// Envoi du message chiffré
 							tmpOut = tcpSocket.getOutputStream();
 							tmpOut.write(encryptedPC);
 							isInfoSent = true;
@@ -163,7 +170,7 @@ public class SystemInfoRetrieverClient {
 						}
 					}
 				}
-
+				LOG.info("Cleaning up resources");
 				oos.close();
 				tmpIn.close();
 				tmpOut.close();
@@ -176,6 +183,9 @@ public class SystemInfoRetrieverClient {
 	}
 
 	/**
+	 * Permet la connexion TCP au serveur 
+	 * Prends en paramètre l'adresse IP et le port du serveur
+	 * 
 	 * @param serverAddress
 	 * @param serverPort
 	 */

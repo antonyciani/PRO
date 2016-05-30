@@ -25,6 +25,10 @@ import monitor.model.PCInfo;
 import utils.Cryptography;
 
 /**
+ * Cette classe permet la récupération des informations système auprès des PC clients
+ * Elle se comporte comme un serveur allant intérroger les clients pour qu'il lui
+ * renvoient leurs informations
+ * 
  * @author CIANI Antony
  * @author STEINER Lucie
  *
@@ -35,9 +39,13 @@ public class SystemInfoRetrieverServer {
 
 	private int udpPort;
 	private int tcpPort;
-	private LinkedList<PCInfo> pcInfos;
+	private LinkedList<PCInfo> pcInfos; // liste des informations récupérees
 
-	/**
+	/** 
+	 * Constructeur, prends en paramètre le port udp pour l'envoi du message de demande de
+	 * récupération des informations au client et le port tcp sur lequel les connexions des
+	 * clients sont accéptées
+	 * 
 	 * @param udpPort
 	 * @param tcpPort
 	 * @throws SocketException
@@ -50,23 +58,27 @@ public class SystemInfoRetrieverServer {
 	}
 
 	/**
+	 * Lance le processus de récupération des informations auprès des clients.
 	 * 
 	 */
 	public void retrieveInfosFromClients() {
+		
 		LOG.info("Starting the Receptionist Worker on a new thread...");
 		Thread receptionist = new Thread(new ReceptionistWorker());
 		receptionist.start();
+		
 		try {
-			receptionist.join();
+			receptionist.join(); // On attends que le thread réceptioniste se termine
+			
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
-	 * @return
+	 * Permet de récupérer les informations des PC qui ont répondur au serveur
+	 * 
+	 * @return La liste des informations récoltées
 	 */
 	public LinkedList<PCInfo> getPcInfos() {
 
@@ -74,6 +86,10 @@ public class SystemInfoRetrieverServer {
 	}
 
 	/**
+	 * Permet de gérér les connexions de plusieurs clients de façon multi-threadée
+	 * Pour chaque client se connectant, accepte sa connexion et lance un nouveau
+	 * thread permettant de gérer l'échange d'informations
+	 * 
 	 * @author CIANI Antony
 	 *
 	 */
@@ -81,9 +97,9 @@ public class SystemInfoRetrieverServer {
 
 		@Override
 		public void run() {
+			
 			ServerSocket serverSocket;
 			MulticastSocket udpSocket;
-			// DatagramSocket udpSocket;
 			LinkedList<Thread> servants = new LinkedList<>();
 
 			try {
@@ -103,9 +119,8 @@ public class SystemInfoRetrieverServer {
 
 			boolean listening = true;
 			try {
-				serverSocket.setSoTimeout(20000);
+				serverSocket.setSoTimeout(SystemInfoRetrieverProtocol.TIMEOUT);
 			} catch (SocketException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			while (listening) {
@@ -142,6 +157,10 @@ public class SystemInfoRetrieverServer {
 		}
 
 		/**
+		 * Permet la gestion des échanges avec les clients s'étant connectés 
+		 * Un thread est créé par client, les informations reçues sont stockées
+		 * dans la liste de PCInfos
+		 * 
 		 * @author CIANI Antony
 		 * @author STEINER Lucie
 		 *
@@ -176,9 +195,7 @@ public class SystemInfoRetrieverServer {
 
 				try {
 					LOG.info("Waiting for client INFOISREADY");
-
 					LOG.info(msg);
-
 					ObjectInputStream ois = null;
 					OutputStream tmpOut = null;
 					while ((!isInfoReady) && (msg = in.readLine()) != null) {
@@ -191,7 +208,7 @@ public class SystemInfoRetrieverServer {
 							out.println(SystemInfoRetrieverProtocol.WAITING_FOR_PUBLIC_KEY);
 							out.flush();
 
-							// R�cup�rer cl� publique du client
+							// Récupération de la clé publique du client
 							ois = new ObjectInputStream(clientSocket.getInputStream());
 							while ((!isPublicKeyReceived) && (publicKey = (RSAPublicKey) ois.readObject()) != null) {
 
@@ -204,21 +221,19 @@ public class SystemInfoRetrieverServer {
 
 							}
 
-							// G�n�ration et envoi de la cl� secr�te chiffr�e
-							// avec la cl� publique
+							// Génération et envoi de la clé secrète chiffrée avec la clé publique
 							tmpOut = clientSocket.getOutputStream();
 							while ((msg = in.readLine()) != null) {
 								if (msg.equals(SystemInfoRetrieverProtocol.WAITING_FOR_SECRET_KEY)) {
 
-									// G�n�rer cl� secr�te sym�trique
+									// Génération de la clé secrète symétrique
 									secretKey = Cryptography.generateAESSecretKey();
 
-									// Chiffrer cl� secr�te avec cl� publique
+									// Chiffrement de la clé secrète avec la clé publique
 									byte[] encryptedSecretKey = Cryptography.RSAEncrypt(secretKey.getEncoded(),
 											publicKey);
 
-									// Envoyer la cl� secr�te
-
+									// Envoi de la clé secrète
 									tmpOut.write(encryptedSecretKey);
 									break;
 								}
@@ -226,47 +241,48 @@ public class SystemInfoRetrieverServer {
 						}
 					}
 
-					// R�ception et d�chiffrement des donn�es
+					// Réception et déchiffrement des données
 					PCInfo pc = null;
 					InputStream tmpIn = null;
 					while (!isInfoReceived && (msg = in.readLine()) != null) {
 
-						// R�ception de la taille du message
+						// Réception de la taille du message
 						int msgSize = Integer.parseInt(msg);
+						LOG.info("LOL" + msg);
 						byte[] encryptedPC = new byte[msgSize];
 
-						// R�ception des donn�es chiffr�es
-
+						// Réception des données chiffrées
 						tmpIn = clientSocket.getInputStream();
 						while (tmpIn.read(encryptedPC) != -1) {
 
 							isInfoReceived = true;
 							LOG.info("READING OBJECT");
 
-							// D�chiffrer le message avec la cl� secr�te
+							// Déchiffrement du message avec la clé secrète
 							byte[] decryptedPC = Cryptography.AESDecrypt(encryptedPC, secretKey);
 
-							// Reconstruire l'objet � partir des bytes
+							// Reconstruction l'objet à partir des octets 
 							ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(decryptedPC));
 							pc = (PCInfo) objIn.readObject();
 
+							// Ajout dans la liste des PCInfos
 							pcInfos.add(pc);
 							objIn.close();
 
-							System.out.println(pc.getHostname());
-							System.out.println(pc.getIpAddress());
-							System.out.println(pc.getMacAddress());
-							System.out.println(pc.getOs());
-							System.out.println(pc.getRamSize());
-							System.out.println(pc.getCpu().getConstructor());
-							System.out.println(pc.getCpu().getModel());
-							System.out.println(pc.getHdd().getFreeSize());
-							System.out.println(pc.getPrograms().size());
-
-							LOG.info("Cleaning up resources...");
+//							System.out.println(pc.getHostname());
+//							System.out.println(pc.getIpAddress());
+//							System.out.println(pc.getMacAddress());
+//							System.out.println(pc.getOs());
+//							System.out.println(pc.getRamSize());
+//							System.out.println(pc.getCpu().getConstructor());
+//							System.out.println(pc.getCpu().getModel());
+//							System.out.println(pc.getHdd().getFreeSize());
+//							System.out.println(pc.getPrograms().size());
+							LOG.info("Informations retrieved");
 
 						}
 					}
+					LOG.info("Cleaning up resources...");
 					tmpIn.close();
 					tmpOut.close();
 					clientSocket.close();

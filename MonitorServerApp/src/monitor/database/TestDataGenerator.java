@@ -27,8 +27,8 @@ public class TestDataGenerator {
 	private static final String[] CONSTRUCTOR = { "Intel", "AMD" };
 	private static final String[] MODEL = { "Core i3", "Core i5", "Corei7", "Pentium", "Celeron", "FX-8350", "FX-6350",
 			"FX-4300", "A4-4020" };
-	// But: remplir la base de donn�es avec des infos permettant de montrer
-	// des graphiques repr�sentatifs et l'utilisation des filtres
+	// But: remplir la base de données avec des infos permettant de montrer
+	// des graphiques représentatifs et l'utilisation des filtres
 
 	/**
 	 * @return
@@ -65,20 +65,20 @@ public class TestDataGenerator {
 		Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
 		db.connect();
 		Random r = new Random();
-		// Cr�ation de processeurs
+		// Création de processeurs
 		LinkedList<PCInfo> parc = new LinkedList<>();
 
-		// Construction du parc informatique --> cr�er 20 postes
+		// Construction du parc informatique --> créer 20 postes
 		/*
 		 * private String hostname; --> pc*(variable de boucle) private String
-		 * ipAddress; --> g�n�r�e une fois al�atoirement au d�but private String
-		 * macAddress; --> g�n�r�e une fois al�atoirement au d�but private
+		 * ipAddress; --> générée une fois aléatoirement au début private String
+		 * macAddress; --> générée une fois aléatoirement au début private
 		 * String os; --> tableau private CPUInfo cpu; private String
 		 * constructor; --> tableau private String model; --> tableau private
 		 * double frequency; --> tableau private int numbCore; --> tableau
 		 * private HDDInfo hdd; private double totalSize; --> tableau private
-		 * double freeSize; --> g�n�rer al�atoirement en fonction de total,puis
-		 * faire �voluer private long ramSize; --> tableau private
+		 * double freeSize; --> générer aléatoirement en fonction de total,puis
+		 * faire évoluer private long ramSize; --> tableau private
 		 * LinkedList<Program> programs; String name; --> tableau String
 		 * version; --> tableau
 		 */
@@ -94,10 +94,10 @@ public class TestDataGenerator {
 			int nbCores = NB_CORES[r.nextInt(NB_CORES.length)];
 			double totalSize = TOTAL_HDD_SIZE[r.nextInt(TOTAL_HDD_SIZE.length)];
 			double freeSize = Math.random() * totalSize;
-			// G�n�rer programmes-> nombre al�atoire de programmes
-			// install�s, choix al�atoire des prorgammes et des versions
+			// Générer programmes-> nombre aléatoire de programmes
+			// install�s, choix aléatoire des prorgammes et des versions
 			LinkedList<Program> programs = new LinkedList<>();
-			// G�n�rer nb programs
+			// Générer nb programs
 			int nbPrograms = r.nextInt(PROGRAM_NAMES.length);
 			// Boucle avec choix programme et version
 			for (int j = 0; j < nbPrograms; j++) {
@@ -109,7 +109,7 @@ public class TestDataGenerator {
 
 		}
 		db.storePCs(parc);
-		// R�p�ter 10 fois
+		// Répéter 10 fois
 		// Modification de l'espace
 		for (int i = 0; i < 9; i++) {
 			try {
@@ -120,7 +120,7 @@ public class TestDataGenerator {
 			}
 			for (PCInfo pc : parc) {
 				double freesize = pc.getHdd().getFreeSize();
-				pc.getHdd().setFreeSize(Math.random() * freesize);
+				pc.getHdd().setFreeSize(freesize/1.5 + Math.random() * (freesize - freesize/1.5));
 			}
 			// Enregistrement des PC dans la DB
 			db.storePCs(parc);
