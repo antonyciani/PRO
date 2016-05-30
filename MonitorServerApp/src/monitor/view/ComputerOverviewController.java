@@ -316,9 +316,8 @@ public class ComputerOverviewController {
 	 */
 	private void showPieChartDetails(PCInfoViewWrapper newValue) {
 		if (newValue != null) {
+			
 			pieChart.getData().clear();
-			//A supprimer une fois problème reglé
-			pieChart.setAnimated(false);
 			double freeSpace = newValue.getHdd().getFreeSize();
 			double fullSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
 
