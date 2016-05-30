@@ -12,7 +12,7 @@ import monitor.ServerApp;
 import monitor.database.Database;
 
 /**
- * Cette classe joue le rôle de controleur. Elle permet de visualiser  les
+ * Cette classe joue le rôle de contrôleur. Elle permet de visualiser  les
  * statistiques correspondant au taux moyen d'utilisation de l'ensemble de
  * l'espace de stockage du parc informatique de l'entreprise.
  *

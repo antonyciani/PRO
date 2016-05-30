@@ -14,7 +14,7 @@ import monitor.ServerApp;
 import monitor.model.ObservableDate;
 
 /**
- * Cette classe joue le rôle de controleur. Elle contrôle une fenêtre graphique permettant
+ * Cette classe joue le rôle de contrôleur. Elle contrôle une fenêtre graphique permettant
  * d'afficher les différentes captures réalisées au cours du temps et d'en sélectionner une.
  * Pour se faire elle utilise la base de donnée de l'application principale.
  *
@@ -84,6 +84,7 @@ public class CaptureSelectionDialogController {
 
 	/**
 	 * Permet de retenir la date sélectionnée, est appelée par le listener lorsqu'un utilisateur clique sur une cellule
+	 * 
 	 * @param date, la date séléctonnée
 	 */
 	private void setDate(ObservableDate date) {
@@ -123,7 +124,7 @@ public class CaptureSelectionDialogController {
 	}
 
 	/**
-	 * Ferme la fenêtre de dialog, et set la dat de capture avec un champ vide, cette fonction est appelée
+	 * Ferme la fenêtre de dialogue, et set la date de capture avec un champ vide, cette fonction est appelée
 	 * lorsque l'utilisateur clique sur cancel.
 	 */
 	@FXML
