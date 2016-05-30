@@ -26,7 +26,6 @@ public class CaptureSelectionDialogController {
 	private Stage dialogStage;
 
 	//Une référence à l'application principale
-	@SuppressWarnings("unused")
 	private ServerApp serverApp;
 
 	//Permet de retenir la date sélectionnée
@@ -66,6 +65,7 @@ public class CaptureSelectionDialogController {
 	public void init(ServerApp serverApp, Stage dialogStage) {
 		this.serverApp = serverApp;
 		this.dialogStage = dialogStage;
+		this.selectedDate = "";
 
 		//Récupère la liste de date de la base de donnée
 		list = createObservableDate(serverApp.getDatabase().getCaptures());

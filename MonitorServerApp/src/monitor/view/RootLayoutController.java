@@ -158,6 +158,9 @@ public class RootLayoutController {
 		refreshingAlert.show();
 	}
 
+	/**
+	 * 
+	 */
 	private void showNoPCAlertDialog() {
 		refreshingAlert.close();
 		refreshingAlert = new Alert(AlertType.WARNING);
@@ -167,6 +170,9 @@ public class RootLayoutController {
 		refreshingAlert.show();
 	}
 
+	/**
+	 * 
+	 */
 	@FXML
 	private void handleExportStatistics(){
 		if(!serverApp.getCurentDateView().get().equals("")){

@@ -52,7 +52,7 @@ public class ServerApp extends Application {
 	 */
 	public ServerApp() {
 		filters = new AdvancedFilters(pcData);
-		currentDateView = new SimpleStringProperty();
+		currentDateView = new SimpleStringProperty("");
 		database = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
 		database.connect();
 	}
@@ -191,7 +191,7 @@ public class ServerApp extends Application {
 			//Affiche la fenêtre de dialogue
 			dialogStage.showAndWait();
 
-			//Retourn la date sélectionnée
+			//Retourne la date sélectionnée
 			return controller.getDate();
 
 		} catch (IOException e) {
