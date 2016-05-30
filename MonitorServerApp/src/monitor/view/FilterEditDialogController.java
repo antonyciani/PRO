@@ -7,7 +7,6 @@ import monitor.ServerApp;
 
 /**
  * @author ROHRER Michaël
- *
  */
 public class FilterEditDialogController {
 

@@ -18,23 +18,36 @@ import monitor.view.*;
 import utils.AdvancedFilters;
 
 /**
+ * Cette classe est la classe de base de l'application serverApp, c'est elle qui initialise et
+ * lance l'interface graphique. Elle implémente les différentes méthodes permettant d'afficher
+ * les fenêtres de l'application. Elle comporte également différents objets qui seront
+ * utilisés par les controleurs correspondant pour réaliser leur tâches.
+ *
  * @author ROHRER Michael
  * @author CIANI Antony
- *
  */
 public class ServerApp extends Application {
 
+	//Permet la gestion de la fenètre principale
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 
+	//Permet la gestion de la base de donnée
 	private Database database;
+
+	//Permet la gestion des filtres avancés
 	private AdvancedFilters filters;
 
+	//Contient la date de la capture courante
 	private SimpleStringProperty currentDateView;
+
+	//Contient les informations relatives aux différents PC du parc informatique
 	private ObservableList<PCInfoViewWrapper> pcData = FXCollections.observableArrayList();
 
 	/**
-	 * 
+	 * Constructeur ServerApp:
+	 * Instanciation des différents objets nécessaires à l'application et effectur la connection
+	 * à la base de donnée.
 	 */
 	public ServerApp() {
 		filters = new AdvancedFilters(pcData);
@@ -44,29 +57,15 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * @return
+	 * @return Une référence sur une instance de la classe AdvancedFilter
 	 */
-	public ObservableList<PCInfoViewWrapper> getPcInfo() {
-		return pcData;
-	}
-
-	/**
-	 * @return
-	 */
-	public Stage getPrimaryStage() {
-		return primaryStage;
-	}
-
-	/**
-	 * @return
-	 */
-	public Database getDatabase() {
-		return database;
+	public AdvancedFilters getAdvancedFilters() {
+		return filters;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
@@ -74,65 +73,72 @@ public class ServerApp extends Application {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("SystemInfoVisualizer");
 
+		//Initialisation de la scène principale
 		initRootLayout();
-		showComputerOverview();
 
+		//Initialisation du contenu de la scène principale
+		showComputerOverview();
 	}
 
 	/**
-	 * 
+	 * Initialise la fenêtre principale.
 	 */
 	public void initRootLayout() {
 		try {
-			// Load root layout from fxml file.
+			//Charge les données xml et construit la fenêtre correspondante
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ServerApp.class.getResource("view/RootLayout.fxml"));
 			rootLayout = (BorderPane) loader.load();
 
-			// Give the controller access to the main app.
+			//Donne à l'application principale l'accèes au controleur de la fenêtre correspondante
 			RootLayoutController controller = loader.getController();
 			controller.init(this);
 
-			// Show the scene containing the root layout.
+			//Affiche la scène comportant la feneêtre créée
 			Scene scene = new Scene(rootLayout);
 			primaryStage.setScene(scene);
 			primaryStage.show();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * 
+	 * Initialise le contenu de la fenêtre principale en plaçant la vue correspondante
+	 * au centre de cette dernière.
 	 */
 	public void showComputerOverview() {
 		try {
-			// Load person overview.
+			//Charge les données xml et construit la vue correspondante
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ServerApp.class.getResource("view/ComputerOverview.fxml"));
-			AnchorPane computerOverview = (AnchorPane) loader.load();
+			AnchorPane page = (AnchorPane) loader.load();
 
-			// Give the controller access to the main app.
+			//Donne à l'application principale l'accèes au controleur de la fenêtre correspondante
 			ComputerOverviewController controller = loader.getController();
 			controller.init(this);
 
-			// Set person overview into the center of root layout.
-			rootLayout.setCenter(computerOverview);
+			// Place la vue au centre de la fenêtre principale.
+			rootLayout.setCenter(page);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * 
+	 * Affiche la fenêtre comportant les statistiques générales du parc informatique.
 	 */
 	public void showGeneralStatistics() {
 
 		try {
-			// Load the fxml file and create a new stage for the popup.
+			//Charge les données xml et construit la vue correspondante
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ServerApp.class.getResource("view/GeneralStatistics.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
+
+			//Construit la fenêtre popup qui présentera les différentes statistiques
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("General Statistics");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -140,10 +146,11 @@ public class ServerApp extends Application {
 			Scene scene = new Scene(page);
 			dialogStage.setScene(scene);
 
-			// Set the persons into the controller.
+			//Donne à l'application principale l'accèes au controleur de la fenêtre correspondante
 			GeneralStatisticsController controller = loader.getController();
 			controller.init(this);
 
+			//Affiche la fenêtre
 			dialogStage.show();
 
 		} catch (IOException e) {
@@ -152,46 +159,55 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * @param title
-	 * @return
+	 * Affiche la fenêtre permettant la selection d'une date de capture.
+	 *
+	 * @param title, le titre a afficher par la fenêtre de sélection
+	 * @return la date de la capture sélectionnée sous forme d'un "String"
 	 */
 	public String showCaptureSelectionDialog(String title) {
 
 		try {
-			// Load the fxml file and create a new stage for the popup dialog.
+			//Charge les données xml et construit la vue correspondante
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ServerApp.class.getResource("view/CaptureSelectionDialog.fxml"));
-			AnchorPane captureSelectionDialog = (AnchorPane) loader.load();
+			AnchorPane page = (AnchorPane) loader.load();
 
+			//Construit la fenêtre popup qui affichera les différentes dates pouvant être sélectionnées
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle(title);
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(primaryStage);
-			Scene scene = new Scene(captureSelectionDialog);
+			Scene scene = new Scene(page);
 			dialogStage.setScene(scene);
 
+			//Donne à l'application principale l'accèes au controleur de la fenêtre correspondante
 			CaptureSelectionDialogController controller = loader.getController();
 			controller.init(this, dialogStage);
 
+			//Affiche la fenêtre de dialogue
 			dialogStage.showAndWait();
+
+			//Retourn la date sélectionnée
 			return controller.getDate();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return "";
 		}
+		return "";
 	}
 
 	/**
-	 * 
+	 * Affiche la fenêtre permettant de visualiser les statistiques correspondant aux taux d'utilisation
+	 * global de l'ensemble des disques dures du parc informatique.
 	 */
 	public void showAverageStorageLoadDialog() {
 		try {
-			// Load the fxml file and create a new stage for the popup.
+			//Charge les données xml et construit la vue correspondante
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ServerApp.class.getResource("view/AverageStorageLoadStatisticDialog.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
+
+			//Construit la fenêtre popup qui affichera les statistiques correspondantes
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Average Storage Load");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -199,10 +215,11 @@ public class ServerApp extends Application {
 			Scene scene = new Scene(page);
 			dialogStage.setScene(scene);
 
-			// Set the persons into the controller.
+			//Donne à l'application principale l'accèes au controleur de la fenêtre correspondante
 			AverageStorageLoadStatisticDialogController controller = loader.getController();
 			controller.init(this);
 
+			//Affiche la fenêtre
 			dialogStage.show();
 
 		} catch (IOException e) {
@@ -211,26 +228,18 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * @return
-	 */
-	public SimpleStringProperty getCurentDateView() {
-		return currentDateView;
-	}
-
-	/*
-	 * public String getCurentPcView(){ return curentPcView; }
-	 */
-
-	/**
-	 * 
+	 * Affiche la fenêtre permettant de consulter les différentes statistiques réalisées sur l'ensemble des
+	 * programmes installés dans le parc informatique.
 	 */
 	public void showProgramsStatistics() {
 
 		try {
-			// Load the fxml file and create a new stage for the popup.
+			//Charge les données xml et construit la vue correspondante
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ServerApp.class.getResource("view/ProgramStatistics.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
+
+			//Construit la fenêtre popup qui affichera les statistiques correspondantes
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Program Statistics");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -238,10 +247,11 @@ public class ServerApp extends Application {
 			Scene scene = new Scene(page);
 			dialogStage.setScene(scene);
 
-			// Set the persons into the controller.
+			//Donne à l'application principale l'accèes au controleur de la fenêtre correspondante
 			ProgramStatisticsController controller = loader.getController();
 			controller.init(this);
 
+			//Affiche la fenêtre
 			dialogStage.show();
 
 		} catch (IOException e) {
@@ -250,43 +260,75 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * 
+	 * Affiche la fenêtre de dialogue permettant d'éditer des filtres avancés
 	 */
 	public void showFilterEditDialog() {
 		try {
-			// Load the fxml file and create a new stage for the popup dialog.
+			//Charge les données xml et construit la vue correspondante
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ServerApp.class.getResource("view/FilterEditDialog.fxml"));
-			AnchorPane filterEditDialog = (AnchorPane) loader.load();
+			AnchorPane page = (AnchorPane) loader.load();
 
+			//Construit la fenêtre popup qui affichera la fenêtre d'édition de filtres
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Filter");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.initOwner(primaryStage);
-			Scene scene = new Scene(filterEditDialog);
+			Scene scene = new Scene(page);
 			dialogStage.setScene(scene);
 
+			//Donne à l'application principale l'accèes au controleur de la fenêtre correspondante
 			FilterEditDialogController controller = loader.getController();
 			controller.init(this, dialogStage);
 
-			// Show the dialog and wait until the user closes it
+			//Affiche la fenêtre de dialogue et attend que l'utilisateur la ferme
 			dialogStage.showAndWait();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
 
 	/**
-	 * @return
+	 * Permet de récupérer la liste de PC.
+	 *
+	 * @return Une référence sur la liste de PC contenant les informations de la capture courante.
 	 */
-	public AdvancedFilters getAdvancedFilters() {
-		return filters;
+	public ObservableList<PCInfoViewWrapper> getPcInfo() {
+		return pcData;
 	}
 
 	/**
+	 * Permet de récupérer la scène principale.
+	 *
+	 * @return Une référence sur la scène principale.
+	 */
+	public Stage getPrimaryStage() {
+		return primaryStage;
+	}
+
+	/**
+	 * Permetd de récupérer la base de donnée.
+	 *
+	 * @return Une référence sur la base de donnée.
+	 */
+	public Database getDatabase() {
+		return database;
+	}
+
+	/**
+	 * Permet de récupérer la date de la capture courante
+	 *
+	 * @return La date de la capture courante sous forme d'un SimpleStringProperty (valeur observable)
+	 */
+	public SimpleStringProperty getCurentDateView() {
+		return currentDateView;
+	}
+
+	/**
+	 * Lance l'application graphique
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
