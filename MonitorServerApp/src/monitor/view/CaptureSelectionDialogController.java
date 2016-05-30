@@ -26,6 +26,7 @@ public class CaptureSelectionDialogController {
 	private Stage dialogStage;
 
 	//Une référence à l'application principale
+	@SuppressWarnings("unused")
 	private ServerApp serverApp;
 
 	//Permet de retenir la date sélectionnée

@@ -1,19 +1,13 @@
 package monitor.view;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map.Entry;
-
-import com.itextpdf.text.DocumentException;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import monitor.ServerApp;
 import monitor.database.Database;
-import utils.PdfGenerator;
 
 /**
  * @author ROHRER Michaël

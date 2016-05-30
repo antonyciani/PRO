@@ -26,7 +26,6 @@ import monitor.ServerApp;
 import monitor.database.Database;
 import monitor.model.PCInfoViewWrapper;
 import monitor.model.ProgramViewWrapper;
-import utils.PdfGenerator;
 
 /**
  * Cette classe joue le rôle de contrôleur. Elle gère les actions suivantes:
