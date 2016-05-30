@@ -180,7 +180,6 @@ public class ComputerOverviewController {
 			} else {
 				installedProgrammsLabel.setText("0");
 			}
-
 		}
 
 		else {

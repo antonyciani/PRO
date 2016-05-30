@@ -1,7 +1,11 @@
 package monitor.view;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import com.itextpdf.text.DocumentException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import monitor.ServerApp;
 import monitor.database.Database;
+import utils.TestPDF;
 
 /**
  * @author ROHRER Michaël
@@ -22,7 +27,7 @@ public class GeneralStatisticsController {
 	@FXML
 	private PieChart nbCoreChart;
 	@FXML
-	private PieChart constructorChart;
+	private PieChart modelChart;
 	@FXML
 	private PieChart hddSizeChart;
 	@FXML
@@ -40,9 +45,10 @@ public class GeneralStatisticsController {
 		this.serverApp = serverApp;
 		this.database = serverApp.getDatabase();
 		showNumberOfCoreStatistics();
-		showModelStatistics();
+		//showModelStatistics();
 		showHardDriveStatistics();
 		showRamStatistics();
+		TestPDF.generatePdfCapture(serverApp.getCurentDateView().get(), nbCoreChart, modelChart, hddSizeChart, ramSizeChart);
 	}
 
 	/**
@@ -56,6 +62,7 @@ public class GeneralStatisticsController {
 		}
 
 		nbCoreChart.setData(pieChartData);
+		
 	}
 
 	/**
@@ -67,7 +74,7 @@ public class GeneralStatisticsController {
 		for (Entry<String, Integer> e : constructor.entrySet()) {
 			pieChartData.add(new PieChart.Data(e.getKey(), e.getValue()));
 		}
-		constructorChart.setData(pieChartData);
+		modelChart.setData(pieChartData);
 	}
 
 	/**
