@@ -26,6 +26,7 @@ import monitor.ServerApp;
 import monitor.database.Database;
 import monitor.model.PCInfoViewWrapper;
 import monitor.model.ProgramViewWrapper;
+import utils.PdfGenerator;
 
 /**
  * Cette classe joue le rôle de contrôleur. Elle gère les actions suivantes:
@@ -105,10 +106,14 @@ public class ComputerOverviewController {
 	//Permet d'afficher la capture courante
 	private Label captureDateLabel;
 
+
 	//Référence à l'application principale
 	private ServerApp serverApp;
 
-	//Contient la capture courante
+	// Le PC séléctionné
+	private PCInfoViewWrapper currentPc;
+	
+	//Contient la date de la capture courante
 	private SimpleStringProperty currentDateView;
 
 	//Permet de gérer le filtre principal
@@ -123,6 +128,9 @@ public class ComputerOverviewController {
 	 * 	-Configure le contenu des cellules du tableau d'affichage des pc.
 	 * 	-Configure des listener et les méthodes à appeler lorsque l'utilisateur sélectionne un pc.
 	 * 	-Définit le prédicat permettant de filtré la liste de pc.
+	 * 
+	 * @param serverApp
+	 *
 	 */
 	@FXML
 	private void initialize() {
@@ -154,10 +162,11 @@ public class ComputerOverviewController {
 		pcTable.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showLineChartDetails(newValue));
 
-		// Message lorsque la liste des PC est vide
-		pcTable.setPlaceholder(new Label("PC list is empty"));
 
 		//Configure le prédicat à appliquer lorsque le champ text du filtre est modifié
+
+		pcTable.getSelectionModel().selectedItemProperty()
+				.addListener((observable, oldValue, newValue) -> setCurrentPc(newValue));
 
 		filterField.textProperty().addListener((observable, oldValue, newValue) -> {
 
@@ -280,9 +289,9 @@ public class ComputerOverviewController {
 			statusLabel.setText("");
 			lineChart.getData().clear();
 
-			//Récupère les infos de la base de donnée
-			TreeMap<String, Double> map = database.storageLoadRate(newValue);
 
+			// Récupère les infos de la base de donnée
+			TreeMap<String, Double> map = database.storageLoadRate(newValue, currentDateView.get());
 
 			Series<String, Double> series = new Series<>();
 			series.setName("Storage Load Rate");
@@ -306,35 +315,30 @@ public class ComputerOverviewController {
 	 * @param newValue
 	 */
 	private void showPieChartDetails(PCInfoViewWrapper newValue) {
-
 		if (newValue != null) {
-
-			//Efface les éventuelles anciennes données
 			pieChart.getData().clear();
-
-			//Récupération des valeurs a placer dans le graphique
+			//A supprimer une fois problème reglé
+			pieChart.setAnimated(false);
 			double freeSpace = newValue.getHdd().getFreeSize();
 			double fullSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
 
-			//Ajout de ces données au graphique
 			pieChartData = FXCollections.observableArrayList(new PieChart.Data("Free Space", freeSpace),
 					new PieChart.Data("Full Space", fullSpace));
-			pieChart.setData(pieChartData);
 
-			//Ajout d'un listener, lorsque l'utilisateur clique sur une partie du graphique le pourcentage correspondant s'affiche
+			pieChart.setData(pieChartData);
 			for (final PieChart.Data data : pieChart.getData()) {
 				data.getNode().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent e) {
-						//Définit la précision à un chiffre après la virgule
-						String tmp = String.format("%.1f%%", 100 * data.getPieValue() / newValue.getHdd().getTotalSize());
-
-						//Affiche les informations dans les champs correspondants
-						spaceLabel.setText(data.getName() + ":");
-						statusLabel.setText(tmp + " %");
+						String tmp = String.format("%.1f%%",
+								100 * data.getPieValue() / newValue.getHdd().getTotalSize());
+						spaceLabel.setText(data.getName() + ": ");
+						statusLabel.setText(tmp);
 					}
 				});
 			}
+			//TestPDF.generatePdfMachine(newValue, currentDateView.getValue(), pieChart);
+
 		} else {
 			pieChart.getData().clear();
 		}
@@ -342,6 +346,7 @@ public class ComputerOverviewController {
 
 	/**
 	 * Affiche la fenêtre de dialogue correspondant à l'édition de filtres avancés.
+	 *
 	 */
 	@FXML
 	public void handleAdvancedFilter() {
@@ -368,6 +373,7 @@ public class ComputerOverviewController {
 
 	/**
 	 * Efface le filtre avancé appliqué à la liste de pc.
+	 *
 	 */
 	@FXML
 	public void handleClearFilter() {
@@ -382,5 +388,22 @@ public class ComputerOverviewController {
 
 		//Défini la liste à afficher dans la table
 		pcTable.setItems(sortedList);
+	}
+
+	/**
+	 * @param newValue
+	 */
+	private void setCurrentPc(PCInfoViewWrapper newValue){
+		this.currentPc = newValue;
+	}
+
+	/**
+	 * 
+	 */
+	@FXML
+	public void handleExportToPDF(){
+		if(currentPc != null){
+			serverApp.showPcSummaryWindow(currentPc);
+		}
 	}
 }

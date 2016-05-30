@@ -23,7 +23,6 @@ public class AverageStorageLoadStatisticDialogController {
 	private Database database;
 
 	//La référence à l'application principale
-	@SuppressWarnings("unused")
 	private ServerApp serverApp;
 
 	//Les objets indispensables à la conception du graphique
@@ -36,6 +35,7 @@ public class AverageStorageLoadStatisticDialogController {
 
 	/**
 	 * Utilisé par le xml loader pour initialiser les objets déclarés dans le fichier xml
+	 * 
 	 */
 	@FXML
 	private void initialize() {}
@@ -56,12 +56,13 @@ public class AverageStorageLoadStatisticDialogController {
 	/**
 	 * Génère le graphique correspondant à l'évolution du taux de chargement selon la capacité totale
 	 * de stockage du parc informatique.
+	 *
 	 */
 	private void showStatistics() {
 		lineChart.getData().clear();
 
-		//Récupère les infos de la base de donnée
-		TreeMap<String, Double> map = database.averageStorageLoadRate();
+		// Récupère les infos de la base de donnée
+		TreeMap<String, Double> map = database.averageStorageLoadRate(serverApp.getCurentDateView().getValue());
 
 		//Crée les axes du graphique
 		XYChart.Series<String, Double> series = new XYChart.Series<>();

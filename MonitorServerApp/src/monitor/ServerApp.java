@@ -23,7 +23,7 @@ import utils.AdvancedFilters;
  * les fenêtres de l'application. Elle comporte également différents objets qui seront
  * utilisés par les controleurs correspondant pour réaliser leur tâches.
  *
- * @author ROHRER Michael
+ * @author ROHRER Michaël
  * @author CIANI Antony
  */
 public class ServerApp extends Application {
@@ -48,6 +48,7 @@ public class ServerApp extends Application {
 	 * Constructeur ServerApp:
 	 * Instanciation des différents objets nécessaires à l'application et effectur la connection
 	 * à la base de donnée.
+	 * 
 	 */
 	public ServerApp() {
 		filters = new AdvancedFilters(pcData);
@@ -82,6 +83,7 @@ public class ServerApp extends Application {
 
 	/**
 	 * Initialise la fenêtre principale.
+	 * 
 	 */
 	public void initRootLayout() {
 		try {
@@ -107,6 +109,7 @@ public class ServerApp extends Application {
 	/**
 	 * Initialise le contenu de la fenêtre principale en plaçant la vue correspondante
 	 * au centre de cette dernière.
+	 *
 	 */
 	public void showComputerOverview() {
 		try {
@@ -129,6 +132,7 @@ public class ServerApp extends Application {
 
 	/**
 	 * Affiche la fenêtre comportant les statistiques générales du parc informatique.
+	 *
 	 */
 	public void showGeneralStatistics() {
 
@@ -199,6 +203,7 @@ public class ServerApp extends Application {
 	/**
 	 * Affiche la fenêtre permettant de visualiser les statistiques correspondant aux taux d'utilisation
 	 * global de l'ensemble des disques dures du parc informatique.
+	 * 
 	 */
 	public void showAverageStorageLoadDialog() {
 		try {
@@ -227,9 +232,10 @@ public class ServerApp extends Application {
 		}
 	}
 
+	
 	/**
-	 * Affiche la fenêtre permettant de consulter les différentes statistiques réalisées sur l'ensemble des
-	 * programmes installés dans le parc informatique.
+	 *	Affiche la fenêtre permettant de consulter les différentes statistiques réalisées sur l'ensemble des
+	 * 	programmes installés dans le parc informatique.
 	 */
 	public void showProgramsStatistics() {
 
@@ -261,6 +267,7 @@ public class ServerApp extends Application {
 
 	/**
 	 * Affiche la fenêtre de dialogue permettant d'éditer des filtres avancés
+	 *
 	 */
 	public void showFilterEditDialog() {
 		try {
@@ -291,6 +298,70 @@ public class ServerApp extends Application {
 	}
 
 	/**
+	 * Affiche une fenêtre récapitulative des différentes statistiques pour le PC séléctionné
+	 * 
+	 * @param Le PC séléctionné
+	 */
+	public void showPcSummaryWindow(PCInfoViewWrapper pc) {
+		try {
+			// Load the fxml file and create a new stage for the popup dialog.
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(ServerApp.class.getResource("view/PcSummaryWindow.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Create PDF");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(primaryStage);
+			Scene scene = new Scene(page);
+			dialogStage.setScene(scene);
+
+			PcSummaryWindowController controller = loader.getController();
+			controller.init(this, dialogStage, pc);
+
+			// Show the dialog and wait until the user closes it
+			dialogStage.showAndWait();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	/**
+	 * Affiche une fenêtre récapitulative des différentes statistiques pour l'ensemble des PC
+	 * d'une capture séléctionnée
+	 * 
+	 * @param la date de la capture courante
+	 */
+	public void showCaptureSummaryWindow(SimpleStringProperty currentDateView) {
+		try {
+			// Load the fxml file and create a new stage for the popup dialog.
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(ServerApp.class.getResource("view/CaptureSummaryWindow.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Create PDF");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(primaryStage);
+			Scene scene = new Scene(page);
+			dialogStage.setScene(scene);
+
+			CaptureSummaryWindowController controller = loader.getController();
+			controller.init(this, dialogStage);
+
+			// Show the dialog and wait until the user closes it
+			dialogStage.showAndWait();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+
+	/**
 	 * Permet de récupérer la liste de PC.
 	 *
 	 * @return Une référence sur la liste de PC contenant les informations de la capture courante.
@@ -309,7 +380,7 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * Permetd de récupérer la base de donnée.
+	 * Permet de récupérer la base de donnée.
 	 *
 	 * @return Une référence sur la base de donnée.
 	 */
@@ -325,6 +396,11 @@ public class ServerApp extends Application {
 	public SimpleStringProperty getCurentDateView() {
 		return currentDateView;
 	}
+	
+	
+	
+	
+	
 
 	/**
 	 * Lance l'application graphique
@@ -334,4 +410,7 @@ public class ServerApp extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
+
+	
+	
 }

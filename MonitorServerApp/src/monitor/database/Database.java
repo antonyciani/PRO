@@ -41,7 +41,7 @@ public class Database {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void connect() {
 		try {
@@ -200,13 +200,13 @@ public class Database {
 	 * @param captureTime
 	 * @return
 	 */
-	public HashMap<String, Integer> nbPcByConstructor(String captureTime) {
+	public HashMap<String, Integer> nbPcByModel(String captureTime) {
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		try {
 			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery("SELECT constructor, count(constructor)"
+			ResultSet result = statement.executeQuery("SELECT model, count(model)"
 					+ "FROM machineState INNER JOIN processor ON machineState.processorId = processor.ID WHERE captureTime ='"
-					+ captureTime + "' GROUP BY constructor;");
+					+ captureTime + "' GROUP BY model;");
 			while (result.next()) {
 				map.put(result.getString(1), result.getInt(2));
 			}
@@ -319,13 +319,13 @@ public class Database {
 	 * @param pc
 	 * @return
 	 */
-	public TreeMap<String, Double> storageLoadRate(PCInfoViewWrapper pc) {
+	public TreeMap<String, Double> storageLoadRate(PCInfoViewWrapper pc, String captureTime) {
 		TreeMap<String, Double> map = new TreeMap<>();
 		try {
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery(
 					"SELECT captureTime, freeHardDriveSize, totalHardDriveSize FROM machineState WHERE MacAddress ='"
-							+ pc.getMacAddress() + "';");
+							+ pc.getMacAddress() + "' AND captureTime <= '"+captureTime+"';");
 			while (result.next()) {
 				double load = result.getDouble(3) - result.getDouble(2);
 				double rate = load / result.getDouble(3);
@@ -340,12 +340,12 @@ public class Database {
 	/**
 	 * @return
 	 */
-	public TreeMap<String, Double> averageStorageLoadRate() {
+	public TreeMap<String, Double> averageStorageLoadRate(String captureTime) {
 		TreeMap<String, Double> map = new TreeMap<>();
 		try {
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery(
-					"SELECT captureTime, SUM(freeHardDriveSize), SUM(totalHardDriveSize) FROM machineState GROUP BY captureTime;");
+					"SELECT captureTime, SUM(freeHardDriveSize), SUM(totalHardDriveSize) FROM machineState WHERE  captureTime <= '"+captureTime+"' GROUP BY captureTime;");
 			while (result.next()) {
 				double load = result.getDouble(3) - result.getDouble(2);
 				double rate = load / result.getDouble(3);
@@ -395,6 +395,7 @@ public class Database {
 			int counter = 0;
 			while (result.next() && counter < max) {
 				map.put(result.getString(1), result.getInt(2));
+				counter++;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -423,7 +424,7 @@ public class Database {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#finalize()
 	 */
 	public void finalize() {
@@ -435,123 +436,4 @@ public class Database {
 			}
 		}
 	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String args[]) {
-		Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
-		db.connect();
-		/*
-		 * HashMap<Integer,Integer> map = db.nbPcByNbCores();
-		 * 
-		 * for(Entry<Integer, Integer> entry : map.entrySet()){ Integer key =
-		 * entry.getKey(); Integer value = entry.getValue();
-		 * System.out.println(key + " : "+ value); }
-		 */
-
-		String hostname = "LuciePc";
-		String ipAddress = "192.168.1.11";
-		String macAddress = "5E:FF:56:A2:AF:30";
-		String os = "Windows 7";
-		CPUInfo cpu = new CPUInfo("Intel", "i5", 2.3, 4);
-		HDDInfo hdd = new HDDInfo(500.8, 400.4);
-		long ramSize = 8;
-		LinkedList<Program> programs = new LinkedList<>();
-		programs.add(new Program("ls", "1.4"));
-		programs.add(new Program("cat", "2.4"));
-
-		LinkedList<Program> programs2 = new LinkedList<>();
-		programs.add(new Program("ls", "1.3"));
-		programs.add(new Program("cat", "2.3"));
-		PCInfo pc = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs);
-		hostname = "MichaelPc";
-		ipAddress = "192.168.1.10";
-		macAddress = "5E:FF:56:A2:AF:15";
-		os = "Windows 10";
-		cpu = new CPUInfo("Intel", "i7", 2.7, 8);
-		hdd = new HDDInfo(500.8, 209.4);
-		ramSize = 16;
-
-		PCInfo pc2 = new PCInfo(hostname, ipAddress, macAddress, os, cpu, hdd, ramSize, programs2);
-		LinkedList<PCInfo> pcs = new LinkedList<>();
-		pcs.add(pc);
-		pcs.add(pc2);
-		db.storePCs(pcs);
-
-		/*
-		 * ArrayList<String> capt = db.getCaptures(); for(String s : capt){
-		 * System.out.println(s); } ArrayList<PCInfo> tmp =
-		 * db.loadPCInfo(capt.get(0)); for(PCInfo p : tmp){
-		 * System.out.println(p.getHostname()); } db.deleteCapture(capt.get(0));
-		 * capt = db.getCaptures(); for(String s : capt){ System.out.println(s);
-		 * }
-		 */
-		// db.deleteCapture("2016-05-06 15:36:07");
-		/*
-		 * HashMap<String, Double> map = db.freeHardDriveSizeRate(pc2);
-		 * for(Entry<String, Double> entry : map.entrySet()){ String key =
-		 * entry.getKey(); Double value = entry.getValue();
-		 * System.out.println(key + " : "+ value); } map =
-		 * db.averageFreeHardDriveSizeRate(); for(Entry<String, Double> entry :
-		 * map.entrySet()){ String key = entry.getKey(); Double value =
-		 * entry.getValue(); System.out.println(key + " : "+ value); } hdd = new
-		 * HDDInfo(500.8, 101.6); pc2 = new PCInfo(hostname, ipAddress,
-		 * macAddress, os, cpu, hdd, ramSize, new LinkedList<Program>());
-		 * pcs.add(pc); pcs.add(pc2); db.storePCs(pcs);
-		 */
-		String lastCapture = db.getLastCapture();
-
-		System.out.println("Last capture: " + lastCapture);
-
-		System.out.println("Nb PCs by nb Cores:");
-		HashMap<Integer, Integer> map2 = db.nbPcByNbCores(lastCapture);
-
-		for (Entry<Integer, Integer> entry : map2.entrySet()) {
-			Integer key = entry.getKey();
-			Integer value = entry.getValue();
-			System.out.println(key + " : " + value);
-		}
-		System.out.println("Nb PCs by hard drive size:");
-
-		HashMap<Float, Integer> map3 = db.nbPcByHddSize(lastCapture);
-
-		for (Entry<Float, Integer> entry : map3.entrySet()) {
-			Float key = entry.getKey();
-			Integer value = entry.getValue();
-			System.out.println(key + " : " + value);
-		}
-		System.out.println("Nb PCs by ram size:");
-
-		HashMap<Integer, Integer> map4 = db.nbPcByRamSize(lastCapture);
-
-		for (Entry<Integer, Integer> entry : map4.entrySet()) {
-			Integer key = entry.getKey();
-			Integer value = entry.getValue();
-			System.out.println(key + " : " + value);
-		}
-		System.out.println("Nb PCs by constructor");
-
-		HashMap<String, Integer> map5 = db.nbPcByConstructor(lastCapture);
-
-		for (Entry<String, Integer> entry : map5.entrySet()) {
-			String key = entry.getKey();
-			Integer value = entry.getValue();
-			System.out.println(key + " : " + value);
-		}
-		/*
-		 * System.out.println("\n===== Versions ====="); HashMap<String,
-		 * Integer> map6 = db.nbProgramsInstalledByVersion("ls");
-		 * for(Entry<String, Integer> entry : map6.entrySet()){ String key =
-		 * entry.getKey(); Integer value = entry.getValue();
-		 * System.out.println(key + " : "+ value);}
-		 * 
-		 * System.out.println("\n===== Most frequently installed programs ====="
-		 * ); HashMap<String, Integer> map7 =
-		 * db.mostFrequentlyInstalledPrograms(10); for(Entry<String, Integer>
-		 * entry : map7.entrySet()){ String key = entry.getKey(); Integer value
-		 * = entry.getValue(); System.out.println(key + " : "+ value);}
-		 */
-	}
-
 }

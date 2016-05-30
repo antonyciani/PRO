@@ -120,7 +120,7 @@ public class TestDataGenerator {
 			}
 			for (PCInfo pc : parc) {
 				double freesize = pc.getHdd().getFreeSize();
-				pc.getHdd().setFreeSize(Math.random() * freesize);
+				pc.getHdd().setFreeSize(freesize/1.5 + Math.random() * (freesize - freesize/1.5));
 			}
 			// Enregistrement des PC dans la DB
 			db.storePCs(parc);
