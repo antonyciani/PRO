@@ -34,7 +34,7 @@ public class ServerApp extends Application {
 	private ObservableList<PCInfoViewWrapper> pcData = FXCollections.observableArrayList();
 
 	/**
-	 * 
+	 *
 	 */
 	public ServerApp() {
 		filters = new AdvancedFilters(pcData);
@@ -66,7 +66,7 @@ public class ServerApp extends Application {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
@@ -80,7 +80,7 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void initRootLayout() {
 		try {
@@ -103,7 +103,7 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void showComputerOverview() {
 		try {
@@ -124,7 +124,7 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void showGeneralStatistics() {
 
@@ -184,7 +184,7 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void showAverageStorageLoadDialog() {
 		try {
@@ -222,7 +222,7 @@ public class ServerApp extends Application {
 	 */
 
 	/**
-	 * 
+	 *
 	 */
 	public void showProgramsStatistics() {
 
@@ -250,7 +250,7 @@ public class ServerApp extends Application {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void showFilterEditDialog() {
 		try {
@@ -279,6 +279,32 @@ public class ServerApp extends Application {
 
 	}
 
+	public void showPcSummaryWindow(PCInfoViewWrapper pc) {
+		try {
+			// Load the fxml file and create a new stage for the popup dialog.
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(ServerApp.class.getResource("view/PcSummaryWindow.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Create PDF");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(primaryStage);
+			Scene scene = new Scene(page);
+			dialogStage.setScene(scene);
+
+			PcSummaryWindowController controller = loader.getController();
+			controller.init(this, dialogStage, pc);
+
+			// Show the dialog and wait until the user closes it
+			dialogStage.showAndWait();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	/**
 	 * @return
 	 */
@@ -291,5 +317,30 @@ public class ServerApp extends Application {
 	 */
 	public static void main(String[] args) {
 		launch(args);
+	}
+
+	public void showCaptureSummaryWindow(SimpleStringProperty curentDateView) {
+		try {
+			// Load the fxml file and create a new stage for the popup dialog.
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(ServerApp.class.getResource("view/CaptureSummaryWindow.fxml"));
+			AnchorPane page = (AnchorPane) loader.load();
+
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Create PDF");
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.initOwner(primaryStage);
+			Scene scene = new Scene(page);
+			dialogStage.setScene(scene);
+
+			CaptureSummaryWindowController controller = loader.getController();
+			controller.init(this, dialogStage);
+
+			// Show the dialog and wait until the user closes it
+			dialogStage.showAndWait();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

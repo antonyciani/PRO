@@ -5,12 +5,13 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="monitor.view.RootLayoutController">
+<BorderPane onDragDetected="#handleExportStatistics" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="monitor.view.RootLayoutController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
             <Menu mnemonicParsing="false" text="System">
               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleExportStatistics" text="Export Statistics" />
               <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
               </items>
             </Menu>

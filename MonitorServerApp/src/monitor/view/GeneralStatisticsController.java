@@ -13,7 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import monitor.ServerApp;
 import monitor.database.Database;
-import utils.TestPDF;
+import utils.PdfGenerator;
 
 /**
  * @author ROHRER Michaël
@@ -45,10 +45,10 @@ public class GeneralStatisticsController {
 		this.serverApp = serverApp;
 		this.database = serverApp.getDatabase();
 		showNumberOfCoreStatistics();
-		//showModelStatistics();
+		showModelStatistics();
 		showHardDriveStatistics();
 		showRamStatistics();
-		TestPDF.generatePdfCapture(serverApp.getCurentDateView().get(), nbCoreChart, modelChart, hddSizeChart, ramSizeChart);
+		//TestPDF.generatePdfCapture(serverApp.getCurentDateView().get(), nbCoreChart, modelChart, hddSizeChart, ramSizeChart);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class GeneralStatisticsController {
 		}
 
 		nbCoreChart.setData(pieChartData);
-		
+
 	}
 
 	/**

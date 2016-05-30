@@ -34,7 +34,7 @@ public class RootLayoutController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleAbout() {
@@ -42,7 +42,7 @@ public class RootLayoutController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleStorageStatistic() {
@@ -50,7 +50,7 @@ public class RootLayoutController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleParkStatistics() {
@@ -58,7 +58,7 @@ public class RootLayoutController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleExit() {
@@ -66,7 +66,7 @@ public class RootLayoutController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleProgramsStatistics() {
@@ -74,7 +74,7 @@ public class RootLayoutController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleSelectCapture() {
@@ -87,7 +87,7 @@ public class RootLayoutController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleDeleteCapture() {
@@ -103,7 +103,7 @@ public class RootLayoutController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@FXML
 	public void handleRefreshCapture() {
@@ -129,12 +129,12 @@ public class RootLayoutController {
 			else{
 				showNoPCAlertDialog();
 			}
-			
+
 		} , PlatformExecutor.instance);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void showRetrievingAlertDialog() {
 		refreshingAlert = new Alert(AlertType.INFORMATION);
@@ -146,7 +146,7 @@ public class RootLayoutController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void showCompletedAlertDialog() {
 		refreshingAlert.close();
@@ -156,7 +156,7 @@ public class RootLayoutController {
 		refreshingAlert.setContentText("The new capture is now available in the capture selection window !");
 		refreshingAlert.show();
 	}
-	
+
 	private void showNoPCAlertDialog() {
 		refreshingAlert.close();
 		refreshingAlert = new Alert(AlertType.WARNING);
@@ -164,5 +164,12 @@ public class RootLayoutController {
 		refreshingAlert.setHeaderText("Your capture is finished !");
 		refreshingAlert.setContentText("Unfortunately no PC's have been detected!");
 		refreshingAlert.show();
+	}
+
+	@FXML
+	private void handleExportStatistics(){
+		if(!serverApp.getCurentDateView().get().equals("")){
+			serverApp.showCaptureSummaryWindow(serverApp.getCurentDateView());
+		}
 	}
 }

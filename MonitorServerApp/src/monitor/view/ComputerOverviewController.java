@@ -26,7 +26,7 @@ import monitor.ServerApp;
 import monitor.database.Database;
 import monitor.model.PCInfoViewWrapper;
 import monitor.model.ProgramViewWrapper;
-import utils.TestPDF;
+import utils.PdfGenerator;
 
 /**
  * @author ROHRER MichaÃ«l
@@ -90,6 +90,7 @@ public class ComputerOverviewController {
 	@FXML
 	private Label captureDateLabel;
 
+	private PCInfoViewWrapper currentPc;
 	private ServerApp serverApp;
 	private SimpleStringProperty currentDateView;
 	private FilteredList<PCInfoViewWrapper> filteredList;
@@ -139,6 +140,10 @@ public class ComputerOverviewController {
 		pcTable.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showLineChartDetails(newValue));
 		pcTable.setPlaceholder(new Label("PC list is empty"));
+
+		pcTable.getSelectionModel().selectedItemProperty()
+				.addListener((observable, oldValue, newValue) -> setCurrentPc(newValue));
+
 		programTable.setPlaceholder(new Label("Installed programs list is empty"));
 		// FilteredList<PCInfo> filteredList; = new FilteredList<>(pcList, p ->
 		// true);
@@ -245,7 +250,7 @@ public class ComputerOverviewController {
 	private void showPieChartDetails(PCInfoViewWrapper newValue) {
 		if (newValue != null) {
 			pieChart.getData().clear();
-			//A supprimer une fois problème reglé
+			//A supprimer une fois problï¿½me reglï¿½
 			pieChart.setAnimated(false);
 			double freeSpace = newValue.getHdd().getFreeSize();
 			double fullSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
@@ -301,5 +306,16 @@ public class ComputerOverviewController {
 		// 4. Bind the SortedList comparator to the TableView comparator.
 		sortedList.comparatorProperty().bind(pcTable.comparatorProperty());
 		pcTable.setItems(sortedList);
+	}
+
+	private void setCurrentPc(PCInfoViewWrapper newValue){
+		this.currentPc = newValue;
+	}
+
+	@FXML
+	public void handleExportToPDF(){
+		if(currentPc != null){
+			serverApp.showPcSummaryWindow(currentPc);
+		}
 	}
 }
