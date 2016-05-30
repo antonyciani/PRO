@@ -161,12 +161,18 @@ public class SystemInfoRetrieverClient {
 							out.flush();
 							byteArrayOutputStream.close();
 							objOut.close();
-
-							// Envoi du message chiffré
-							tmpOut = tcpSocket.getOutputStream();
-							tmpOut.write(encryptedPC);
-							isInfoSent = true;
-							LOG.info("SENT INFOS");
+							String s;
+							while(!isInfoSent && (s=in.readLine()) != null){
+								if(s.equals(SystemInfoRetrieverProtocol.MSG_SIZE_RECEIVED)){
+									
+									// Envoi du message chiffré
+									tmpOut = tcpSocket.getOutputStream();
+									tmpOut.write(encryptedPC);
+									isInfoSent = true;
+									LOG.info("SENT INFOS");
+								}
+							}
+							
 						}
 					}
 				}

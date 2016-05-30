@@ -186,6 +186,7 @@ public class SystemInfoRetrieverServer {
 
 			@Override
 			public void run() {
+				boolean isSizeReceived = false;
 				boolean isInfoReceived = false;
 				boolean isPublicKeyReceived = false;
 				boolean isInfoReady = false;
@@ -244,13 +245,16 @@ public class SystemInfoRetrieverServer {
 					// Réception et déchiffrement des données
 					PCInfo pc = null;
 					InputStream tmpIn = null;
-					while (!isInfoReceived && (msg = in.readLine()) != null) {
-
+					byte[] encryptedPC = null;
+					while (!isSizeReceived && (msg = in.readLine()) != null) {
+						isSizeReceived = true;
 						// Réception de la taille du message
 						int msgSize = Integer.parseInt(msg);
-						LOG.info("LOL" + msg);
-						byte[] encryptedPC = new byte[msgSize];
-
+						encryptedPC = new byte[msgSize];
+						out.println(SystemInfoRetrieverProtocol.MSG_SIZE_RECEIVED);
+						out.flush();
+					}
+					
 						// Réception des données chiffrées
 						tmpIn = clientSocket.getInputStream();
 						while (tmpIn.read(encryptedPC) != -1) {
@@ -281,7 +285,7 @@ public class SystemInfoRetrieverServer {
 							LOG.info("Informations retrieved");
 
 						}
-					}
+					
 					LOG.info("Cleaning up resources...");
 					tmpIn.close();
 					tmpOut.close();
