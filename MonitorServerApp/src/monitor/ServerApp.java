@@ -1,7 +1,11 @@
 package monitor;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Properties;
 
+import communication.SystemInfoRetrieverProtocol;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -43,6 +47,14 @@ public class ServerApp extends Application {
 
 	//Contient les informations relatives aux différents PC du parc informatique
 	private ObservableList<PCInfoViewWrapper> pcData = FXCollections.observableArrayList();
+	
+	private static final String confFilename = "app.properties";
+	private String dbAddress;
+	private String dbUsername;
+	private String dbPassword;
+	private int udpPort;
+	private int tcpPort;
+	private String multicastGroupAddress;
 
 	/**
 	 * Constructeur ServerApp:
@@ -51,9 +63,37 @@ public class ServerApp extends Application {
 	 * 
 	 */
 	public ServerApp() {
+		
+		Properties prop = new Properties();
+		
+        // Retrieving information from properties file
+        try {
+
+            BufferedReader br = new BufferedReader(new FileReader(this.confFilename));
+            //load a properties file from class path, inside static method
+            prop.load(br);
+
+            //get the property value and print it out
+            
+            dbAddress = prop.getProperty("dbaddress");
+            dbUsername = prop.getProperty("dbusername");
+            dbPassword = prop.getProperty("dbpassword");
+            
+            udpPort = Integer.parseInt(prop.getProperty("udpport"));
+            tcpPort = Integer.parseInt(prop.getProperty("tcpport"));
+            multicastGroupAddress = prop.getProperty("multicastaddress");
+            
+
+        } catch (IOException ex) {
+            System.out.println("app.properties couldn't be loaded, please check it is present in the same folder as the application");
+            System.exit(1);
+        }
+		
+		
+		
 		filters = new AdvancedFilters(pcData);
 		currentDateView = new SimpleStringProperty("");
-		database = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
+		database = new Database(dbAddress, dbUsername, dbPassword);
 		database.connect();
 	}
 
@@ -387,6 +427,20 @@ public class ServerApp extends Application {
 	public Database getDatabase() {
 		return database;
 	}
+	
+	public int getUdpPort() {
+		return udpPort;
+	}
+
+	public int getTcpPort() {
+		return tcpPort;
+	}
+
+	public String getMulticastGroupAddress() {
+		return multicastGroupAddress;
+	}
+	
+	
 
 	/**
 	 * Permet de récupérer la date de la capture courante
@@ -396,10 +450,6 @@ public class ServerApp extends Application {
 	public SimpleStringProperty getCurentDateView() {
 		return currentDateView;
 	}
-	
-	
-	
-	
 	
 
 	/**

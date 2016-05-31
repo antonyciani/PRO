@@ -1,6 +1,10 @@
 package monitor;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Properties;
+
 import communication.SystemInfoRetrieverClient;
 import communication.SystemInfoRetrieverProtocol;
 
@@ -13,7 +17,10 @@ import communication.SystemInfoRetrieverProtocol;
  *
  */
 public class ClientApp {
+	
 
+	private static String confFilename = "app.properties";
+	
 	/**
 	 * Programme principal
 	 * 
@@ -21,17 +28,44 @@ public class ClientApp {
 	 */
 	public static void main(String[] args) {
 
-		try {
-			SystemInfoRetrieverClient sirc = new SystemInfoRetrieverClient(SystemInfoRetrieverProtocol.UDP_PORT,
-					SystemInfoRetrieverProtocol.TCP_PORT);
+		
+Properties prop = new Properties();
+		
+        // Retrieving information from properties file
+        try {
 
-			// Le client est toujours en écoute
-			while (true) {
-				System.out.println("Listening to server");
-				sirc.startListening();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+            BufferedReader br = new BufferedReader(new FileReader(confFilename));
+            //load a properties file from class path, inside static method
+            prop.load(br);
+
+            //get the property value and print it out
+            
+            int udpPort = Integer.parseInt(prop.getProperty("udpport"));
+            int tcpPort = Integer.parseInt(prop.getProperty("tcpport"));
+            String multicastGroupAddress = prop.getProperty("multicastaddress");
+            
+            try {
+    			SystemInfoRetrieverClient sirc = new SystemInfoRetrieverClient(udpPort,tcpPort,multicastGroupAddress);
+
+    			// Le client est toujours en écoute
+    			while (true) {
+    				System.out.println("Listening to server");
+    				sirc.startListening();
+    			}
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+            
+            
+            
+
+        } catch (IOException ex) {
+            System.out.println("app.properties couldn't be loaded, please check it is present in the same folder as the application");
+            System.exit(1);
+        }
+		
+		
+		
+		
 	}
 }

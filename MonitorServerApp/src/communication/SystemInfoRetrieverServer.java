@@ -39,6 +39,7 @@ public class SystemInfoRetrieverServer {
 
 	private int udpPort;
 	private int tcpPort;
+	private String multicastGroupAddress;
 	private LinkedList<PCInfo> pcInfos; // liste des informations récupérees
 
 	/** 
@@ -48,12 +49,14 @@ public class SystemInfoRetrieverServer {
 	 * 
 	 * @param udpPort
 	 * @param tcpPort
+	 * @param multicastGroupAddress 
 	 * @throws SocketException
 	 */
-	public SystemInfoRetrieverServer(int udpPort, int tcpPort) throws SocketException {
+	public SystemInfoRetrieverServer(int udpPort, int tcpPort, String multicastGroupAddress) throws SocketException {
 
 		this.udpPort = udpPort;
 		this.tcpPort = tcpPort;
+		this.multicastGroupAddress = multicastGroupAddress;
 		this.pcInfos = new LinkedList<>();
 	}
 
@@ -105,11 +108,11 @@ public class SystemInfoRetrieverServer {
 			try {
 				serverSocket = new ServerSocket(tcpPort);
 				udpSocket = new MulticastSocket();
-				udpSocket.joinGroup(InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS));
+				udpSocket.joinGroup(InetAddress.getByName(multicastGroupAddress));
 
 				udpSocket.send(new DatagramPacket(SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes(),
 						SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length,
-						InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS), udpPort));
+						InetAddress.getByName(multicastGroupAddress), udpPort));
 				udpSocket.close();
 
 			} catch (IOException ex) {

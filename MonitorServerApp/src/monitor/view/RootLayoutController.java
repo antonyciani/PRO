@@ -112,8 +112,8 @@ public class RootLayoutController {
 		CompletableFuture.supplyAsync(() -> {
 			SystemInfoRetrieverServer sirs = null;
 			try {
-				sirs = new SystemInfoRetrieverServer(SystemInfoRetrieverProtocol.UDP_PORT,
-						SystemInfoRetrieverProtocol.TCP_PORT);
+				sirs = new SystemInfoRetrieverServer(serverApp.getUdpPort(),
+						serverApp.getTcpPort(), serverApp.getMulticastGroupAddress());
 				sirs.retrieveInfosFromClients();
 			} catch (SocketException e) {
 				e.printStackTrace();

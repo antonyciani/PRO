@@ -52,6 +52,8 @@ public class Database {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			System.out.println("An error has occured during database connection, please check your connection parameters...");
+			System.exit(1); // Si la connexion échoue on tue l'application
 		}
 
 	}

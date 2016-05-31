@@ -47,6 +47,7 @@ public class SystemInfoRetrieverClient {
 
 	private int udpPort;
 	private int tcpPort;
+	private String multicastGroupAddress;
 
 	/**
 	 * Constructeur, prends en paramètre le port udp surlequel écouter 
@@ -54,11 +55,13 @@ public class SystemInfoRetrieverClient {
 	 * 
 	 * @param udpPort
 	 * @param tcpPort
+	 * @param multicastGroupAddress 
 	 * @throws SocketException
 	 */
-	public SystemInfoRetrieverClient(int udpPort, int tcpPort) throws SocketException {
+	public SystemInfoRetrieverClient(int udpPort, int tcpPort, String multicastGroupAddress) throws SocketException {
 		this.udpPort = udpPort;
 		this.tcpPort = tcpPort;
+		this.multicastGroupAddress = multicastGroupAddress;
 
 	}
 
@@ -79,7 +82,7 @@ public class SystemInfoRetrieverClient {
 		RSAPrivateKey privateKey;
 
 		udpSocket = new MulticastSocket(udpPort);
-		udpSocket.joinGroup(InetAddress.getByName(SystemInfoRetrieverProtocol.MULTICAST_ADDRESS));
+		udpSocket.joinGroup(InetAddress.getByName(multicastGroupAddress));
 
 		byte[] buffer = new byte[SystemInfoRetrieverProtocol.REQUEST_INFO.getBytes().length];
 
