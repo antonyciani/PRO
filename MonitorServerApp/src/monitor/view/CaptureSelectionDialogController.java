@@ -51,8 +51,8 @@ public class CaptureSelectionDialogController {
 		//Configure le contenu des cellules ici les dates de captures
 		dateColumn.setCellValueFactory(cellData -> cellData.getValue().getDateProperty());
 
-		//Ajoute un listener sur les cellules, ainsi à chaque clique sur une cellule,
-		//la fonction setDate sera appelée
+		//Ajoute un listener sur les cellules
+		//Ainsi à chaque clique sur une cellule, la fonction setDate sera appelée
 		dateTable.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> setDate(newValue));
 	}
@@ -85,7 +85,7 @@ public class CaptureSelectionDialogController {
 
 	/**
 	 * Permet de retenir la date sélectionnée, est appelée par le listener lorsqu'un utilisateur clique sur une cellule
-	 * 
+	 *
 	 * @param date, la date séléctonnée
 	 */
 	private void setDate(ObservableDate date) {

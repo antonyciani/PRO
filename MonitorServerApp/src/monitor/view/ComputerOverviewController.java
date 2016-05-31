@@ -111,7 +111,7 @@ public class ComputerOverviewController {
 
 	// Le PC séléctionné
 	private PCInfoViewWrapper currentPc;
-	
+
 	//Contient la date de la capture courante
 	private SimpleStringProperty currentDateView;
 
@@ -127,7 +127,7 @@ public class ComputerOverviewController {
 	 * 	-Configure le contenu des cellules du tableau d'affichage des pc.
 	 * 	-Configure des listener et les méthodes à appeler lorsque l'utilisateur sélectionne un pc.
 	 * 	-Définit le prédicat permettant de filtré la liste de pc.
-	 * 
+	 *
 	 * @param serverApp
 	 *
 	 */
@@ -220,6 +220,7 @@ public class ComputerOverviewController {
 	 */
 	private void showPcDetails(PCInfoViewWrapper newValue) {
 		if (newValue != null) {
+			//Assigne les valeurs aux différents champs
 			hostnameLabel.setText(newValue.getHostname());
 			ipAddressLabel.setText(newValue.getIpAddress());
 			macAddressLabel.setText(newValue.getMacAddress());
@@ -238,6 +239,7 @@ public class ComputerOverviewController {
 			}
 		}
 		else {
+			//Assigne une valeur null aux différents champs
 			hostnameLabel.setText("");
 			ipAddressLabel.setText("");
 			macAddressLabel.setText("");
@@ -315,7 +317,7 @@ public class ComputerOverviewController {
 	 */
 	private void showPieChartDetails(PCInfoViewWrapper newValue) {
 		if (newValue != null) {
-			
+
 			pieChart.getData().clear();
 			double freeSpace = newValue.getHdd().getFreeSize();
 			double fullSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
@@ -389,6 +391,10 @@ public class ComputerOverviewController {
 	}
 
 	/**
+	 * Affecte l'objet correspondant au pc sélectionné (PCInfoViewWrapper) au champ currentPc.
+	 * Cette méthode est appelée par le listener initialisé plus haut et permet de garder une trace
+	 * du pc sélectionné pour le passé le cas échéant à une autre méthode.
+	 *
 	 * @param newValue
 	 */
 	private void setCurrentPc(PCInfoViewWrapper newValue){
@@ -396,11 +402,15 @@ public class ComputerOverviewController {
 	}
 
 	/**
-	 * 
+	 * Permet d'afficher la fenêtre permettant la génération d'un doccument pdf comportant un résumé
+	 * des différents graphiques. Cette méthode est appelée dès que l'utilisateur appuie sur le bouton
+	 * "Export".
+	 *
 	 */
 	@FXML
 	public void handleExportToPDF(){
 		if(currentPc != null){
+			//Affiche la fenêtre permettant la génération d'un document pdf
 			serverApp.showPcSummaryWindow(currentPc);
 		}
 	}

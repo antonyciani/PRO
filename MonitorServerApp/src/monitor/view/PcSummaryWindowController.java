@@ -20,12 +20,23 @@ import monitor.database.Database;
 import monitor.model.PCInfoViewWrapper;
 import utils.PdfGenerator;
 
+/**
+ * Cette classe joue le rôle de contrôleur. Elle gère l'affichage d'une fenêtre graphique
+ * comportant un résumé des statistiques portant sur un pc sélectionné. Ce contrôleur gêre
+ * également l'exportation de ces données au format PDF.
+ *
+ * @author Michael Rohrer
+ * @author Lucie Steiner
+ */
 public class PcSummaryWindowController {
 
 
+	//Concerne le graphique du taux de remplissage du disque dure
 	@FXML
 	private PieChart pieChart;
 	private ObservableList<PieChart.Data> pieChartData;
+
+	//Concerne le graphique représentant l'évolution du taux de chargement du disc dure
 	@FXML
 	private LineChart<String, Double> lineChart;
 	@FXML
@@ -36,13 +47,24 @@ public class PcSummaryWindowController {
 	private Stage dialogStage;
 	private ServerApp serverApp;
 	private Database database;
+
+	//Le pc sur le quel sont basées ces statistiques
 	private PCInfoViewWrapper pc;
 
+	/**
+	 * Utilisé par le xml loader pour initialiser les objets déclarés dans le fichier xml
+	 */
 	@FXML
 	public void initialize(){
 
 	}
 
+	/**
+	 * Permet d'initialiser le controleur et génère les graphiques.
+	 *
+	 * @param serverApp, en référence à l'application principale, permet d'en utilisé ses méthodes
+	 * @param dialogStage la scène de la fenêtre graphique (permet sa fermeture)
+	 */
 	public void init(ServerApp serverApp, Stage dialogStage, PCInfoViewWrapper pc){
 		this.serverApp = serverApp;
 		this.dialogStage = dialogStage;
@@ -54,23 +76,30 @@ public class PcSummaryWindowController {
 
 
 	/**
-	 * @param newValue
+	 * Génère le graphique correspondant à l'évolution du remplissage de l'espace disque du
+	 * pc au cours du temps.
+	 *
+	 * @param newValue, le pc sélectionné
 	 */
 	private void showLineChartDetails(PCInfoViewWrapper newValue) {
 
 		if (newValue != null) {
+
+			//Efface les éventuelles anciennes données
 			lineChart.getData().clear();
 
-			// Récupère les infos de la base de donnée
-			TreeMap<String, Double> map = database.storageLoadRate(newValue, serverApp.getCurentDateView().get());
+			//Récupération des données dans la base de donnée
+			TreeMap<String, Double> map = database.storageLoadRate(newValue,
+					serverApp.getCurentDateView().get());
 
-			// Ajout des données au graphique
 			Series<String, Double> series = new Series<>();
 			series.setName("Storage Load Rate");
+
+			//Formatage des données
 			for (Entry<String, Double> e : map.entrySet()) {
 				series.getData().add(new Data<String, Double>(e.getKey(), e.getValue()));
 			}
-
+			//Assignation des données au graphique
 			lineChart.getData().add(series);
 		} else {
 			lineChart.getData().clear();
@@ -79,63 +108,74 @@ public class PcSummaryWindowController {
 
 
 	/**
+	 * Génère le graphique en camambert permettant de visualiser le taux de remplissage du disque dure.
+	 *
 	 * @param newValue
 	 */
 	private void showPieChartDetails(PCInfoViewWrapper newValue) {
 		if (newValue != null) {
+
+			//Efface les éventuelles anciennes données
 			pieChart.getData().clear();
-			//A supprimer une fois probl�me regl�
-			pieChart.setAnimated(false);
+
+			//Récupération des données
 			double freeSpace = newValue.getHdd().getFreeSize();
 			double fullSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
 
+			//Formatage des données
 			pieChartData = FXCollections.observableArrayList(new PieChart.Data("Free Space", freeSpace),
 					new PieChart.Data("Full Space", fullSpace));
 
+			//Assignation des données au graphique
 			pieChart.setData(pieChartData);
-
-			//TestPDF.generatePdfMachine(newValue, currentDateView.getValue(), pieChart);
-
 		} else {
 			pieChart.getData().clear();
 		}
 	}
 
 
+	/**
+	 * Permet la génération du doccument pdf comportant un résumé des différents graphiques.
+	 * Cette méthode est appelée dès que l'utilisateur appuie sur le bouton "Export".
+	 *
+	 */
 	@FXML
 	public void handleExport(){
 
 		FileChooser fileChooser = new FileChooser();
 
-        // Set extension filter
+		//Définition du filtre d'extension
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "PDF files (*.pdf)", "*.pdf");
         fileChooser.getExtensionFilters().add(extFilter);
 
-        // Show save file dialog
+        //Affiche la fenêtre de dialogue demandant ou sauver le document
         String docNameCapture = serverApp.getCurentDateView().get().replace(' ', '_').replace(':', '_');
         fileChooser.setInitialFileName(pc.getHostname()+"_"+docNameCapture);
         File file = fileChooser.showSaveDialog(serverApp.getPrimaryStage());
 
 
         if (file != null) {
-            // Make sure it has the correct extension
+        	//Permet de s'assurer que l'extension est correcte
             if (!file.getPath().endsWith(".pdf")) {
                 file = new File(file.getPath() + ".pdf");
             }
-    		PdfGenerator.generatePdfMachine(file, pc, serverApp.getCurentDateView().get(), pieChart, lineChart);
+          //Génération du pdf
+    		PdfGenerator.generatePdfMachine(file, pc,
+    				serverApp.getCurentDateView().get(), pieChart, lineChart);
         }
-
-		//ouvrir fenetre pour choisir le nom et l'emplacement
-
-
-
+        //Fermeture de la fenêtre
 		dialogStage.close();
 	}
 
 
+	/**
+	 * Permet la fermeture de la fenêtre si l'utilisateur clique sur cancel
+	 *
+	 */
 	@FXML
 	public void handleCancel(){
+		//Fermeture de la fenêtre
 		dialogStage.close();
 	}
 }

@@ -47,7 +47,7 @@ public class ServerApp extends Application {
 
 	//Contient les informations relatives aux différents PC du parc informatique
 	private ObservableList<PCInfoViewWrapper> pcData = FXCollections.observableArrayList();
-	
+
 	private static final String confFilename = "app.properties";
 	private String dbAddress;
 	private String dbUsername;
@@ -60,37 +60,33 @@ public class ServerApp extends Application {
 	 * Constructeur ServerApp:
 	 * Instanciation des différents objets nécessaires à l'application et effectur la connection
 	 * à la base de donnée.
-	 * 
+	 *
 	 */
 	public ServerApp() {
-		
-		Properties prop = new Properties();
-		
-        // Retrieving information from properties file
-        try {
 
+		Properties prop = new Properties();
+
+        //Récupération des informations de configuration à partir du fichier de configuration
+        try {
+        	//Chargement du fichier de configuration
             BufferedReader br = new BufferedReader(new FileReader(this.confFilename));
-            //load a properties file from class path, inside static method
             prop.load(br);
 
-            //get the property value and print it out
-            
+            //Récupération des informations de configuration
             dbAddress = prop.getProperty("dbaddress");
             dbUsername = prop.getProperty("dbusername");
             dbPassword = prop.getProperty("dbpassword");
-            
+
             udpPort = Integer.parseInt(prop.getProperty("udpport"));
             tcpPort = Integer.parseInt(prop.getProperty("tcpport"));
             multicastGroupAddress = prop.getProperty("multicastaddress");
-            
 
         } catch (IOException ex) {
             System.out.println("app.properties couldn't be loaded, please check it is present in the same folder as the application");
             System.exit(1);
         }
-		
-		
-		
+
+        //Instenciation des différents objets utilisés par l'application
 		filters = new AdvancedFilters(pcData);
 		currentDateView = new SimpleStringProperty("");
 		database = new Database(dbAddress, dbUsername, dbPassword);
@@ -123,7 +119,7 @@ public class ServerApp extends Application {
 
 	/**
 	 * Initialise la fenêtre principale.
-	 * 
+	 *
 	 */
 	public void initRootLayout() {
 		try {
@@ -243,7 +239,7 @@ public class ServerApp extends Application {
 	/**
 	 * Affiche la fenêtre permettant de visualiser les statistiques correspondant aux taux d'utilisation
 	 * global de l'ensemble des disques dures du parc informatique.
-	 * 
+	 *
 	 */
 	public void showAverageStorageLoadDialog() {
 		try {
@@ -272,7 +268,7 @@ public class ServerApp extends Application {
 		}
 	}
 
-	
+
 	/**
 	 *	Affiche la fenêtre permettant de consulter les différentes statistiques réalisées sur l'ensemble des
 	 * 	programmes installés dans le parc informatique.
@@ -339,16 +335,17 @@ public class ServerApp extends Application {
 
 	/**
 	 * Affiche une fenêtre récapitulative des différentes statistiques pour le PC séléctionné
-	 * 
+	 *
 	 * @param Le PC séléctionné
 	 */
 	public void showPcSummaryWindow(PCInfoViewWrapper pc) {
 		try {
-			// Load the fxml file and create a new stage for the popup dialog.
+			//Charge les données xml et construit la vue correspondante
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ServerApp.class.getResource("view/PcSummaryWindow.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
 
+			//Construit la fenêtre popup dans la quelle sera affiché les différents graphiques
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Create PDF");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -356,10 +353,11 @@ public class ServerApp extends Application {
 			Scene scene = new Scene(page);
 			dialogStage.setScene(scene);
 
+			//Donne à l'application principale l'accèes au controleur de la fenêtre correspondante
 			PcSummaryWindowController controller = loader.getController();
 			controller.init(this, dialogStage, pc);
 
-			// Show the dialog and wait until the user closes it
+			//Affiche la fenêtre de dialogue et attend que l'utilisateur la ferme
 			dialogStage.showAndWait();
 
 		} catch (IOException e) {
@@ -367,20 +365,21 @@ public class ServerApp extends Application {
 		}
 
 	}
-	
+
 	/**
 	 * Affiche une fenêtre récapitulative des différentes statistiques pour l'ensemble des PC
 	 * d'une capture séléctionnée
-	 * 
+	 *
 	 * @param la date de la capture courante
 	 */
 	public void showCaptureSummaryWindow(SimpleStringProperty currentDateView) {
 		try {
-			// Load the fxml file and create a new stage for the popup dialog.
+			//Charge les données xml et construit la vue correspondante
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ServerApp.class.getResource("view/CaptureSummaryWindow.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
 
+			//Construit la fenêtre popup dans la quelle sera affiché les différents graphiques
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Create PDF");
 			dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -388,18 +387,17 @@ public class ServerApp extends Application {
 			Scene scene = new Scene(page);
 			dialogStage.setScene(scene);
 
+			//Donne à l'application principale l'accèes au controleur de la fenêtre correspondante
 			CaptureSummaryWindowController controller = loader.getController();
 			controller.init(this, dialogStage);
 
-			// Show the dialog and wait until the user closes it
+			//Affiche la fenêtre de dialogue et attend que l'utilisateur la ferme
 			dialogStage.showAndWait();
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	
 
 	/**
 	 * Permet de récupérer la liste de PC.
@@ -427,20 +425,33 @@ public class ServerApp extends Application {
 	public Database getDatabase() {
 		return database;
 	}
-	
+
+	/**
+	 * Permet de récupérer le numéro de port UDP utilisé par l'application
+	 *
+	 * @return le numéro de port UDP
+	 */
 	public int getUdpPort() {
 		return udpPort;
 	}
 
+	/**
+	 * Permet de récupérer le numéro de port TCP utilisé par l'application
+	 *
+	 * @return le numéro de port TCP
+	 */
 	public int getTcpPort() {
 		return tcpPort;
 	}
 
+	/**
+	 * Permet de récupérer l'adresse multicaste de groupe
+	 *
+	 * @return l'adresse multicaste de groupe
+	 */
 	public String getMulticastGroupAddress() {
 		return multicastGroupAddress;
 	}
-	
-	
 
 	/**
 	 * Permet de récupérer la date de la capture courante
@@ -450,7 +461,6 @@ public class ServerApp extends Application {
 	public SimpleStringProperty getCurentDateView() {
 		return currentDateView;
 	}
-	
 
 	/**
 	 * Lance l'application graphique
@@ -461,6 +471,6 @@ public class ServerApp extends Application {
 		launch(args);
 	}
 
-	
-	
+
+
 }
