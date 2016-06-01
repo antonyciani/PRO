@@ -138,7 +138,7 @@ public class SystemInfoRetrieverClient {
 
 				while ((!receivedReady) && (msg = in.readLine()) != null) {
 
-					if (msg.equals(SystemInfoRetrieverProtocol.READY_TO_READ_INFO)) {
+					if (msg.equals(SystemInfoRetrieverProtocol.PUBLIC_KEY_RECEIVED)) {
 						LOG.info("RECEIVED READY");
 						receivedReady = true;
 						out.println(SystemInfoRetrieverProtocol.WAITING_FOR_SECRET_KEY);
@@ -166,7 +166,7 @@ public class SystemInfoRetrieverClient {
 							objOut.close();
 							String s;
 							while(!isInfoSent && (s=in.readLine()) != null){
-								if(s.equals(SystemInfoRetrieverProtocol.MSG_SIZE_RECEIVED)){
+								if(s.equals(SystemInfoRetrieverProtocol.READY_TO_READ_INFO)){
 									
 									// Envoi du message chiffré
 									tmpOut = tcpSocket.getOutputStream();

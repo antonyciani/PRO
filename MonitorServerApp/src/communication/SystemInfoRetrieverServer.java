@@ -28,7 +28,7 @@ import utils.Cryptography;
  * Cette classe permet la récupération des informations système auprès des PC clients
  * Elle se comporte comme un serveur allant interroger les clients pour qu'il lui
  * renvoient leurs informations
- * 
+ *
  * @author CIANI Antony
  * @author STEINER Lucie
  *
@@ -42,14 +42,14 @@ public class SystemInfoRetrieverServer {
 	private String multicastGroupAddress;
 	private LinkedList<PCInfo> pcInfos; // liste des informations récupérées
 
-	/** 
+	/**
 	 * Constructeur, prends en paramètre le port udp pour l'envoi du message de demande de
 	 * récupération des informations au client et le port tcp sur lequel les connexions des
 	 * clients sont acceptées
-	 * 
+	 *
 	 * @param udpPort
 	 * @param tcpPort
-	 * @param multicastGroupAddress 
+	 * @param multicastGroupAddress
 	 * @throws SocketException
 	 */
 	public SystemInfoRetrieverServer(int udpPort, int tcpPort, String multicastGroupAddress) throws SocketException {
@@ -62,17 +62,17 @@ public class SystemInfoRetrieverServer {
 
 	/**
 	 * Lance le processus de récupération des informations auprès des clients.
-	 * 
+	 *
 	 */
 	public void retrieveInfosFromClients() {
-		
+
 		LOG.info("Starting the Receptionist Worker on a new thread...");
 		Thread receptionist = new Thread(new ReceptionistWorker());
 		receptionist.start();
-		
+
 		try {
 			receptionist.join(); // On attends que le thread réceptionniste se termine
-			
+
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -80,7 +80,7 @@ public class SystemInfoRetrieverServer {
 
 	/**
 	 * Permet de récupérer les informations des PC qui ont répondu au serveur
-	 * 
+	 *
 	 * @return La liste des informations récoltées
 	 */
 	public LinkedList<PCInfo> getPcInfos() {
@@ -92,7 +92,7 @@ public class SystemInfoRetrieverServer {
 	 * Permet de gérer les connexions de plusieurs clients de façon multi-threadée
 	 * Pour chaque client se connectant, accepte sa connexion et lance un nouveau
 	 * thread permettant de gérer l'échange d'informations
-	 * 
+	 *
 	 * @author CIANI Antony
 	 *
 	 */
@@ -100,7 +100,7 @@ public class SystemInfoRetrieverServer {
 
 		@Override
 		public void run() {
-			
+
 			ServerSocket serverSocket;
 			MulticastSocket udpSocket;
 			LinkedList<Thread> servants = new LinkedList<>();
@@ -157,10 +157,10 @@ public class SystemInfoRetrieverServer {
 		}
 
 		/**
-		 * Permet la gestion des échanges avec les clients s'étant connectés 
+		 * Permet la gestion des échanges avec les clients s'étant connectés
 		 * Un thread est créé par client, les informations reçues sont stockées
 		 * dans la liste de PCInfos
-		 * 
+		 *
 		 * @author CIANI Antony
 		 * @author STEINER Lucie
 		 *
@@ -214,7 +214,7 @@ public class SystemInfoRetrieverServer {
 								isPublicKeyReceived = true;
 								LOG.info("RECEIVED PUBLIC KEY");
 
-								out.println(SystemInfoRetrieverProtocol.READY_TO_READ_INFO);
+								out.println(SystemInfoRetrieverProtocol.PUBLIC_KEY_RECEIVED);
 								out.flush();
 								LOG.info("SENT READY TO READ");
 
@@ -249,31 +249,31 @@ public class SystemInfoRetrieverServer {
 						// Réception de la taille du message
 						int msgSize = Integer.parseInt(msg);
 						encryptedPC = new byte[msgSize];
-						out.println(SystemInfoRetrieverProtocol.MSG_SIZE_RECEIVED);
+						out.println(SystemInfoRetrieverProtocol.READY_TO_READ_INFO);
 						out.flush();
 					}
-					
-						// Réception des données chiffrées
-						tmpIn = clientSocket.getInputStream();
-						while (tmpIn.read(encryptedPC) != -1) {
 
-							isInfoReceived = true;
-							LOG.info("READING OBJECT");
+					// Réception des données chiffrées
+					tmpIn = clientSocket.getInputStream();
+					while (tmpIn.read(encryptedPC) != -1) {
 
-							// Déchiffrement du message avec la clé secrète
-							byte[] decryptedPC = Cryptography.AESDecrypt(encryptedPC, secretKey);
+						isInfoReceived = true;
+						LOG.info("READING OBJECT");
 
-							// Reconstruction l'objet à partir des octets 
-							ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(decryptedPC));
-							pc = (PCInfo) objIn.readObject();
+						// Déchiffrement du message avec la clé secrète
+						byte[] decryptedPC = Cryptography.AESDecrypt(encryptedPC, secretKey);
 
-							// Ajout dans la liste des PCInfos
-							pcInfos.add(pc);
-							objIn.close();
-							LOG.info("Informations retrieved");
+						// Reconstruction l'objet à partir des octets
+						ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(decryptedPC));
+						pc = (PCInfo) objIn.readObject();
 
-						}
-					
+						// Ajout dans la liste des PCInfos
+						pcInfos.add(pc);
+						objIn.close();
+						LOG.info("Informations retrieved");
+
+					}
+
 					LOG.info("Cleaning up resources...");
 					tmpIn.close();
 					tmpOut.close();

@@ -35,8 +35,6 @@ public class TestDataGenerator {
 	private static final String[] CONSTRUCTOR = { "Intel", "AMD" };
 	private static final String[] MODEL = { "Core i3", "Core i5", "Corei7", "Pentium", "Celeron", "FX-8350", "FX-6350",
 			"FX-4300", "A4-4020" };
-	// But: remplir la base de données avec des infos permettant de montrer
-	// des graphiques représentatifs et l'utilisation des filtres
 
 	/**
 	 * Permet de générer une adresse IP aléatoire.
