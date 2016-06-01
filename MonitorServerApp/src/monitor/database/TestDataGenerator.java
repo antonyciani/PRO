@@ -1,8 +1,11 @@
 package monitor.database;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.Random;
-
 import monitor.model.*;
 
 /**
@@ -62,7 +65,36 @@ public class TestDataGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Database db = new Database("jdbc:mysql://localhost:3306/inventory", "root", "1234");
+		
+		final String confFilename = "app.properties";
+		String dbAddress = "";
+		String dbUsername = "";
+		String dbPassword = "";
+		Properties prop = new Properties();
+		
+		//Récupération des informations de configuration à partir du fichier de configuration
+        try {
+        	
+        	//Chargement du fichier de configuration
+            BufferedReader br = new BufferedReader(new FileReader(confFilename));
+            //load a properties file from class path, inside static method
+            prop.load(br);
+
+            //Récupération des informations de configuration
+            dbAddress = prop.getProperty("dbaddress");
+            dbUsername = prop.getProperty("dbusername");
+            dbPassword = prop.getProperty("dbpassword");
+            
+            
+            
+        } catch (IOException ex) {
+            System.out.println("app.properties couldn't be loaded, please check it is present in the same folder as the application");
+            System.exit(1);
+        }
+		
+		
+		
+		Database db = new Database(dbAddress, dbUsername, dbPassword);
 		db.connect();
 		Random r = new Random();
 		// Création de processeurs
@@ -82,6 +114,7 @@ public class TestDataGenerator {
 		 * LinkedList<Program> programs; String name; --> tableau String
 		 * version; --> tableau
 		 */
+		System.out.println("Generating test data...");
 		for (int i = 0; i < 20; i++) {
 			String hostname = "PC" + i;
 			String ip = generateIPAddress();
@@ -115,7 +148,6 @@ public class TestDataGenerator {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			for (PCInfo pc : parc) {
@@ -126,5 +158,6 @@ public class TestDataGenerator {
 			db.storePCs(parc);
 			// Modifications PC
 		}
+		System.out.println("Finished generation");
 	}
 }

@@ -56,16 +56,10 @@ Properties prop = new Properties();
     			e.printStackTrace();
     		}
             
-            
-            
-
         } catch (IOException ex) {
             System.out.println("app.properties couldn't be loaded, please check it is present in the same folder as the application");
             System.exit(1);
         }
-		
-		
-		
 		
 	}
 }
