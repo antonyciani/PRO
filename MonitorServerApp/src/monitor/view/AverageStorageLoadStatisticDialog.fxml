@@ -5,10 +5,9 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane prefHeight="600.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65" fx:controller="monitor.view.AverageStorageLoadStatisticDialogController">
+<AnchorPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="monitor.view.AverageStorageLoadStatisticDialogController">
    <children>
-      <LineChart fx:id="lineChart" layoutX="50.0" layoutY="51.0" prefHeight="497.0" prefWidth="500.0" title="Average Storage Load Rate">
+      <LineChart fx:id="lineChart" layoutX="50.0" layoutY="51.0" prefHeight="600.0" prefWidth="600.0" title="Average Storage Load Rate" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <xAxis>
           <CategoryAxis label="Capture Date" side="BOTTOM" fx:id="xAxis" />
         </xAxis>

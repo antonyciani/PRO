@@ -318,14 +318,22 @@ public class ComputerOverviewController {
 	private void showPieChartDetails(PCInfoViewWrapper newValue) {
 		if (newValue != null) {
 
+			//Efface les éventuelles anciennes données
 			pieChart.getData().clear();
+
+			//Récupération des données
 			double freeSpace = newValue.getHdd().getFreeSize();
 			double fullSpace = newValue.getHdd().getTotalSize() - newValue.getHdd().getFreeSize();
 
+			//Formatage des données
 			pieChartData = FXCollections.observableArrayList(new PieChart.Data("Free Space", freeSpace),
 					new PieChart.Data("Full Space", fullSpace));
 
+			//Assignation des données au graphique
 			pieChart.setData(pieChartData);
+
+			//Ajout d'un listener permettant de connaître le pourcentage d'une partie du graphique lorsque l'utilisateur
+			//clique dessus
 			for (final PieChart.Data data : pieChart.getData()) {
 				data.getNode().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 					@Override
@@ -337,8 +345,6 @@ public class ComputerOverviewController {
 					}
 				});
 			}
-			//TestPDF.generatePdfMachine(newValue, currentDateView.getValue(), pieChart);
-
 		} else {
 			pieChart.getData().clear();
 		}

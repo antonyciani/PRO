@@ -183,7 +183,5 @@ public class SystemInfoRecuperator {
 			e.printStackTrace();
 		}
 		return null;
-
 	}
-
 }
