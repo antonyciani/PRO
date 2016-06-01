@@ -14,8 +14,10 @@ public class Program implements Serializable {
 	private String version;
 
 	/**
-	 * @param name
-	 * @param version
+	 * Constructeur, construit l'objet à partir des infos relatives au programmes.
+	 *
+	 * @param name, le nom du programme
+	 * @param version, la version du programme
 	 */
 	public Program(String name, String version) {
 		this.name = name;
@@ -23,14 +25,14 @@ public class Program implements Serializable {
 	}
 
 	/**
-	 * @return
+	 * @return le nom du programme
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @return
+	 * @return la version du programme
 	 */
 	public String getVersion() {
 		return version;
