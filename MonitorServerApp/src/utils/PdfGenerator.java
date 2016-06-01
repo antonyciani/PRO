@@ -27,12 +27,31 @@ import javax.imageio.ImageIO;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+
+/**
+ * Cette classe fournit des méthodes permettant l'exportation des données au format PDF.
+ */
 public class PdfGenerator {
+
+	//Définition de styles
 	private static final Font H1 = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD);
 	private static final Font H2 = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
 	private static final Font SUBTITLE = new Font(Font.FontFamily.HELVETICA, 16, Font.ITALIC);
 	private static final Font STD_BOLD = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
 
+	/**
+	 * Permet la génération d'un PDF résumant toutes les informations d'une capture.
+	 *
+	 * @param file, le fichier dans lequel stocker le PDF
+	 * @param pcList, l'état des PCs du parc lors de la capture
+	 * @param captureTime, la date de la capture
+	 * @param nbCoreChart, le graphique des PCs par nombre de coeurs du processeur
+	 * @param modelChart, le graphique des PCs par modèles de processeur
+	 * @param hddSizeChart, le graphique des PCs par taille de disque dur
+	 * @param ramSizeChart, le graphique des PCs par taille de mémoire vive
+	 * @param storageChart, le graphique de la charge moyenne des disque durs en fonction du temps
+	 * @param programsChart, le graphique des programmes les plus installés
+	 */
 	public static void generatePdfCapture(File file, ObservableList<PCInfoViewWrapper> pcList, String captureTime, PieChart nbCoreChart, PieChart modelChart, PieChart hddSizeChart, PieChart ramSizeChart, LineChart<String, Double> storageChart, BarChart<String, Integer> programsChart){
         Document document = new Document();
         try {
@@ -87,34 +106,16 @@ public class PdfGenerator {
 		}
 	}
 
-	private static void addParkInformation(ObservableList<PCInfoViewWrapper> pcList, Document document) throws DocumentException {
-		// TODO Auto-generated method stub
-		//Hostname, Ip Address, OS, free Storage Space, nb installed programs
-		PdfPTable table = new PdfPTable(5);
-		table.setSpacingBefore(10f);
-		table.setWidthPercentage(90f);
-		table.addCell(new PdfPCell(new Paragraph("Hostname", STD_BOLD)));
-		table.addCell(new PdfPCell(new Paragraph("IP Address", STD_BOLD)));
-		table.addCell(new PdfPCell(new Paragraph("OS", STD_BOLD)));
-		table.addCell(new PdfPCell(new Paragraph("Free Space", STD_BOLD)));
-		table.addCell(new PdfPCell(new Paragraph("Installed Programs", STD_BOLD)));
-
-		for(PCInfoViewWrapper pc : pcList){
-			table.addCell(new PdfPCell(new Paragraph(pc.getHostname())));
-			table.addCell(new PdfPCell(new Paragraph(pc.getIpAddress())));
-			table.addCell(new PdfPCell(new Paragraph(pc.getOs())));
-			table.addCell(new PdfPCell(new Paragraph(pc.getHdd().getFreeSize()+" GB")));
-			table.addCell(new PdfPCell(new Paragraph(Integer.toString(pc.getPrograms().size()))));
-		}
-		document.add(table);
-
-	}
-
+	/**
+	 * Permet la génération d'un PDF résumant toutes les informations d'un PC lors d'une certaine capture.
+	 *
+	 * @param file, le fichier dans lequel le PDF sera enregistré
+	 * @param pc, le PC qui sera décrit dans le PDF
+	 * @param captureTime, la date de la capture correspondant à l'état du PC
+	 * @param pieChart, le graphique de l'espace de stockage libre par rapport à l'espace total
+	 * @param lineChart, le graphique montrant l'évolution dans le temps du taux d'occupation de l'espace de stockage
+	 */
 	public static void generatePdfMachine(File file, PCInfoViewWrapper pc, String captureTime, PieChart pieChart, LineChart<String, Double> lineChart){
-        //Cr�ation du nom du document
-    	//ajouter choix du nom et de l'emplacement
-    	/*String docNameCapture = captureTime.replace(' ', '_').replace(':', '_');
-        String docName = pc.getHostname()+"_"+docNameCapture+".pdf";*/
         Document document = new Document();
 
         try {
@@ -157,6 +158,45 @@ public class PdfGenerator {
 		}
     }
 
+	/**
+	 * Permet la génération de la section "Park Information" du PDF résumant une capture
+	 *
+	 * @param pcList, la liste des PCs du parc lors de la capture
+	 * @param document, le PDF en cours de génération
+	 * @throws DocumentException
+	 */
+	private static void addParkInformation(ObservableList<PCInfoViewWrapper> pcList, Document document) throws DocumentException {
+
+		PdfPTable table = new PdfPTable(5);
+
+		table.setSpacingBefore(10f);
+		table.setWidthPercentage(90f);
+
+		table.addCell(new PdfPCell(new Paragraph("Hostname", STD_BOLD)));
+		table.addCell(new PdfPCell(new Paragraph("IP Address", STD_BOLD)));
+		table.addCell(new PdfPCell(new Paragraph("OS", STD_BOLD)));
+		table.addCell(new PdfPCell(new Paragraph("Free Space", STD_BOLD)));
+		table.addCell(new PdfPCell(new Paragraph("Installed Programs", STD_BOLD)));
+
+		for(PCInfoViewWrapper pc : pcList){
+			table.addCell(new PdfPCell(new Paragraph(pc.getHostname())));
+			table.addCell(new PdfPCell(new Paragraph(pc.getIpAddress())));
+			table.addCell(new PdfPCell(new Paragraph(pc.getOs())));
+			table.addCell(new PdfPCell(new Paragraph(pc.getHdd().getFreeSize()+" GB")));
+			table.addCell(new PdfPCell(new Paragraph(Integer.toString(pc.getPrograms().size()))));
+		}
+		document.add(table);
+
+	}
+
+
+	/**
+	 * Permet la génération de la section "Installed programs" du PDF résumant un PC
+	 *
+	 * @param programs, la liste des programmes du PC
+	 * @param document, le PDF en cours de génération
+	 * @throws DocumentException
+	 */
 	private static void addProgramInfos(ObservableList<ProgramViewWrapper> programs, Document document) throws DocumentException {
 		PdfPTable table = new PdfPTable(2);
 		PdfPCell cell = null;
@@ -177,6 +217,16 @@ public class PdfGenerator {
          document.add(table);
 
 	}
+
+	/**
+	 * Permet d'ajouter un diagramme en barre à un PDF.
+	 * Crée une image .png à partir d'un graphique, l'ajoute au PDF, puis l'efface.
+	 *
+	 * @param barChart, le diagramme à ajouter
+	 * @param document, le PDF en cours de génération
+	 * @throws IOException
+	 * @throws DocumentException
+	 */
 	private static void addBarChart(BarChart<String, Integer> barChart, Document document) throws IOException, DocumentException {
     	WritableImage image = barChart.snapshot(new SnapshotParameters(), null);
 
@@ -192,6 +242,16 @@ public class PdfGenerator {
         file.delete();
 
 	}
+
+	/**
+	 * Permet d'ajouter un diagramme en courbes à un PDF.
+	 * Crée une image .png à partir d'un graphique, l'ajoute au PDF, puis l'efface.
+	 *
+	 * @param lineChart, le diagramme à ajouter
+	 * @param document, le PDF en cours de génération
+	 * @throws IOException
+	 * @throws DocumentException
+	 */
 	private static void addLineChart(LineChart<String, Double> lineChart, Document document) throws IOException, DocumentException {
 		WritableImage image = lineChart.snapshot(new SnapshotParameters(), null);
 
@@ -205,9 +265,18 @@ public class PdfGenerator {
         chart.scalePercent(80f);
         document.add(chart);
         file.delete();
-
 	}
 
+	/**
+	 * Permet d'ajouter un diagramme en camembert à un PDF.
+	 * Crée une image .png à partir d'un graphique, l'ajoute au PDF, puis l'efface.
+	 *
+	 * @param pieChart, le diagramme à ajouter
+	 * @param document, le PDF en cours de génération
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws DocumentException
+	 */
 	private static void addPieChart(PieChart pieChart, Document document) throws MalformedURLException, IOException, DocumentException {
 		WritableImage image = pieChart.snapshot(new SnapshotParameters(), null);
 
@@ -224,6 +293,16 @@ public class PdfGenerator {
 
 	}
 
+	/**
+	 * Permet de placer un diagramme en camembert dans un tableau.
+	 * Crée une image .png à partir d'un graphique, l'ajoute au PDF, puis l'efface.
+	 *
+	 * @param pieChart, le diagramme à ajouter
+	 * @param table, le tableau auquel ajouter le diagramme
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 * @throws DocumentException
+	 */
 	private static void addPieChart(PieChart pieChart, PdfPTable table) throws MalformedURLException, IOException, DocumentException {
 		WritableImage image = pieChart.snapshot(new SnapshotParameters(), null);
 		File file = new File("chart.png");
@@ -240,9 +319,14 @@ public class PdfGenerator {
 
 	}
 
+	/**
+	 * Permet d'ajouter la section "PC information" au PDF résumant un PC
+	 *
+	 * @param pc, le PC résumé dans le PDF
+	 * @param document, le PDF en cours de génération
+	 * @throws DocumentException
+	 */
 	private static void addPCInformation(PCInfoViewWrapper pc, Document document) throws DocumentException {
-
-
          PdfPTable table = new PdfPTable(2);
          table.setSpacingBefore(10f);
          table.setSpacingAfter(10f);

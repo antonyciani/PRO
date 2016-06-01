@@ -9,6 +9,11 @@ import java.util.Random;
 import monitor.model.*;
 
 /**
+ * Cette classe permet de remplir la base de données avec des données générées aléatoirement.
+ * Elle est utilisée pour tester le bon fonctionnement de l'application et permet également de
+ * procéder à une démonstration de l'application.
+ *
+ *
  * @author STEINER Lucie
  *
  */
@@ -34,7 +39,9 @@ public class TestDataGenerator {
 	// des graphiques représentatifs et l'utilisation des filtres
 
 	/**
-	 * @return
+	 * Permet de générer une adresse IP aléatoire.
+	 *
+	 * @return l'adresse IP
 	 */
 	public static String generateIPAddress() {
 		int rand = 0;
@@ -48,7 +55,9 @@ public class TestDataGenerator {
 	}
 
 	/**
-	 * @return
+	 * Permet de générer une adresse MAC aléatoire.
+	 *
+	 * @return l'adresse MAC
 	 */
 	public static String generateMACAddress() {
 		int rand = 0;
@@ -62,19 +71,22 @@ public class TestDataGenerator {
 	}
 
 	/**
+	 * Méthode principale de la classe, effectue la génération aléatoire des données de plusieurs
+	 * captures ainsi que leur stockage dans la base de données
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+
 		final String confFilename = "app.properties";
 		String dbAddress = "";
 		String dbUsername = "";
 		String dbPassword = "";
 		Properties prop = new Properties();
-		
+
 		//Récupération des informations de configuration à partir du fichier de configuration
         try {
-        	
+
         	//Chargement du fichier de configuration
             BufferedReader br = new BufferedReader(new FileReader(confFilename));
             //load a properties file from class path, inside static method
@@ -84,37 +96,19 @@ public class TestDataGenerator {
             dbAddress = prop.getProperty("dbaddress");
             dbUsername = prop.getProperty("dbusername");
             dbPassword = prop.getProperty("dbpassword");
-            
-            
-            
+
         } catch (IOException ex) {
             System.out.println("app.properties couldn't be loaded, please check it is present in the same folder as the application");
             System.exit(1);
         }
-		
-		
-		
+
 		Database db = new Database(dbAddress, dbUsername, dbPassword);
 		db.connect();
+
 		Random r = new Random();
-		// Création de processeurs
+
 		LinkedList<PCInfo> parc = new LinkedList<>();
 
-		// Construction du parc informatique --> créer 20 postes
-		/*
-		 * private String hostname; --> pc*(variable de boucle) private String
-		 * ipAddress; --> générée une fois aléatoirement au début private String
-		 * macAddress; --> générée une fois aléatoirement au début private
-		 * String os; --> tableau private CPUInfo cpu; private String
-		 * constructor; --> tableau private String model; --> tableau private
-		 * double frequency; --> tableau private int numbCore; --> tableau
-		 * private HDDInfo hdd; private double totalSize; --> tableau private
-		 * double freeSize; --> générer aléatoirement en fonction de total,puis
-		 * faire évoluer private long ramSize; --> tableau private
-		 * LinkedList<Program> programs; String name; --> tableau String
-		 * version; --> tableau
-		 */
-		System.out.println("Generating test data...");
 		for (int i = 0; i < 20; i++) {
 			String hostname = "PC" + i;
 			String ip = generateIPAddress();
@@ -127,21 +121,23 @@ public class TestDataGenerator {
 			int nbCores = NB_CORES[r.nextInt(NB_CORES.length)];
 			double totalSize = TOTAL_HDD_SIZE[r.nextInt(TOTAL_HDD_SIZE.length)];
 			double freeSize = Math.random() * totalSize;
-			// Générer programmes-> nombre aléatoire de programmes
-			// install�s, choix aléatoire des prorgammes et des versions
+
 			LinkedList<Program> programs = new LinkedList<>();
 			// Générer nb programs
 			int nbPrograms = r.nextInt(PROGRAM_NAMES.length);
+
 			// Boucle avec choix programme et version
 			for (int j = 0; j < nbPrograms; j++) {
 				programs.add(new Program(PROGRAM_NAMES[r.nextInt(PROGRAM_NAMES.length)],
 						PROGRAM_VERSIONS[r.nextInt(PROGRAM_VERSIONS.length)]));
 			}
+
 			parc.add(new PCInfo(hostname, ip, mac, os, new CPUInfo(constructor, model, freq, nbCores),
 					new HDDInfo(totalSize, freeSize), ram, programs));
-
 		}
+
 		db.storePCs(parc);
+
 		// Répéter 10 fois
 		// Modification de l'espace
 		for (int i = 0; i < 9; i++) {
@@ -156,8 +152,6 @@ public class TestDataGenerator {
 			}
 			// Enregistrement des PC dans la DB
 			db.storePCs(parc);
-			// Modifications PC
 		}
-		System.out.println("Finished generation");
 	}
 }

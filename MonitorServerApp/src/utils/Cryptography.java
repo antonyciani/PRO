@@ -15,13 +15,18 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 /**
+ * Cette classe fournit des fonctions encapsulant les appels aux foncitons des classes java.security
+ * et javax.crypto.
+ *
  * @author STEINER Lucie
  *
  */
 public class Cryptography {
 
 	/**
-	 * @return
+	 * Permet la génération d'une paire de clés RSA.
+	 *
+	 * @return la paire de clés générée
 	 */
 	public static KeyPair generateRSAKeyPair() {
 		KeyPairGenerator keyPairGenerator;
@@ -36,7 +41,9 @@ public class Cryptography {
 	}
 
 	/**
-	 * @return
+	 * Permet la génération d'une clé secrète AES
+	 *
+	 * @return la clé secrète générée
 	 */
 	public static SecretKey generateAESSecretKey() {
 		KeyGenerator keyGenerator = null;
@@ -44,16 +51,17 @@ public class Cryptography {
 			keyGenerator = KeyGenerator.getInstance("AES");
 			keyGenerator.init(128);
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return keyGenerator.generateKey();
 	}
 
 	/**
-	 * @param plaintext
-	 * @param publicKey
-	 * @return
+	 * Permet le chiffrement de données avec RSA
+	 *
+	 * @param plaintext, les données à chiffrer
+	 * @param publicKey, la clé utilisée pour le chiffrement
+	 * @return les données chiffrées
 	 */
 	public static byte[] RSAEncrypt(byte[] plaintext, RSAPublicKey publicKey) {
 		byte[] ciphertext = null;
@@ -72,9 +80,11 @@ public class Cryptography {
 	}
 
 	/**
-	 * @param ciphertext
-	 * @param privateKey
-	 * @return
+	 * Permet le déchiffrement des données avec RSA
+	 *
+	 * @param ciphertext, les données à déchiffrer
+	 * @param privateKey, la clé utilisée pour le déchiffrement
+	 * @return les données déchiffrées
 	 */
 	public static byte[] RSADecrypt(byte[] ciphertext, RSAPrivateKey privateKey) {
 		byte[] plaintext = null;
@@ -92,9 +102,11 @@ public class Cryptography {
 	}
 
 	/**
-	 * @param plaintext
-	 * @param secretKey
-	 * @return
+	 * Permet le chiffrement des données avec AES
+	 *
+	 * @param plaintext, les données à chiffrer
+	 * @param secretKey, la clé utilisée pour le chiffrement
+	 * @return les données chiffrées
 	 */
 	public static byte[] AESEncrypt(byte[] plaintext, SecretKey secretKey) {
 		byte[] ciphertext = null;
@@ -112,9 +124,10 @@ public class Cryptography {
 	}
 
 	/**
-	 * @param ciphertext
-	 * @param secretKey
-	 * @return
+	 * Permet le déchiffrement des données avec AES
+	 * @param ciphertext, les données à déchiffrer
+	 * @param secretKey, la clé utilisée pour le déchiffrement
+	 * @return les données déchiffrées
 	 */
 	public static byte[] AESDecrypt(byte[] ciphertext, SecretKey secretKey) {
 		byte[] plaintext = null;
