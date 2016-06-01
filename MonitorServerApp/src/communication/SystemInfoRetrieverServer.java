@@ -128,10 +128,9 @@ public class SystemInfoRetrieverServer {
 			}
 			while (listening) {
 
-				LOG.log(Level.INFO, "Waiting (blocking) for a new client on port {0}", tcpPort);
+				LOG.log(Level.INFO, "Waiting for a new client on port {0}", tcpPort);
 				try {
 					Socket clientSocket = serverSocket.accept();
-					LOG.info("Socket " + clientSocket);
 					LOG.info("A new client has arrived. Starting a new thread and delegating work to a new servant...");
 					Thread newServant = new Thread(new ServantWorker(clientSocket));
 					newServant.start();
@@ -146,14 +145,12 @@ public class SystemInfoRetrieverServer {
 				try {
 					t.join();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 			try {
 				serverSocket.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -177,7 +174,6 @@ public class SystemInfoRetrieverServer {
 			public ServantWorker(Socket clientSocket) {
 				try {
 					this.clientSocket = clientSocket;
-					LOG.info("Socket " + clientSocket);
 					LOG.info(clientSocket.getInetAddress().toString());
 					in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 					out = new PrintWriter(clientSocket.getOutputStream());
@@ -199,7 +195,6 @@ public class SystemInfoRetrieverServer {
 
 				try {
 					LOG.info("Waiting for client INFOISREADY");
-					LOG.info(msg);
 					ObjectInputStream ois = null;
 					OutputStream tmpOut = null;
 					while ((!isInfoReady) && (msg = in.readLine()) != null) {
