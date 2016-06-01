@@ -39,7 +39,7 @@ public class SystemInfoRecuperator {
 		File f = new File("C:");
 		double freeSpaceGB = f.getFreeSpace() / Math.pow(1024.0, 3);
 		double totalSpaceGB = f.getTotalSpace() / Math.pow(1024.0, 3);
-
+		
 		return new HDDInfo(totalSpaceGB, freeSpaceGB);
 
 	}
@@ -56,6 +56,7 @@ public class SystemInfoRecuperator {
 		Sigar s = new Sigar();
 
 		try {
+			
 			String vendor = s.getCpuInfoList()[0].getVendor();
 			String model = s.getCpuInfoList()[0].getModel();
 			double frequency = s.getCpuInfoList()[0].getMhz() / 1000.0;
@@ -81,29 +82,24 @@ public class SystemInfoRecuperator {
 
 			LinkedList<Program> programs = new LinkedList<>();
 			Process proc = Runtime.getRuntime().exec("wmic product get name,version /format:\""
-					+ System.getenv("SystemRoot") + "\\System32\\wbem\\fr-FR\\csv\"");
+					+ System.getenv("SystemRoot") + "\\System32\\wbem\\fr-FR\\csv\""); // Commande Windows pour récupérer la liste des programmes
 
 			BufferedInputStream bs = new BufferedInputStream(proc.getInputStream());
 			BufferedReader br = new BufferedReader(new InputStreamReader(bs));
 			String program = "";
 
+			// Parsage des informations retournées par la console windows
 			while ((program = br.readLine()) != null) {
 
 				if (!program.equals("") && !program.equals("Node,Name,Version")) {
 					String[] elems = program.split(",");
 					String name = "";
 					String version = "";
-					System.out.println("YOOO: " + elems.length);
-					for (int i = 0; i < elems.length; i++) {
-						System.out.println(elems[i]);
-					}
 
-					System.out.println("P:" + program);
 					if (elems.length > 1) {
 						name = elems[1];
 						if (elems.length == 3) {
 							version = elems[2];
-							System.out.println(elems[2]);
 						}
 						Program p = new Program(name, version);
 						programs.add(p);
@@ -147,17 +143,15 @@ public class SystemInfoRecuperator {
 
 			InetAddress ip = InetAddress.getLocalHost();
 			ipAddress = ip.getHostAddress();
-			System.out.println("Current IP address : " + ip.getHostAddress());
 
 			NetworkInterface network = NetworkInterface.getByInetAddress(ip);
 			byte[] mac = network.getHardwareAddress();
-			System.out.print("Current MAC address : ");
+			
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < mac.length; i++) {
 				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
 			}
 			macAddress = sb.toString();
-			System.out.println(sb.toString());
 
 			Properties prop = System.getProperties();
 			os = prop.getProperty("os.name");
@@ -166,8 +160,7 @@ public class SystemInfoRecuperator {
 			hdd = retrieveHDDInfo();
 
 			Sigar s = new Sigar();
-			ramSize = (long) (Math.ceil(s.getMem().getRam() / 1024.0));
-			System.out.println("RAM: " + ramSize);
+			ramSize = (long) (Math.ceil(s.getMem().getRam() / 1024.0)); // taille de la RAM en GB arrondie
 
 			programs.addAll(retrieveInstalledPrograms());
 
