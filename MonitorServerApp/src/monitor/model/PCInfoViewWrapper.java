@@ -13,7 +13,7 @@ import javafx.collections.ObservableList;
  * Cette classe permet d'envelopper les informations relatives au PC dans des objets
  * observables. Ces objets permettent de notifier automatiquement la vue correspondante
  * si un champ venait à changer.
- * 
+ *
  * @author CIANI Antony
  *
  */
@@ -29,14 +29,16 @@ public class PCInfoViewWrapper {
 	private ObservableList<ProgramViewWrapper> programs;
 
 	/**
-	 * @param hostname
-	 * @param ipAddress
-	 * @param macAddress
-	 * @param os
-	 * @param cpu
-	 * @param hdd
-	 * @param ramSize
-	 * @param programs
+	 * Constructeur, construit l'objet à partir des infos relatives au PC
+	 *
+	 * @param hostname, le nom d'hôte du PC
+	 * @param ipAddress, l'adresse IP du PC
+	 * @param macAddress, l'adresse MAC du PC
+	 * @param os, l'OS du PC
+	 * @param cpu, les informations relatives au CPU du PC
+	 * @param hdd, les informations relatives au disque dure
+	 * @param ramSize, la taille de la mémoire RAM
+	 * @param programs, les informations relatives aux programmes installés sur le PC
 	 */
 	public PCInfoViewWrapper(String hostname, String ipAddress, String macAddress, String os, CPUInfo cpu, HDDInfo hdd,
 			long ramSize, ObservableList<Program> programs) {
@@ -56,7 +58,9 @@ public class PCInfoViewWrapper {
 	}
 
 	/**
-	 * @param pc
+	 * Constructeur, construit l'objet à partir de l'objet PCInfo
+	 *
+	 * @param pc, l'objet contenant les infos relative au PC
 	 */
 	public PCInfoViewWrapper(PCInfo pc) {
 		this.hostname = new SimpleStringProperty(pc.getHostname());
@@ -75,114 +79,107 @@ public class PCInfoViewWrapper {
 	}
 
 	/**
-	 * @return
+	 * @return le nom d'hôte
 	 */
 	public String getHostname() {
 		return hostname.get();
 	}
 
 	/**
-	 * @return
+	 * @return le nom d'hôte sous forme d'objet observable
 	 */
 	public StringProperty hostnameProperty() {
 		return hostname;
 	}
 
 	/**
-	 * @return
+	 * @return l'adresse IP
 	 */
 	public String getIpAddress() {
 		return ipAddress.get();
 	}
 
 	/**
-	 * @return
+	 * @return l'adresse IP sous forme d'objet observable
 	 */
 	public StringProperty ipAddressProperty() {
 		return ipAddress;
 	}
 
 	/**
-	 * @return
+	 * @return l'adresse MAC
 	 */
 	public String getMacAddress() {
 		return macAddress.get();
 	}
 
 	/**
-	 * @return
+	 * @return l'adresse MAC sous forme d'objet observable
 	 */
 	public StringProperty macAddressProperty() {
 		return macAddress;
 	}
 
 	/**
-	 * @return
+	 * @return l'os
 	 */
 	public String getOs() {
 		return os.get();
 	}
 
 	/**
-	 * @return
+	 * @return l'os sous forme d'objet observable
 	 */
 	public StringProperty osProperty() {
 		return os;
 	}
 
 	/**
-	 * @return
+	 * @return les informations relatives au CPU
 	 */
 	public CPUInfo getCpu() {
 		return cpu.getValue();
 	}
 
 	/**
-	 * @return
+	 * @return les informations relatives au CPU sous forme d'objet observable
 	 */
 	public ObjectProperty<CPUInfo> cpuProperty() {
 		return cpu;
 	}
 
 	/**
-	 * @return
+	 * @return les informations relatives au disque dure
 	 */
 	public HDDInfo getHdd() {
 		return hdd.getValue();
 	}
 
 	/**
-	 * @return
+	 * @return les informations relatives au disque dure sous forme d'objet observable
 	 */
 	public ObjectProperty<HDDInfo> hddProperty() {
 		return hdd;
 	}
 
 	/**
-	 * @return
+	 * @return la taille de la mémoire RAM
 	 */
 	public long getRamSize() {
 		return ramSize.get();
 	}
 
 	/**
-	 * @return
+	 * @return la taille de la mémoire RAM sous forme d'objet observable
 	 */
 	public LongProperty ramSizeProperty() {
 		return ramSize;
 	}
 
 	/**
-	 * @return
+	 * @return les informations relatives aux programmes installés sur le PC
 	 */
 	public ObservableList<ProgramViewWrapper> getPrograms() {
-		return programs;
-	}
-
-	/**
-	 * @return
-	 */
-	public ObservableList<ProgramViewWrapper> programsProperties() {
 		return programs;
 	}
 }

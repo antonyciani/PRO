@@ -15,23 +15,25 @@ public class ObservableDate {
 	private SimpleStringProperty date;
 
 	/**
-	 * @param date
+	 * Constructeur, enveloppe la date dans un objet observable
+	 *
+	 * @param date la date à rendre observable
 	 */
 	public ObservableDate(String date) {
 		this.date = new SimpleStringProperty(date);
 	}
 
 	/**
-	 * @return
-	 */
-	public SimpleStringProperty getDateProperty() {
-		return date;
-	}
-
-	/**
-	 * @return
+	 * @return la date
 	 */
 	public String getDate() {
 		return date.get();
+	}
+
+	/**
+	 * @return la date observable
+	 */
+	public SimpleStringProperty getDateProperty() {
+		return date;
 	}
 }

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 /**
  * Cette classe permet de stocker les informations relatives au PC.
- * 
+ *
  * @author CIANI Antony
  *
  */
@@ -22,14 +22,16 @@ public class PCInfo implements Serializable {
 	private LinkedList<Program> programs;
 
 	/**
-	 * @param hostname
-	 * @param ipAddress
-	 * @param macAddress
-	 * @param os
-	 * @param cpu
-	 * @param hdd
-	 * @param ramSize
-	 * @param programs
+	 * Constructeur, construit l'objet à partir des infos relatives au PC.
+	 *
+	 * @param hostname, le nom d'hôte du PC
+	 * @param ipAddress, l'adresse IP du PC
+	 * @param macAddress, l'adresse MAC du PC
+	 * @param os, l'OS du PC
+	 * @param cpu, les informations relatives au CPU du PC
+	 * @param hdd, les informations relatives au disque dure
+	 * @param ramSize, la taille de la mémoire RAM
+	 * @param programs, les informations relatives aux programmes installés sur le PC
 	 */
 	public PCInfo(String hostname, String ipAddress, String macAddress, String os, CPUInfo cpu, HDDInfo hdd,
 			long ramSize, LinkedList<Program> programs) {
@@ -44,56 +46,56 @@ public class PCInfo implements Serializable {
 	}
 
 	/**
-	 * @return
+	 * @return le nom d'hôte du PC
 	 */
 	public String getHostname() {
 		return hostname;
 	}
 
 	/**
-	 * @return
+	 * @return l'adresse IP du PC
 	 */
 	public String getIpAddress() {
 		return ipAddress;
 	}
 
 	/**
-	 * @return
+	 * @return l'adresse MAC du PC
 	 */
 	public String getMacAddress() {
 		return macAddress;
 	}
 
 	/**
-	 * @return
+	 * @return l'OS du PC
 	 */
 	public String getOs() {
 		return os;
 	}
 
 	/**
-	 * @return
+	 * @return les informations relatives au CPU du PC
 	 */
 	public CPUInfo getCpu() {
 		return cpu;
 	}
 
 	/**
-	 * @return
+	 * @return les informations relatives au disque dure
 	 */
 	public HDDInfo getHdd() {
 		return hdd;
 	}
 
 	/**
-	 * @return
+	 * @return la taille de la mémoire RAM
 	 */
 	public long getRamSize() {
 		return ramSize;
 	}
 
 	/**
-	 * @return
+	 * @return les informations relatives aux programmes installés sur le PC
 	 */
 	public LinkedList<Program> getPrograms() {
 		return programs;
