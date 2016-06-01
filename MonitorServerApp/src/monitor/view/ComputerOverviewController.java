@@ -29,7 +29,7 @@ import monitor.model.ProgramViewWrapper;
 
 /**
  * Cette classe joue le rôle de contrôleur. Elle gère les actions suivantes:
- * 	-Affichage des pc d'une capture et des informations correspondates.
+ * 	-Affichage des pc d'une capture et des informations correspondantes.
  * 	-Affichage des programmes installés sur la machine sélectionnée.
  *  -Application de filtres standard et avancés pour effectuer des recherches.
  *  -Affichage de différents graphiques.
@@ -38,7 +38,7 @@ import monitor.model.ProgramViewWrapper;
  */
 public class ComputerOverviewController {
 
-	//Le champ de saisie à partir du quel est apliqué le filtre principal
+	//Le champ de saisie à partir du quel est appliqué le filtre principal
 	@FXML
 	private TextField filterField;
 
@@ -109,7 +109,7 @@ public class ComputerOverviewController {
 	//Référence à l'application principale
 	private ServerApp serverApp;
 
-	// Le PC séléctionné
+	// Le PC sélectionné
 	private PCInfoViewWrapper currentPc;
 
 	//Contient la date de la capture courante
@@ -119,7 +119,7 @@ public class ComputerOverviewController {
 	private FilteredList<PCInfoViewWrapper> filteredList;
 	private SortedList<PCInfoViewWrapper> sortedList;
 
-	//Référance sur la base de donée
+	//Référence sur la base de donnée
 	private Database database;
 
 	/**
@@ -149,7 +149,7 @@ public class ComputerOverviewController {
 		pcTable.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showPcDetails(newValue));
 
-		//Affiche le graphique en camambert correspondant au pc sélectionné
+		//Affiche le graphique en camembert correspondant au pc sélectionné
 		pcTable.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showPieChartDetails(newValue));
 
@@ -187,7 +187,7 @@ public class ComputerOverviewController {
 	/**
 	 * Permet d'initialiser le contrôleur
 	 *
-	 * @param serverApp, la référence à l'applicaton principale
+	 * @param serverApp, la référence à l'application principale
 	 */
 	public void init(ServerApp serverApp) {
 		//Initialise les champs généraux
@@ -214,7 +214,7 @@ public class ComputerOverviewController {
 
 
 	/**
-	 * Permet de remplir les chams correspondant aux info du pc sélectionné.
+	 * Permet de remplir les champs correspondant aux infos du pc sélectionné.
 	 *
 	 * @param newValue, le pc sélectionné de type PCInfoViewWrapper
 	 */
@@ -310,8 +310,8 @@ public class ComputerOverviewController {
 	}
 
 	/**
-	 * Affiche le graphique en camambert permettant de visualiser le taux d'occupation
-	 * du disc dur.
+	 * Affiche le graphique en camembert permettant de visualiser le taux d'occupation
+	 * du disque dur.
 	 *
 	 * @param newValue
 	 */
@@ -402,7 +402,7 @@ public class ComputerOverviewController {
 	}
 
 	/**
-	 * Permet d'afficher la fenêtre permettant la génération d'un doccument pdf comportant un résumé
+	 * Permet d'afficher la fenêtre permettant la génération d'un document pdf comportant un résumé
 	 * des différents graphiques. Cette méthode est appelée dès que l'utilisateur appuie sur le bouton
 	 * "Export".
 	 *

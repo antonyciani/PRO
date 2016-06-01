@@ -26,7 +26,7 @@ import utils.Cryptography;
 
 /**
  * Cette classe permet la récupération des informations système auprès des PC clients
- * Elle se comporte comme un serveur allant intérroger les clients pour qu'il lui
+ * Elle se comporte comme un serveur allant interroger les clients pour qu'il lui
  * renvoient leurs informations
  * 
  * @author CIANI Antony
@@ -40,12 +40,12 @@ public class SystemInfoRetrieverServer {
 	private int udpPort;
 	private int tcpPort;
 	private String multicastGroupAddress;
-	private LinkedList<PCInfo> pcInfos; // liste des informations récupérees
+	private LinkedList<PCInfo> pcInfos; // liste des informations récupérées
 
 	/** 
 	 * Constructeur, prends en paramètre le port udp pour l'envoi du message de demande de
 	 * récupération des informations au client et le port tcp sur lequel les connexions des
-	 * clients sont accéptées
+	 * clients sont acceptées
 	 * 
 	 * @param udpPort
 	 * @param tcpPort
@@ -71,7 +71,7 @@ public class SystemInfoRetrieverServer {
 		receptionist.start();
 		
 		try {
-			receptionist.join(); // On attends que le thread réceptioniste se termine
+			receptionist.join(); // On attends que le thread réceptionniste se termine
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -79,7 +79,7 @@ public class SystemInfoRetrieverServer {
 	}
 
 	/**
-	 * Permet de récupérer les informations des PC qui ont répondur au serveur
+	 * Permet de récupérer les informations des PC qui ont répondu au serveur
 	 * 
 	 * @return La liste des informations récoltées
 	 */
@@ -89,7 +89,7 @@ public class SystemInfoRetrieverServer {
 	}
 
 	/**
-	 * Permet de gérér les connexions de plusieurs clients de façon multi-threadée
+	 * Permet de gérer les connexions de plusieurs clients de façon multi-threadée
 	 * Pour chaque client se connectant, accepte sa connexion et lance un nouveau
 	 * thread permettant de gérer l'échange d'informations
 	 * 
@@ -275,16 +275,6 @@ public class SystemInfoRetrieverServer {
 							// Ajout dans la liste des PCInfos
 							pcInfos.add(pc);
 							objIn.close();
-
-//							System.out.println(pc.getHostname());
-//							System.out.println(pc.getIpAddress());
-//							System.out.println(pc.getMacAddress());
-//							System.out.println(pc.getOs());
-//							System.out.println(pc.getRamSize());
-//							System.out.println(pc.getCpu().getConstructor());
-//							System.out.println(pc.getCpu().getModel());
-//							System.out.println(pc.getHdd().getFreeSize());
-//							System.out.println(pc.getPrograms().size());
 							LOG.info("Informations retrieved");
 
 						}

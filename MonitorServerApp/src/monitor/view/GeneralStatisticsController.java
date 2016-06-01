@@ -49,7 +49,7 @@ public class GeneralStatisticsController {
 	}
 
 	/**
-	 * Permet d'initialiser le controleur et génère les graphiques.
+	 * Permet d'initialiser le contrôleur et génère les graphiques.
 	 *
 	 * @param serverApp, en référence à l'application principale, permet d'en utilisé ses méthodes
 	 */
@@ -64,7 +64,7 @@ public class GeneralStatisticsController {
 	}
 
 	/**
-	 * Génère un graphique en camambert permettant de visualiser les différents types de processeurs du
+	 * Génère un graphique en camembert permettant de visualiser les différents types de processeurs du
 	 * parc informatique en fonction de leur nombre de coeur.
 	 *
 	 */
@@ -84,7 +84,7 @@ public class GeneralStatisticsController {
 	}
 
 	/**
-	 * Génère un graphique en camambert permettant de visualiser les différents modèles de processeurs du
+	 * Génère un graphique en camembert permettant de visualiser les différents modèles de processeurs du
 	 * parc informatique.
 	 *
 	 */
@@ -102,7 +102,7 @@ public class GeneralStatisticsController {
 	}
 
 	/**
-	 * Génère un graphique en camambert permettant de visualiser les différents tailles de disque dur du
+	 * Génère un graphique en camembert permettant de visualiser les différents tailles de disque dur du
 	 * parc informatique.
 	 *
 	 */
@@ -121,7 +121,7 @@ public class GeneralStatisticsController {
 	}
 
 	/**
-	 * Génère un graphique en camambert permettant de visualiser les différents tailles de mémoire vives du
+	 * Génère un graphique en camembert permettant de visualiser les différents tailles de mémoire vives du
 	 * parc informatique.
 	 *
 	 */

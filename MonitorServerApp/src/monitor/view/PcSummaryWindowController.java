@@ -60,7 +60,7 @@ public class PcSummaryWindowController {
 	}
 
 	/**
-	 * Permet d'initialiser le controleur et génère les graphiques.
+	 * Permet d'initialiser le contrôleur et génère les graphiques.
 	 *
 	 * @param serverApp, en référence à l'application principale, permet d'en utilisé ses méthodes
 	 * @param dialogStage la scène de la fenêtre graphique (permet sa fermeture)
@@ -108,7 +108,7 @@ public class PcSummaryWindowController {
 
 
 	/**
-	 * Génère le graphique en camambert permettant de visualiser le taux de remplissage du disque dure.
+	 * Génère le graphique en camembert permettant de visualiser le taux de remplissage du disque dure.
 	 *
 	 * @param newValue
 	 */
@@ -135,7 +135,7 @@ public class PcSummaryWindowController {
 
 
 	/**
-	 * Permet la génération du doccument pdf comportant un résumé des différents graphiques.
+	 * Permet la génération du document pdf comportant un résumé des différents graphiques.
 	 * Cette méthode est appelée dès que l'utilisateur appuie sur le bouton "Export".
 	 *
 	 */

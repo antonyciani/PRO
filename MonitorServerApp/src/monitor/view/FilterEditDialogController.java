@@ -35,7 +35,7 @@ public class FilterEditDialogController {
 	/**
 	 * Permet d'initialiser le contrôleur
 	 *
-	 * @param serverApp, la référence à l'applicaton principale
+	 * @param serverApp, la référence à l'application principale
 	 * @param dialogStage, une référence sur la scène correspondant à la fenêtre graphique
 	 */
 	public void init(ServerApp serverApp, Stage dialogStage) {
@@ -54,7 +54,7 @@ public class FilterEditDialogController {
 		//Application du filtre avancé
 		serverApp.getAdvancedFilters().applyFilter(osField.getText(), ramSizeField.getText(), hddSizeField.getText(),
 				hddOccupRateField.getText(), programField.getText());
-		//Fermetur de la fenêtre
+		//Fermeture de la fenêtre
 		dialogStage.close();
 
 	}
@@ -65,7 +65,7 @@ public class FilterEditDialogController {
 	 */
 	@FXML
 	private void handleCancel() {
-		//Fermetur de la fenêtre
+		//Fermeture de la fenêtre
 		dialogStage.close();
 	}
 }

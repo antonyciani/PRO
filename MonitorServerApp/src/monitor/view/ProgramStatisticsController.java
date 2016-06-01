@@ -71,7 +71,7 @@ public class ProgramStatisticsController {
 	}
 
 	/**
-	 * Permet d'initialiser le controleur et génère les graphiques.
+	 * Permet d'initialiser le contrôleur et génère les graphiques.
 	 *
 	 * @param serverApp, en référence à l'application principale, permet d'en utilisé ses méthodes
 	 */

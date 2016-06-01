@@ -86,7 +86,7 @@ public class CaptureSelectionDialogController {
 	/**
 	 * Permet de retenir la date sélectionnée, est appelée par le listener lorsqu'un utilisateur clique sur une cellule
 	 *
-	 * @param date, la date séléctonnée
+	 * @param date, la date sélectionnée
 	 */
 	private void setDate(ObservableDate date) {
 		selectedDate = date.getDate();

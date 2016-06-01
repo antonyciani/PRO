@@ -23,7 +23,7 @@ import utils.PdfGenerator;
 /**
  * Cette classe joue le rôle de contrôleur. Elle gère l'affichage d'une fenêtre graphique
  * comportant un résumé des statistiques portant sur l'ensemble du parc informatique. Ce
- * contrôleur gêre également l'exportation de ces données au format PDF.
+ * contrôleur gêne également l'exportation de ces données au format PDF.
  *
  * @author Michael Rohrer
  * @author Lucie Steiner
@@ -76,7 +76,7 @@ public class CaptureSummaryWindowController {
 	}
 
 	/**
-	 * Permet d'initialiser le controleur et génère les graphiques.
+	 * Permet d'initialiser le contrôleur et génère les graphiques.
 	 *
 	 * @param serverApp, en référence à l'application principale, permet d'en utilisé ses méthodes
 	 * @param dialogStage la scène de la fenêtre graphique (permet sa fermeture)
@@ -96,7 +96,7 @@ public class CaptureSummaryWindowController {
 	}
 
 	/**
-	 * Génère le graphique en camambert permettant de visualiser les différents types de processeurs du
+	 * Génère le graphique en camembert permettant de visualiser les différents types de processeurs du
 	 * parc informatique en fonction de leur nombre de coeur.
 	 *
 	 */
@@ -154,7 +154,7 @@ public class CaptureSummaryWindowController {
 	}
 
 	/**
-	 * Génère le graphique en camambert permettant de visualiser les différents tailles de mémoire vives du
+	 * Génère le graphique en camembert permettant de visualiser les différents tailles de mémoire vives du
 	 * parc informatique.
 	 *
 	 */
@@ -215,7 +215,7 @@ public class CaptureSummaryWindowController {
 	}
 
 	/**
-	 * Permet la génération du doccument pdf comportant un résumé des différents graphiques.
+	 * Permet la génération du document pdf comportant un résumé des différents graphiques.
 	 * Cette méthode est appelée dès que l'utilisateur appuie sur le bouton "Export".
 	 *
 	 */

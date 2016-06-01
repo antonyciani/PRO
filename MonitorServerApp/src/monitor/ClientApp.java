@@ -31,15 +31,15 @@ public class ClientApp {
 		
 Properties prop = new Properties();
 		
-        // Retrieving information from properties file
+		//Récupération des informations de configuration à partir du fichier de configuration
         try {
-
+        	
+        	//Chargement du fichier de configuration
             BufferedReader br = new BufferedReader(new FileReader(confFilename));
             //load a properties file from class path, inside static method
             prop.load(br);
 
-            //get the property value and print it out
-            
+            //Récupération des informations de configuration            
             int udpPort = Integer.parseInt(prop.getProperty("udpport"));
             int tcpPort = Integer.parseInt(prop.getProperty("tcpport"));
             String multicastGroupAddress = prop.getProperty("multicastaddress");

@@ -50,8 +50,8 @@ public class SystemInfoRetrieverClient {
 	private String multicastGroupAddress;
 
 	/**
-	 * Constructeur, prends en paramètre le port udp surlequel écouter 
-	 * la requête UDP du serveur et le port tcp surlequel se connecter au serveur
+	 * Constructeur, prends en paramètre le port udp sur lequel écouter 
+	 * la requête UDP du serveur et le port tcp sur lequel se connecter au serveur
 	 * 
 	 * @param udpPort
 	 * @param tcpPort
