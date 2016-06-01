@@ -18,6 +18,10 @@ import monitor.model.PCInfoViewWrapper;
 import monitor.model.Program;
 
 /**
+ * Cette classe permet de lier l'application à la base de données. Elle contient des méthodes
+ * permettant d'ouvrir et de fermer la connection, de gérer les captures (sélection, insertion,
+ * suppression) et de récupérer les informations nécessaires aux statistiques.
+ *
  * @author STEINER Lucie
  *
  */
@@ -28,9 +32,9 @@ public class Database {
 	private Connection connection;
 
 	/**
-	 * @param address
-	 * @param username
-	 * @param password
+	 * @param address, l'adresse de la base de données
+	 * @param username, le nom d'un utilisateur de la base de données
+	 * @param password, le mot de passe de l'utilisateur
 	 */
 	public Database(String address, String username, String password) {
 		this.address = address;
@@ -40,13 +44,11 @@ public class Database {
 	}
 
 	/**
-	 *
+	 * Permet d'établir la connection avec la base données
 	 */
 	public void connect() {
 		try {
-			// load the driver
 			Class.forName("com.mysql.jdbc.Driver");
-			// connect
 			connection = DriverManager.getConnection(address, username, password);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -59,43 +61,39 @@ public class Database {
 	}
 
 	/**
-	 * @param pcInfos
+	 * Permet de stocker tous les PC passés en paramètre dans la base de données
+	 *
+	 * @param pcInfos, la liste des PCs à stocker
 	 */
 	public void storePCs(LinkedList<PCInfo> pcInfos) {
 		LocalDateTime currentDate = LocalDateTime.now();
 		for (PCInfo pc : pcInfos) {
 			try {
-				// Cr�ation du processeur
+				// Création du processeur
 				int processorId = 0;
 				Statement statement = connection.createStatement();
-				System.out.println(pc.getCpu().getConstructor() + " " + pc.getCpu().getFrequency() + " "
-						+ pc.getCpu().getModel() + " " + pc.getCpu().getNbCore());
 				ResultSet result = statement
 						.executeQuery("SELECT id FROM processor WHERE constructor ='" + pc.getCpu().getConstructor()
 								+ "'" + "AND frequency =" + pc.getCpu().getFrequency() + " AND model ='"
 								+ pc.getCpu().getModel() + "' AND nmbrcores=" + pc.getCpu().getNbCore() + ";");
 				if (result.next()) {
 					processorId = result.getInt(1);
-					System.out.println("Processor already exists, ID: " + processorId);
 				} else {
 					int ok = statement
 							.executeUpdate("INSERT INTO processor (constructor, frequency, model, nmbrcores) VALUES('"
 									+ pc.getCpu().getConstructor() + "', " + pc.getCpu().getFrequency() + ", '"
 									+ pc.getCpu().getModel() + "', " + pc.getCpu().getNbCore() + ")");
 					if (ok != 0) {
-						System.out.println("Insert new processor: " + ok);
 						result = statement.executeQuery(
 								"SELECT id FROM processor WHERE constructor ='" + pc.getCpu().getConstructor() + "'"
 										+ "AND frequency =" + pc.getCpu().getFrequency() + " AND model ='"
 										+ pc.getCpu().getModel() + "' AND nmbrcores=" + pc.getCpu().getNbCore() + ";");
 						if (result.next()) {
 							processorId = result.getInt(1);
-							System.out.println("New processor ID: " + processorId);
 						}
 					}
 				}
-				// Cr�ation de la machine
-				System.out.println("Processor Id: " + processorId);
+				// Création de la machine
 				statement.executeUpdate(
 						"INSERT INTO machineState (MacAddress, captureTime, hostname, os, processorId, totalram, ipaddress, totalharddrivesize, freeharddrivesize) VALUES('"
 								+ pc.getMacAddress() + "', '" + currentDate + "', '" + pc.getHostname() + "', '"
@@ -112,12 +110,11 @@ public class Database {
 					if (result.next()) {
 						programId = result.getInt(1);
 					}
-					// r�cup�rer l'id
+					// récupérer l'id
 					else {
 						int ok = statement.executeUpdate("INSERT INTO program (name, version) VALUES('" + p.getName()
 								+ "', '" + p.getVersion() + "');");
 						if (ok != 0) {
-							System.out.println(ok);
 							result = statement.executeQuery("SELECT id FROM program WHERE name ='" + p.getName() + "'"
 									+ "AND version ='" + p.getVersion() + "';");
 							if (result.next()) {
@@ -126,7 +123,7 @@ public class Database {
 						}
 					}
 
-					// ajouter � pc_program pcMacAddress, pcCaptureTime,
+					// ajouter à pc_program pcMacAddress, pcCaptureTime,
 					// programId
 					statement.executeUpdate("INSERT INTO pc_program VALUES ('" + pc.getMacAddress() + "','"
 							+ currentDate + "'," + programId + ");");
@@ -138,8 +135,10 @@ public class Database {
 	}
 
 	/**
-	 * @param captureTime
-	 * @return
+	 * Permet de récupérer le nombre de PC par taille de disque dur lors d'une certaine capture
+	 *
+	 * @param captureTime, la date de la capture
+	 * @return les informations nécessaires à la construction du graphique correspondant
 	 */
 	public HashMap<Float, Integer> nbPcByHddSize(String captureTime) {
 		HashMap<Float, Integer> map = new HashMap<Float, Integer>();
@@ -159,8 +158,10 @@ public class Database {
 	}
 
 	/**
-	 * @param captureTime
-	 * @return
+	 * Permet de récupérer le nombre de PC par taille de mémoire vive lors d'une certaine capture
+	 *
+	 * @param captureTime, la date de la capture
+	 * @return les informations nécessaires à la construction du graphique correspondant
 	 */
 	public HashMap<Integer, Integer> nbPcByRamSize(String captureTime) {
 		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
@@ -178,8 +179,9 @@ public class Database {
 	}
 
 	/**
-	 * @param captureTime
-	 * @return
+	 * Permet de récupérer le nombre de PC par nombre de coeurs de processeur lors d'une certaine capture
+	 * @param captureTime la date de la capture
+	 * @return les informations nécessaires à la construction du graphique correspondant
 	 */
 	public HashMap<Integer, Integer> nbPcByNbCores(String captureTime) {
 		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
@@ -198,8 +200,9 @@ public class Database {
 	}
 
 	/**
+	 * Permet de récupérer le nombre de PC par modèle de processeur lors d'une certaine capture
 	 * @param captureTime
-	 * @return
+	 * @return les informations nécessaires à la construction du graphique correspondant
 	 */
 	public HashMap<String, Integer> nbPcByModel(String captureTime) {
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
@@ -218,7 +221,7 @@ public class Database {
 	}
 
 	/**
-	 * @return
+	 * @return la liste des dates auxquelles une capture a été effectuée
 	 */
 	public ArrayList<String> getCaptures() {
 		ArrayList<String> captures = new ArrayList<>();
@@ -236,7 +239,7 @@ public class Database {
 	}
 
 	/**
-	 * @return
+	 * @return la date de la dernière capture effectuée
 	 */
 	public String getLastCapture() {
 		String capture = "";
@@ -255,8 +258,9 @@ public class Database {
 	}
 
 	/**
-	 * @param captureTime
-	 * @return
+	 * Récupère les données de tous les PC récoltées à un moment donnés
+	 * @param captureTime, la date de la capture
+	 * @return la liste des PC correspondant à la capture
 	 */
 	public ArrayList<PCInfoViewWrapper> loadPCInfo(String captureTime) {
 		ArrayList<PCInfoViewWrapper> pcs = new ArrayList<>();
@@ -265,17 +269,17 @@ public class Database {
 			ResultSet result = statement
 					.executeQuery("SELECT * FROM machinestate WHERE CaptureTime ='" + captureTime + "';");
 			while (result.next()) {
-				// R�cup�ration infos pc
+				// Récupération infos pc
 				String mac = result.getString(1);
 				String hostname = result.getString(3);
 				String os = result.getString(4);
 				int ram = result.getInt(6);
 				String ip = result.getString(7);
 
-				// R�cup�ration et cr�ation hdd
+				// Récupération et création hdd
 				HDDInfo hdd = new HDDInfo(result.getDouble(8), result.getDouble(9));
 
-				// R�cup�ration et cr�ation processeur
+				// Récupération et création processeur
 				int processorId = result.getInt(5);
 				Statement statement2 = connection.createStatement();
 				ResultSet resultTmp = statement2.executeQuery("SELECT * FROM processor WHERE id =" + processorId + ";");
@@ -283,7 +287,7 @@ public class Database {
 				CPUInfo cpu = new CPUInfo(resultTmp.getString(2), resultTmp.getString(4), resultTmp.getDouble(3),
 						resultTmp.getInt(5));
 
-				// R�cup�ration programmes
+				// Récupération programmes
 				LinkedList<Program> programs = new LinkedList<>();
 				resultTmp = statement2.executeQuery(
 						"SELECT * FROM program WHERE ID IN ( " + "SELECT DISTINCT programID " + "FROM pc_program "
@@ -292,10 +296,10 @@ public class Database {
 					Program program = new Program(resultTmp.getString(2), resultTmp.getString(3));
 					programs.add(program);
 				}
-				// Cr�ation pc
+				// Création pc
 				PCInfoViewWrapper p = new PCInfoViewWrapper(new PCInfo(hostname, ip, mac, os, cpu, hdd, ram, programs));
 
-				// Ajout � la liste
+				// Ajout à la liste
 				pcs.add(p);
 			}
 		} catch (SQLException e) {
@@ -305,7 +309,8 @@ public class Database {
 	}
 
 	/**
-	 * @param captureTime
+	 * Suppression d'une capture dans la base de données
+	 * @param captureTime, la date de la capture à supprimer
 	 */
 	public void deleteCapture(String captureTime) {
 		try {
@@ -317,8 +322,12 @@ public class Database {
 	}
 
 	/**
-	 * @param pc
-	 * @return
+	 * Permet de récupérer l'évolution du taux d'occupation du disque dur d'un PC à partir des
+	 * informations présentes dans la base de données.
+	 *
+	 * @param pc, le PC sélectionné
+	 * @param captureTime, la date de la dernière capture à prendre en compte
+	 * @return les informations nécessaires à la construction du graphique correspondant
 	 */
 	public TreeMap<String, Double> storageLoadRate(PCInfoViewWrapper pc, String captureTime) {
 		TreeMap<String, Double> map = new TreeMap<>();
@@ -339,7 +348,11 @@ public class Database {
 	}
 
 	/**
-	 * @return
+	 * Permet de récupérer l'évolution du taux d'occupation des disques durs de l'ensemble du parc
+	 * à partir des informations présentes dans la base de données.
+	 *
+	 * @param captureTime, la date de la dernière capture à prendre en compte
+	 * @return les informations nécessaires à la construction du graphique correspondant
 	 */
 	public TreeMap<String, Double> averageStorageLoadRate(String captureTime) {
 		TreeMap<String, Double> map = new TreeMap<>();
@@ -360,9 +373,10 @@ public class Database {
 	}
 
 	/**
-	 * @param program
-	 * @param captureTime
-	 * @return
+	 * Permet de récupérer le nombre de programmes installés par version sur tous les PC du parc.
+	 * @param program, le programme sur lequel effectuer les statistiques
+	 * @param captureTime, la capture sur laquelle effectuer les statistiques
+	 * @return les informations nécessaires à la construction du graphique correspondant
 	 */
 	public TreeMap<String, Integer> nbProgramsInstalledByVersion(String program, String captureTime) {
 		TreeMap<String, Integer> map = new TreeMap<>();
@@ -382,9 +396,12 @@ public class Database {
 	}
 
 	/**
-	 * @param max
-	 * @param captureTime
-	 * @return
+	 * Permet de récupérer les programmes les plus installés et le nombre d'occurences de ces programmes dans
+	 * le parc à un moment donné.
+	 *
+	 * @param max, le nombre de programmes maximal à retourner
+	 * @param captureTime, la capture sur laquelle effectuer les statistiques
+	 * @return les informations nécessaires à la construction du graphique correspondant
 	 */
 	public HashMap<String, Integer> mostFrequentlyInstalledPrograms(int max, String captureTime) {
 		HashMap<String, Integer> map = new HashMap<>();
@@ -405,8 +422,10 @@ public class Database {
 	}
 
 	/**
-	 * @param captureTime
-	 * @return
+	 * Permet de récupérer le nom de tous les programmes présents dans la base de données à un moment donné.
+	 *
+	 * @param captureTime, la capture sélectionnée
+	 * @return la liste des noms des programmes
 	 */
 	public ArrayList<String> getProgramsName(String captureTime) {
 		ArrayList<String> programs = new ArrayList<>();
@@ -423,8 +442,8 @@ public class Database {
 		return programs;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Ferme la connection à la base de données.
 	 *
 	 * @see java.lang.Object#finalize()
 	 */
