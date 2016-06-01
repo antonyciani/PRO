@@ -2,6 +2,7 @@ package monitor.view;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -119,7 +120,7 @@ public class ProgramStatisticsController {
 		numberOfInstalledProgramsByVersion.getData().clear();
 
 		//Récupération des données dans la base de donnée
-		HashMap<String, Integer> map = database.nbProgramsInstalledByVersion(currentProgram,
+		TreeMap<String, Integer> map = database.nbProgramsInstalledByVersion(currentProgram,
 				serverApp.getCurentDateView().get());
 		XYChart.Series<String, Integer> series = new XYChart.Series<>();
 		series.setName("Versions");

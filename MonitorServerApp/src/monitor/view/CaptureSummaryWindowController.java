@@ -177,7 +177,7 @@ public class CaptureSummaryWindowController {
 	 * de stockage totale du parc informatique.
 	 *
 	 */
-	private void showAverageStorageLoadRateStatistics() {
+	public void showAverageStorageLoadRateStatistics() {
 		lineChart.getData().clear();
 
 		//Récupération des données dans la base de donnée

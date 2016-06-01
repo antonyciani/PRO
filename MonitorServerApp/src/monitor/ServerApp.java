@@ -12,6 +12,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
@@ -83,7 +85,13 @@ public class ServerApp extends Application {
 
         } catch (IOException ex) {
             System.out.println("app.properties couldn't be loaded, please check it is present in the same folder as the application");
-            System.exit(1);
+            Alert errorLauchingApp = new Alert(AlertType.ERROR);
+            errorLauchingApp.setTitle("Error loading application");
+            errorLauchingApp.setHeaderText("app.properties file couldn't be loaded!");
+            errorLauchingApp.setContentText("Please check it is present in the same folder as the application!");
+            errorLauchingApp.showAndWait();
+            
+            System.exit(0);
         }
 
         //Instanciation des différents objets utilisés par l'application

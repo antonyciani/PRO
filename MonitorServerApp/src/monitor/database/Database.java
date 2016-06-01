@@ -224,7 +224,7 @@ public class Database {
 		ArrayList<String> captures = new ArrayList<>();
 		try {
 			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery("SELECT DISTINCT CaptureTime FROM machineState ORDER BY captureTime");
+			ResultSet result = statement.executeQuery("SELECT DISTINCT CaptureTime FROM machineState ORDER BY captureTime DESC");
 			while (result.next()) {
 				captures.add(result.getString(1));
 			}
@@ -364,8 +364,8 @@ public class Database {
 	 * @param captureTime
 	 * @return
 	 */
-	public HashMap<String, Integer> nbProgramsInstalledByVersion(String program, String captureTime) {
-		HashMap<String, Integer> map = new HashMap<>();
+	public TreeMap<String, Integer> nbProgramsInstalledByVersion(String program, String captureTime) {
+		TreeMap<String, Integer> map = new TreeMap<>();
 		try {
 			Statement statement = connection.createStatement();
 			ResultSet result = statement

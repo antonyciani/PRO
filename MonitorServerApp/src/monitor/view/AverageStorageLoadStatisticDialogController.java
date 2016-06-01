@@ -41,7 +41,7 @@ public class AverageStorageLoadStatisticDialogController {
 	private void initialize() {}
 
 	/**
-	 * Permet d'initialiser le controleur et génère le graphique.
+	 * Permet d'initialiser le contrôleur et génère le graphique.
 	 *
 	 * @param serverApp, en référence à l'application principale, permet d'en utilisé ses méthodes
 	 */

@@ -52,7 +52,7 @@ public class RootLayoutController {
 	@FXML
 	public void handleAbout() {
 		Alert about = new Alert(AlertType.INFORMATION);
-		about.setTitle("Information");
+		about.setTitle("About");
 		about.setHeaderText("SystemInfoVisualizer");
 		about.setContentText("This program allows you to perform the monitoring of your Windows machines in your IT infrastructure.\n"
 				+ "Authors:\n\n\tSTEINER Lucie,\n\tZHARKOVA Anastasia,\n\tCIANI Antony,\n\tSELIMI Dardan,\n\tROHRER Michaël");
