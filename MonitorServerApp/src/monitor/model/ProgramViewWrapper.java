@@ -4,6 +4,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
+ * Cette classe permet d'envelopper les informations relatives aux programmes dans des objets
+ * observables. Ces objets permettent de notifier automatiquement la vue correspondante
+ * si un camp venait à changer.
+ * 
  * @author CIANI Antony
  *
  */

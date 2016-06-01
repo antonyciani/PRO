@@ -75,10 +75,9 @@ public class AdvancedFilters {
 			//le pc n'est pas sélectionné si le taux d'occupation de son disque dure est plus petit que hddhddOcupRate
 			if (!(hddOcupRate == null || hddOcupRate.isEmpty())) {
 
-				double ocupRate = (100 / pc.getHdd().getTotalSize())
-						* (pc.getHdd().getTotalSize() - pc.getHdd().getFreeSize());
+				double ocupRate = (pc.getHdd().getTotalSize() - pc.getHdd().getFreeSize()) / pc.getHdd().getTotalSize();
 
-				if (ocupRate < Integer.valueOf(hddOcupRate)) {
+				if (ocupRate < Double.valueOf(hddOcupRate)) {
 					return false;
 				}
 			}

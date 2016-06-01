@@ -3,6 +3,8 @@ package monitor.model;
 import java.io.Serializable;
 
 /**
+ * Cette classe permet de stocker les informations relatives au CPU.
+ *
  * @author CIANI Antony
  *
  */
@@ -14,10 +16,12 @@ public class CPUInfo implements Serializable {
 	private int numbCore;
 
 	/**
-	 * @param constructor
-	 * @param model
-	 * @param frequency
-	 * @param numbCore
+	 * Constructeur, construit l'objet à partir des infos relatives au CPU
+	 *
+	 * @param constructor, le nom du fabriquant
+	 * @param model, le modèle
+	 * @param frequency, la fréquence
+	 * @param numbCore, le nombre de coeurs
 	 */
 	public CPUInfo(String constructor, String model, double frequency, int numbCore) {
 		this.constructor = constructor;
@@ -27,31 +31,30 @@ public class CPUInfo implements Serializable {
 	}
 
 	/**
-	 * @return
+	 * @return le nom du fabriquant du CPU
 	 */
 	public String getConstructor() {
 		return constructor;
 	}
 
 	/**
-	 * @return
+	 * @return le modèle du CPU
 	 */
 	public String getModel() {
 		return model;
 	}
 
 	/**
-	 * @return
+	 * @return la fréquence du CPU
 	 */
 	public double getFrequency() {
 		return frequency;
 	}
 
 	/**
-	 * @return
+	 * @return le nombre de coeur du CPU
 	 */
 	public int getNbCore() {
 		return numbCore;
 	}
-
 }

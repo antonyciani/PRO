@@ -86,7 +86,7 @@ public class ServerApp extends Application {
             System.exit(1);
         }
 
-        //Instenciation des différents objets utilisés par l'application
+        //Instanciation des différents objets utilisés par l'application
 		filters = new AdvancedFilters(pcData);
 		currentDateView = new SimpleStringProperty("");
 		database = new Database(dbAddress, dbUsername, dbPassword);

@@ -10,6 +10,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 /**
+ * Cette classe permet d'envelopper les informations relatives au PC dans des objets
+ * observables. Ces objets permettent de notifier automatiquement la vue correspondante
+ * si un champ venait à changer.
+ * 
  * @author CIANI Antony
  *
  */

@@ -4,6 +4,10 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 /**
+ * Cette classe permet d'envelopper les informations relatives au disque dur dans des objets
+ * observables. Ces objets permettent de notifier automatiquement la vue correspondante si un
+ * champ venait à changer.
+ * 
  * @author CIANI Antony
  *
  */

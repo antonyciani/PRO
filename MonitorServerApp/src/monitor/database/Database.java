@@ -224,7 +224,7 @@ public class Database {
 		ArrayList<String> captures = new ArrayList<>();
 		try {
 			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery("SELECT DISTINCT CaptureTime FROM machineState");
+			ResultSet result = statement.executeQuery("SELECT DISTINCT CaptureTime FROM machineState ORDER BY captureTime");
 			while (result.next()) {
 				captures.add(result.getString(1));
 			}

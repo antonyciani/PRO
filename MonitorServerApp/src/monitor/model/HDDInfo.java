@@ -3,6 +3,8 @@ package monitor.model;
 import java.io.Serializable;
 
 /**
+ * Cette classe permet de stocker les informations relatives au disque dur.
+ * 
  * @author CIANI Antony
  *
  */

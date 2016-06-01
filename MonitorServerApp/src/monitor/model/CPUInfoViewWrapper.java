@@ -8,6 +8,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
+ * Cette classe permet d'envelopper les informations relatives au CPU dans des objets
+ * observables. Ces objets permettent de notifier automatiquement la vue correspondante
+ * si un champ venait à changer.
+ *
  * @author CIANI Antony
  *
  */
@@ -18,10 +22,12 @@ public class CPUInfoViewWrapper {
 	private IntegerProperty nbCores;
 
 	/**
-	 * @param constructor
-	 * @param model
-	 * @param frequency
-	 * @param nbCores
+	 * Constructeur, construit l'objet à partir des infos relatives au CPU
+	 *
+	 * @param constructor, le nom du fabriquant
+	 * @param model, le modèle
+	 * @param frequency, la fréquence
+	 * @param numbCore, le nombre de coeurs
 	 */
 	public CPUInfoViewWrapper(String constructor, String model, double frequency, int nbCores) {
 		this.constructor = new SimpleStringProperty(constructor);
@@ -31,7 +37,9 @@ public class CPUInfoViewWrapper {
 	}
 
 	/**
-	 * @param cpu
+	 * Constructeur, construit l'objet à partir de l'objet CPUInfo
+	 *
+	 * @param cpu, l'objet contenant les infos relative au CPU
 	 */
 	public CPUInfoViewWrapper(CPUInfo cpu) {
 		this.constructor = new SimpleStringProperty(cpu.getConstructor());
@@ -41,56 +49,57 @@ public class CPUInfoViewWrapper {
 	}
 
 	/**
-	 * @return
+	 * @return le nom du fabriquant
 	 */
 	public String getConstructor() {
 		return constructor.get();
 	}
 
 	/**
-	 * @return
+	 * @return le nom du fabriquant sous forme d'objet observable
 	 */
 	public StringProperty constructorProperty() {
 		return constructor;
 	}
 
 	/**
-	 * @return
+	 * @return le modèle du CPU
 	 */
 	public String getModel() {
 		return model.get();
 	}
 
 	/**
-	 * @return
+	 * @return le modèle du CPU sous forme d'objet observable
+	 *
 	 */
 	public StringProperty modelProperty() {
 		return model;
 	}
 
 	/**
-	 * @return
+	 * @return la fréquence du CPU
 	 */
 	public double getFrequency() {
 		return frequency.get();
 	}
 
 	/**
-	 * @return
+	 * @return la fréquence du CPU sous forme d'objet observable
 	 */
 	public DoubleProperty frequencyProperty() {
 		return frequency;
 	}
 
 	/**
-	 * @return
+	 * @return le nombre de coeur du CPU
 	 */
 	public int getNbCore() {
 		return nbCores.get();
 	}
 
 	/**
-	 * @return
+	 * @return le nombre de coeur du CPU sous forme d'objet observable
 	 */
 	public IntegerProperty nbCoreProperty() {
 		return nbCores;

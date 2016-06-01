@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 
 /**
+ * Cette classe permet de stocker les informations relatives au PC.
+ * 
  * @author CIANI Antony
  *
  */
