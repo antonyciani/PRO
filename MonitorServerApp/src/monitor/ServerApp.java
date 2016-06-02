@@ -70,7 +70,7 @@ public class ServerApp extends Application {
         //Récupération des informations de configuration à partir du fichier de configuration
         try {
         	//Chargement du fichier de configuration
-            BufferedReader br = new BufferedReader(new FileReader(this.confFilename));
+            BufferedReader br = new BufferedReader(new FileReader(ServerApp.confFilename));
             prop.load(br);
 
             //Récupération des informations de configuration

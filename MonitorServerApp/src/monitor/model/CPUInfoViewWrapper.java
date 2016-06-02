@@ -27,7 +27,7 @@ public class CPUInfoViewWrapper {
 	 * @param constructor, le nom du fabriquant
 	 * @param model, le modèle
 	 * @param frequency, la fréquence
-	 * @param numbCore, le nombre de coeurs
+	 * @param nbCores, le nombre de coeurs
 	 */
 	public CPUInfoViewWrapper(String constructor, String model, double frequency, int nbCores) {
 		this.constructor = new SimpleStringProperty(constructor);

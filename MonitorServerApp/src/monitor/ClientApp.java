@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import communication.SystemInfoRetrieverClient;
-import communication.SystemInfoRetrieverProtocol;
 
 /**
  * Cette classe est le programme principal de l'application côté client.

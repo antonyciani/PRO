@@ -53,9 +53,9 @@ public class SystemInfoRetrieverClient {
 	 * Constructeur, prends en paramètre le port udp sur lequel écouter 
 	 * la requête UDP du serveur et le port tcp sur lequel se connecter au serveur
 	 * 
-	 * @param udpPort
-	 * @param tcpPort
-	 * @param multicastGroupAddress 
+	 * @param udpPort, le port udp utilisé par l'application
+	 * @param tcpPort, le port tcp utilisé par l'application
+	 * @param multicastGroupAddress, l'adresse multicast utilisée par l'application
 	 * @throws SocketException
 	 */
 	public SystemInfoRetrieverClient(int udpPort, int tcpPort, String multicastGroupAddress) throws SocketException {
@@ -195,8 +195,8 @@ public class SystemInfoRetrieverClient {
 	 * Permet la connexion TCP au serveur 
 	 * Prends en paramètre l'adresse IP et le port du serveur
 	 * 
-	 * @param serverAddress
-	 * @param serverPort
+	 * @param serverAddress, l'adresse IP du serveur
+	 * @param serverPort, le port du serveur
 	 */
 	public void connect(InetAddress serverAddress, int serverPort) {
 
