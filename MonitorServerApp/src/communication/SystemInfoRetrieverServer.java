@@ -255,7 +255,7 @@ public class SystemInfoRetrieverServer {
 
 					// Réception des données chiffrées
 					tmpIn = clientSocket.getInputStream();
-					while (tmpIn.read(encryptedPC) != -1) {
+					while (!isInfoReceived && tmpIn.read(encryptedPC) != -1) {
 
 						isInfoReceived = true;
 						LOG.info("READING OBJECT");
