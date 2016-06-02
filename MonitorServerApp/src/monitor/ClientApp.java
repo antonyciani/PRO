@@ -48,7 +48,7 @@ Properties prop = new Properties();
 
     			// Le client est toujours en écoute
     			while (true) {
-    				System.out.println("Listening to server");
+    				System.out.println("Waiting for server request to retrieve information");
     				sirc.startListening();
     			}
     		} catch (IOException e) {

@@ -82,6 +82,8 @@ public class TestDataGenerator {
 		String dbPassword = "";
 		Properties prop = new Properties();
 
+		System.out.println("Generating data...");
+		
 		//Récupération des informations de configuration à partir du fichier de configuration
         try {
 
@@ -151,5 +153,8 @@ public class TestDataGenerator {
 			// Enregistrement des PC dans la DB
 			db.storePCs(parc);
 		}
+		
+		System.out.println("Finished generating data...");
+		
 	}
 }
